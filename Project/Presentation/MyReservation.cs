@@ -9,7 +9,6 @@ public class MyReservation
         if (reservations.Count == 0)
         {
             Console.WriteLine("You have no reservations.");
-            
             return;
         }
 

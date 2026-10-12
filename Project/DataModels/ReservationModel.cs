@@ -19,7 +19,7 @@ public class ReservationModel : IComparable<ReservationModel>
         TimeSlot = timeSlot;
         Date = date;
         PartySize = partySize;
-        User = user;
+        User = user;    
         Table = table;
     }
     public int CompareTo(ReservationModel? other)
