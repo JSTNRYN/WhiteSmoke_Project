@@ -8,11 +8,6 @@ public class ReservationAccess
     private static string _reservation = "Reservation";
 
 
-    public static ReservationModel? GetById(int User)
-    {
-        string query = $"SELECT * FROM {_reservation} WHERE user = @User";
-        return _connection.QueryFirst<ReservationModel>(query, new { User = User });
-    }
     public static List<ReservationModel> GetWithUserID(int User)
     {
         string query = $"SELECT * FROM Reservation WHERE User = @User";
