@@ -41,46 +41,45 @@ Opening hours
 ");
     }
     public static void Start()
+{
+    while (true)
     {
-        Console.WriteLine("Enter 1 to login");
-        Console.WriteLine("Enter 2 to sign up");
-        Console.WriteLine("Enter 3 to do something else in the future");
-        Console.WriteLine("Enter 4 to do make a reservation");
-        Console.WriteLine("Enter 5 to do show my reservations");
-        
+        bool loggedIn = AccountsLogic.LoggedIn();
+
+        if (loggedIn)
+        {
+            Console.WriteLine("Enter 1 to make a reservation");
+            Console.WriteLine("Enter 2 to show my reservations");
+        }
+        else
+        {
+            Console.WriteLine("Enter 1 to login");
+            Console.WriteLine("Enter 2 to sign up");
+        }
+
 
         string input = Console.ReadLine();
-        if (input == "1")
+
+        if (input == "1" && !loggedIn)
         {
             UserLogin.Start();
         }
-        else if (input == "2")
+        else if (input == "2" && !loggedIn)
         {
             // UserSignUp.Start();
         }
-        else if (input == "3")
+        else if (input == "1" && loggedIn)
         {
-            Console.WriteLine("This feature is not yet implemented");
+            // MakeReservation.MakeReservations();
         }
-        else if (input == "4")
+        else if (input == "2" && loggedIn)
         {
-            // !!! dit is nog niet officieel naam dit is gewoon als opvulling moet nog veranderd worden !!!
-            //MakeReservation.MakeReservations();
+            // MyReservation.ShowReservations();
         }
-
-
-
-        else if (input == "5"){
-
-            //MyReservation.ShowReservations();
-        }
-
-
         else
         {
             Console.WriteLine("Invalid input");
-            Start();
         }
-
     }
+}
 }

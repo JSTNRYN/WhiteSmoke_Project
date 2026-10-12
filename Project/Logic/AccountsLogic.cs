@@ -1,6 +1,8 @@
 ﻿
 
 //This class is not static so later on we can use inheritance and interfaces
+using System.Security.Cryptography.X509Certificates;
+
 public class AccountsLogic
 {
 
@@ -9,12 +11,11 @@ public class AccountsLogic
     //private set, so this can only be set by the class itself
     public static AccountModel? CurrentAccount { get; private set; }
     private AccountsAccess _access = new();
+    public static bool LoggedIn()
+        {
+            return CurrentAccount != null;
+        }
 
-    public AccountsLogic()
-    {
-        // Could do something here
-
-    }
 
     public AccountModel CheckLogin(string email, string password)
     {
