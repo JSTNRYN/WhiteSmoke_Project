@@ -5,6 +5,12 @@ public class MyReservation
     {
         List<ReservationModel> reservations = ReservationLogic.GetWithUserID(User);
 
+        if (reservations.Count == 0)
+        {
+            Console.WriteLine("You have no reservations.");
+            return;
+        }
+
         foreach (ReservationModel reservation in reservations)
         {
             Console.WriteLine($"Date: {reservation.Date}");
