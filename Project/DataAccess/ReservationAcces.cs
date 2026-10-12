@@ -7,9 +7,15 @@ public class ReservationAccess
 
     public static List<ReservationModel> GetWithUserID(int User)
     {
-        string query = $"SELECT * FROM Reservation WHERE User = @User";
-        List<ReservationModel> MyReservation = _connection.Query<ReservationModel>(query, new { User = User }).ToList();
+        string query = @"
+        SELECT Reservation.*, User.FirstName, User.LastName
+        FROM Reservation
+        JOIN User ON Reservation.User = User.ID
+        WHERE Reservation.User = @User";
+        List<ReservationModel> MyReservation =
+        _connection.Query<ReservationModel>(query, new { User = User }).ToList();
+
         return MyReservation;
-        
     }
+    
 }
