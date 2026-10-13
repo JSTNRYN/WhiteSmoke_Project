@@ -23,9 +23,6 @@ static class UserLogin
         else
         {
             ShowError("No account found with that email and password combination.");
-            Console.WriteLine("Press Enter to try again.");
-            Console.ReadLine();
-            
             Start();
         }
     }

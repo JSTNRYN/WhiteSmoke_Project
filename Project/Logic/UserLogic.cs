@@ -10,7 +10,8 @@
     public UserModel CheckLogin(string email, string password)
     {
         UserModel acc = _access.GetByEmail(email);
-        if (acc != null && acc.Password == password)
+    
+        if (acc != null && BCrypt.Net.BCrypt.Verify(password, acc.Password))
         {
             CurrentAccount = acc;
             return acc;
@@ -18,15 +19,31 @@
         return null;
     }
 
-    public UserModel CreateAccount(string email, string password, string firstname, string lastname, string phoneNumber, string role="Customer")
+    public void CreateAccount(string firstname, string lastname, string email, string phone, string password, string role = "Customer")
     {
-        UserModel acc = new UserModel(0, email, password, firstname, lastname, phoneNumber, role);
+        string hashedPassword = HashPassword(password);
+
+        UserModel acc = new UserModel(0, email, hashedPassword, firstname, lastname, phone, role);
         _access.Write(acc);
-        return acc;
+    }
+
+    private string HashPassword(string password)
+    {
+        return BCrypt.Net.BCrypt.HashPassword(password);
     }
 
     public static bool ValidateEmail(string email)
     {
         return email.Contains("@") && email.Contains(".");
+    }
+
+    public static bool ValidateName(string name)
+    {
+        return (name.Length > 1);
+    }
+
+    public static bool IsLoggedIn()
+    {
+        return CurrentAccount != null;
     }
 }

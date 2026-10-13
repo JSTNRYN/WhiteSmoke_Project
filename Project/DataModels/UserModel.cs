@@ -13,6 +13,10 @@
     public string PhoneNumber { get; set; }
     
     public string Role { get; set; }
+    
+    public UserModel()
+    {
+    }
 
     public UserModel(Int64 id, string email, string password, string firstName, string lastName, string phoneNumber, string role)
     {

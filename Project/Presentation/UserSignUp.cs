@@ -10,11 +10,20 @@ public class UserSignUp
         Console.Clear();
         Console.WriteLine("Account Sign up\n");
 
-        Console.Write("Please enter your first name: ");
-        string firstName = Console.ReadLine();
         
-        Console.Write("Please enter your last name: ");
-        string lastName = Console.ReadLine();
+        string firstName = AskName();
+        while (!UserLogic.ValidateName(firstName))
+        {
+            ShowError("Please enter a name with at least 2 characters.");
+            firstName = AskName();
+        }
+        
+        string lastName = AskName();
+        while (!UserLogic.ValidateName(lastName))
+        {
+            ShowError("Please enter a name with at least 2 characters.");
+            lastName = AskName();
+        }
         
         string email = AskEmail();
         while (!UserLogic.ValidateEmail(email))
@@ -28,13 +37,19 @@ public class UserSignUp
         
         Console.Write("Please enter your password: ");
         string password = Console.ReadLine();
-        UserModel acc = _userLogic.CreateAccount(email, password, firstName, lastName, phoneNumber);
+        _userLogic.CreateAccount(firstName, lastName, email, phoneNumber, password);
         Menu.Start();
     }
 
-    private static string AskEmail()
+    private static string? AskEmail()
     {
         Console.Write("Please enter your e-mail: ");
+        return Console.ReadLine();
+    }
+    
+    private static string? AskName()
+    {
+        Console.Write("Please enter your first name: ");
         return Console.ReadLine();
     }
 
@@ -44,4 +59,6 @@ public class UserSignUp
         Console.WriteLine($"\n{message}");
         Console.ResetColor();
     }
+    
+    
 }
