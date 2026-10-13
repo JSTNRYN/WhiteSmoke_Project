@@ -1,3 +1,5 @@
+using Project.Presentation;
+
 static class Menu
 {
 
@@ -44,7 +46,7 @@ Opening hours
 {
     while (true)
     {
-        bool loggedIn = AccountsLogic.LoggedIn();
+        bool loggedIn = UserLogic.IsLoggedIn();
 
         if (loggedIn)
         {
@@ -66,11 +68,11 @@ Opening hours
         }
         else if (input == "2" && !loggedIn)
         {
-            // UserSignUp.Start();
+            UserSignUp.Start();
         }
         else if (input == "1" && loggedIn)
         {
-            // MakeReservation.MakeReservations();
+            MakeReservation.Start();
         }
         else if (input == "2" && loggedIn)
         {
