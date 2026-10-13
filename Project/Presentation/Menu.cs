@@ -1,3 +1,5 @@
+using Project.Presentation;
+
 static class Menu
 {
 
@@ -53,7 +55,7 @@ Opening hours
         }
         else if (input == "2")
         {
-            // UserSignUp.Start();
+            UserSignUp.Start();
         }
         else if (input == "3")
         {
