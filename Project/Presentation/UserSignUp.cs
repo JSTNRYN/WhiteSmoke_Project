@@ -11,18 +11,18 @@ public class UserSignUp
         Console.WriteLine("Account Sign up\n");
 
         
-        string firstName = AskName();
+        string firstName = AskFirstName();
         while (!UserLogic.ValidateName(firstName))
         {
             ShowError("Please enter a name with at least 2 characters.");
-            firstName = AskName();
+            firstName = AskFirstName();
         }
         
-        string lastName = AskName();
+        string lastName = AskLastName();
         while (!UserLogic.ValidateName(lastName))
         {
             ShowError("Please enter a name with at least 2 characters.");
-            lastName = AskName();
+            lastName = AskLastName();
         }
         
         string email = AskEmail();
@@ -47,9 +47,15 @@ public class UserSignUp
         return Console.ReadLine();
     }
     
-    private static string? AskName()
+    private static string? AskFirstName()
     {
         Console.Write("Please enter your first name: ");
+        return Console.ReadLine();
+    }
+
+    private static string? AskLastName()
+    {
+        Console.Write("Please enter your last name: ");
         return Console.ReadLine();
     }
 
