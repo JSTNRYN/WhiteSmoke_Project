@@ -5,7 +5,7 @@ public class TableAccess
 {
     private static SqliteConnection _connection = new SqliteConnection($"Data Source=DataSources/project.db");
 
-    private static string _table = "Table";
+    private static string _table = "`Table`";
 
 
     public static TableModel? GetById(int id)
@@ -17,7 +17,7 @@ public class TableAccess
     public static List<TableModel> GetWithMinimumCapacity(int capacity)
     {
         string query = $"SELECT * FROM {_table} WHERE capacity >= @capacity";
-        List<TableModel> availableTables = _connection.Query<TableModel>(query, capacity).ToList();
+        List<TableModel> availableTables = _connection.Query<TableModel>(query, new { capacity }).ToList();
         return availableTables;
     }
 }

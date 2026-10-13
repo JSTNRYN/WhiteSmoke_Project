@@ -1,9 +1,10 @@
 public class TableModel
 {
-    public int Id { get; private set; }
+    public int Id { get; set; }
 
-    public int Capacity { get; private set; }
+    public int Capacity { get; set; }
 
+    public TableModel() { }
 
     public TableModel(int id, int capacity)
     {

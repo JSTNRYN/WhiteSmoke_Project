@@ -1,5 +1,6 @@
 public static class MakeReservation
 {
+
     public static void Start()
     {
         Console.WriteLine("Enter the date for your reservation (YYYY-MM-DD):");
@@ -31,6 +32,24 @@ public static class MakeReservation
             Console.WriteLine("Invalid number of guests. Please enter a positive integer:");
             partySizeInput = Console.ReadLine();
         }
+
+        Console.WriteLine($"Available tables:");
+        List<TableModel> availableTables = ReservationLogic.GetUniqueTables(partySize);
+        foreach (var table in availableTables)
+        {
+            Console.WriteLine($"Table Number: {table.Id}, Capacity: {table.Capacity}");
+        }
+
+        Console.WriteLine("Enter the Number of the table you want to reserve:");
+        string tableNumberInput = Console.ReadLine();
+        int tableNumber;
+        while (!int.TryParse(tableNumberInput, out tableNumber) || !availableTables.Any(t => t.Id == tableNumber))
+        {
+            Console.WriteLine("Invalid table number. Please enter a valid table number from the list above:");
+            tableNumberInput = Console.ReadLine();
+        }
+    
+
 
         Console.WriteLine($"Reservation made for {partySize} guests on {date.ToShortDateString()} at {time}.");
     }
