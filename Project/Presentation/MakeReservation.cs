@@ -1,10 +1,11 @@
-static class MakeReservation
+public static class MakeReservation
 {
     public static void Start()
     {
         Console.WriteLine("Enter the date for your reservation (YYYY-MM-DD):");
         string dateInput = Console.ReadLine();
         DateTime date;
+
         while (!DateTime.TryParse(dateInput, out date))
         {
             Console.WriteLine("Invalid date format. Please enter the date in YYYY-MM-DD format:");
@@ -14,6 +15,7 @@ static class MakeReservation
         Console.WriteLine("Enter the time for your reservation (HH:MM):");
         string timeInput = Console.ReadLine();
         TimeSpan time;
+
         while (!TimeSpan.TryParse(timeInput, out time))
         {
             Console.WriteLine("Invalid time format. Please enter the time in HH:MM format:");
@@ -23,12 +25,13 @@ static class MakeReservation
         Console.WriteLine("Enter the number of guests:");
         string partySizeInput = Console.ReadLine();
         int partySize;
+
         while (!int.TryParse(partySizeInput, out partySize) || partySize <= 0)
         {
             Console.WriteLine("Invalid number of guests. Please enter a positive integer:");
             partySizeInput = Console.ReadLine();
         }
 
-        Console.WriteLine($"Reservation made for {partySize} guests on {date.ToShortDateString()} at {time}.");  
+        Console.WriteLine($"Reservation made for {partySize} guests on {date.ToShortDateString()} at {time}.");
     }
 }

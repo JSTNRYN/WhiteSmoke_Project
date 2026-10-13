@@ -10,6 +10,15 @@ public static class MyReservation
         if (reservations.Count == 0)
         {
             Console.WriteLine("You have no reservations.");
+            Console.WriteLine("Would you like to make a reservation? (y/n)");
+
+            string choice = Console.ReadLine()?.ToLower();
+
+            if (choice == "y")
+            {
+                MakeReservation.Start();
+            }
+
             return;
         }
 
