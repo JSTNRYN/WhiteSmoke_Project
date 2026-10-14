@@ -22,11 +22,11 @@ public static class MyReservation
 
         foreach (ReservationModel reservation in reservations)
         {
-            Console.WriteLine($"Name: {reservation.FirstName} {reservation.LastName}");
+            Console.WriteLine($"Name: {UserLogic.CurrentAccount.FirstName} {UserLogic.CurrentAccount.LastName}");
             Console.WriteLine($"Date: {reservation.Date:dd-MM-yyyy}");
             Console.WriteLine($"Time: {reservation.TimeSlot}");
             Console.WriteLine($"Guests: {reservation.PartySize}");
-            Console.WriteLine($"Table: {reservation.Table}");
+            // Console.WriteLine($"Table: {reservation.Table}");
             Console.WriteLine("--------------------");
         }
     }

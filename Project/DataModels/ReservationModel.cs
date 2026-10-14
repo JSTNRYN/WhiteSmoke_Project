@@ -9,7 +9,7 @@ public class ReservationModel : IComparable<ReservationModel>
     public int PartySize { get; set; }
     public int UserId { get; protected set;}
     public int Table { get; private set; }
-
+    public ReservationModel() { }
 
 
     public ReservationModel(int id, string timeSlot, DateTime date, int partySize, int userid, int table)
@@ -20,6 +20,7 @@ public class ReservationModel : IComparable<ReservationModel>
         PartySize = partySize;
         UserId = userid;    
         Table = table;
+        
     }
     public int CompareTo(ReservationModel? other)
     {

@@ -8,14 +8,13 @@ public class MyReservationAccess
     public static List<ReservationModel> GetWithUserID(long UserId)
     {
         string query = @"
-        SELECT Reservation.*
+        SELECT *
         FROM Reservation
-        JOIN User ON Reservation.UserID = User.ID
-        WHERE Reservation.UserID = @UserId";
+        WHERE UserID = @UserId";
+        
         List<ReservationModel> MyReservation =
-        _connection.Query<ReservationModel>(query, new { UserId }).ToList();
+            _connection.Query<ReservationModel>(query, new { UserId }).ToList();
 
         return MyReservation;
     }
-    
 }
