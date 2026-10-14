@@ -43,6 +43,8 @@ Opening hours
 ");
     }
     public static void Start()
+{
+    while (true)
     {
         if (UserLogic.IsLoggedIn())
         {
@@ -61,23 +63,27 @@ Opening hours
         Console.WriteLine("Enter 3 to do something else in the future");
 
         string input = Console.ReadLine();
-        if (input == "1")
+
+        if (input == "1" && !loggedIn)
         {
             UserLogin.Start();
         }
-        else if (input == "2")
+        else if (input == "2" && !loggedIn)
         {
             UserSignUp.Start();
         }
-        else if (input == "3")
+        else if (input == "1" && loggedIn)
         {
-            Console.WriteLine("This feature is not yet implemented");
+            // MakeReservation.MakeReservations();
+        }
+        else if (input == "2" && loggedIn)
+        {
+            // MyReservation.ShowReservations();
         }
         else
         {
             Console.WriteLine("Invalid input");
-            Start();
         }
-
     }
+}
 }
