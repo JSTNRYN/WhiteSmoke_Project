@@ -1,3 +1,5 @@
+using Project.Presentation;
+
 static class Menu
 {
 
@@ -44,19 +46,21 @@ Opening hours
 {
     while (true)
     {
-        bool loggedIn = AccountsLogic.LoggedIn();
-
-        if (loggedIn)
+        if (UserLogic.IsLoggedIn())
         {
-            Console.WriteLine("Enter 1 to make a reservation");
-            Console.WriteLine("Enter 2 to show my reservations");
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"You are logged in as: {UserLogic.CurrentAccount.FirstName} {UserLogic.CurrentAccount.LastName}");
+            Console.ResetColor();
         }
         else
         {
-            Console.WriteLine("Enter 1 to login");
-            Console.WriteLine("Enter 2 to sign up");
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"You are currently not logged in!");
+            Console.ResetColor();
         }
-
+        Console.WriteLine("Enter 1 to login");
+        Console.WriteLine("Enter 2 to sign up");
+        Console.WriteLine("Enter 3 to do something else in the future");
 
         string input = Console.ReadLine();
 
@@ -66,7 +70,7 @@ Opening hours
         }
         else if (input == "2" && !loggedIn)
         {
-            // UserSignUp.Start();
+            UserSignUp.Start();
         }
         else if (input == "1" && loggedIn)
         {
