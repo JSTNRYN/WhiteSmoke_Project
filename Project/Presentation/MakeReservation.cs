@@ -6,7 +6,7 @@ public static class MakeReservation
         Console.WriteLine("Enter the date for your reservation (YYYY-MM-DD):");
         string dateInput = Console.ReadLine();
         DateTime date;
-
+        //Tryparse converts the string to a date and returns true if it is successful, otherwise it returns false and asks the user to enter a valid date.
         while (!DateTime.TryParse(dateInput, out date))
         {
             Console.WriteLine("Invalid date format. Please enter the date in YYYY-MM-DD format:");
@@ -26,7 +26,7 @@ public static class MakeReservation
         Console.WriteLine("Enter the number of guests:");
         string partySizeInput = Console.ReadLine();
         int partySize;
-
+        //Tryparse converts the string to an integer and returns true if it is successful, otherwise it returns false and asks the user to enter a valid number of guests.
         while (!int.TryParse(partySizeInput, out partySize) || partySize <= 0)
         {
             Console.WriteLine("Invalid number of guests. Please enter a positive integer:");
@@ -50,7 +50,7 @@ public static class MakeReservation
         }
     
 
-
+        //ToShortDateString() converts the date to a string in the format of YYYY-MM-DD instead of the default format of MM/DD/YYYY.
         Console.WriteLine($"Reservation made for {partySize} guests on {date.ToShortDateString()} at {time}.");
     }
 }
