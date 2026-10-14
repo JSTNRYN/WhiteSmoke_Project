@@ -5,7 +5,7 @@ public class MyReservationAccess
 {
     private static SqliteConnection _connection = new SqliteConnection($"Data Source=DataSources/project.db");
 
-    public static List<ReservationModel> GetWithUserID(int User)
+    public static List<ReservationModel> GetWithUserID(long UserId)
     {
         string query = @"
         SELECT Reservation.*, User.FirstName, User.LastName
@@ -13,7 +13,7 @@ public class MyReservationAccess
         JOIN User ON Reservation.User = User.ID
         WHERE Reservation.User = @User";
         List<ReservationModel> MyReservation =
-        _connection.Query<ReservationModel>(query, new { User = User }).ToList();
+        _connection.Query<ReservationModel>(query, new { User = UserId }).ToList();
 
         return MyReservation;
     }
