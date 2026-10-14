@@ -25,11 +25,18 @@ public class UserSignUp
             lastName = AskLastName();
         }
         
-        string email = AskEmail();
+        string email = AskEmail().ToLower();
         while (!UserLogic.ValidateEmail(email))
         {
-            ShowError("Invalid email format!");
-            email = AskEmail();
+            if (UserLogic.EmailExists(email))
+            {
+                ShowError("This email is already registered!");
+            }
+            else
+            {
+                ShowError("Invalid email format!");
+            }
+            email = AskEmail().ToLower();
         }
         
         Console.Write("Please enter your phone number: ");
