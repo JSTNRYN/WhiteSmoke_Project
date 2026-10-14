@@ -3,7 +3,7 @@ public class ReservationLogic
     public static List<ReservationModel> GetWithUserID(int User)
     {
         List<ReservationModel> reservations =
-            ReservationAccess.GetWithUserID(User);
+            MyReservationAccess.GetWithUserID(User);
 
         reservations.Sort();
 
