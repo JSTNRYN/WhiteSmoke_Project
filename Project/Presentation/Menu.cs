@@ -51,32 +51,35 @@ Opening hours
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($"You are logged in as: {UserLogic.CurrentAccount.FirstName} {UserLogic.CurrentAccount.LastName}");
             Console.ResetColor();
+            Console.WriteLine("Enter 1 to make a reservation");
+            Console.WriteLine("Enter 2 to view your reservations");
         }
         else
         {
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine($"You are currently not logged in!");
             Console.ResetColor();
+            Console.WriteLine("Enter 1 to login");
+            Console.WriteLine("Enter 2 to sign up");
         }
-        Console.WriteLine("Enter 1 to login");
-        Console.WriteLine("Enter 2 to sign up");
+        
         Console.WriteLine("Enter 3 to do something else in the future");
 
         string input = Console.ReadLine();
 
-        if (input == "1" && !loggedIn)
+        if (input == "1" && !UserLogic.IsLoggedIn())
         {
             UserLogin.Start();
         }
-        else if (input == "2" && !loggedIn)
+        else if (input == "2" && !UserLogic.IsLoggedIn())
         {
             UserSignUp.Start();
         }
-        else if (input == "1" && loggedIn)
+        else if (input == "1" && UserLogic.IsLoggedIn())
         {
             // MakeReservation.MakeReservations();
         }
-        else if (input == "2" && loggedIn)
+        else if (input == "2" && UserLogic.IsLoggedIn())
         {
             // MyReservation.ShowReservations();
         }
