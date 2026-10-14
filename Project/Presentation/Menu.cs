@@ -91,7 +91,7 @@ Opening hours
             Console.ResetColor();
 
 
-            // MyReservation.ShowReservations();
+            MyReservation.ShowReservations(UserLogic.CurrentAccount!.Id);
         }
         else
         {

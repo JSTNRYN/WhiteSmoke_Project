@@ -1,9 +1,9 @@
 public class ReservationLogic
 {
-    public static List<ReservationModel> GetWithUserID(int User)
+    public static List<ReservationModel> GetWithUserID(long UserId)
     {
         List<ReservationModel> reservations =
-            MyReservationAccess.GetWithUserID(User);
+            MyReservationAccess.GetWithUserID(UserId);
 
         reservations.Sort();
 

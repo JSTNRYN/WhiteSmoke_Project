@@ -1,9 +1,9 @@
 public static class MyReservation
 {
-    public static void ShowReservations(int User)
+    public static void ShowReservations(long UserId)
     {
         List<ReservationModel> reservations =
-            ReservationLogic.GetWithUserID(User);
+            ReservationLogic.GetWithUserID(UserId);
 
         if (reservations.Count == 0)
         {
