@@ -9,7 +9,7 @@
 
     public UserModel CheckLogin(string email, string password)
     {
-        UserModel acc = _access.GetByEmail(email);
+        UserModel acc = UserAccess.GetByEmail(email);
     
         if (acc != null && BCrypt.Net.BCrypt.Verify(password, acc.Password))
         {
@@ -25,6 +25,7 @@
 
         UserModel acc = new UserModel(0, email, hashedPassword, firstname, lastname, phone, role);
         _access.Write(acc);
+        CurrentAccount = acc;
     }
 
     private string HashPassword(string password)
@@ -33,6 +34,16 @@
     }
 
     public static bool ValidateEmail(string email)
+    {
+        return IsValidEmailFormat(email) && !EmailExists(email);
+    }
+
+    public static bool EmailExists(string email)
+    {
+        return UserAccess.GetByEmail(email) != null;
+    }
+
+    public static bool IsValidEmailFormat(string email)
     {
         return email.Contains("@") && email.Contains(".");
     }

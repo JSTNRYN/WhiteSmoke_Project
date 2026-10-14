@@ -5,9 +5,9 @@ using Dapper;
 
 public class UserAccess
 {
-    private SqliteConnection _connection = new SqliteConnection($"Data Source=DataSources/project.db");
+    private static SqliteConnection _connection = new SqliteConnection($"Data Source=DataSources/project.db");
 
-    private string Table = "User";
+    private static string Table = "User";
 
     public void Write(UserModel account)
     {
@@ -17,7 +17,7 @@ public class UserAccess
         _connection.Close();
     }
 
-    public UserModel GetByEmail(string email)
+    public static UserModel GetByEmail(string email)
     {
         string sql = $"SELECT * FROM {Table} WHERE email = @Email";
         _connection.Open();
