@@ -46,36 +46,51 @@ Opening hours
 {
     while (true)
     {
-        bool loggedIn = UserLogic.IsLoggedIn();
-
-        if (loggedIn)
+        if (UserLogic.IsLoggedIn())
         {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"You are logged in as: {UserLogic.CurrentAccount.FirstName} {UserLogic.CurrentAccount.LastName}");
+            Console.ResetColor();
             Console.WriteLine("Enter 1 to make a reservation");
-            Console.WriteLine("Enter 2 to show my reservations");
+            Console.WriteLine("Enter 2 to view your reservations");
         }
         else
         {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"You are currently not logged in!");
+            Console.ResetColor();
             Console.WriteLine("Enter 1 to login");
             Console.WriteLine("Enter 2 to sign up");
         }
-
+        
+        Console.WriteLine("Enter 3 to do something else in the future");
 
         string input = Console.ReadLine();
 
-        if (input == "1" && !loggedIn)
+        if (input == "1" && !UserLogic.IsLoggedIn())
         {
             UserLogin.Start();
         }
-        else if (input == "2" && !loggedIn)
+        else if (input == "2" && !UserLogic.IsLoggedIn())
         {
             UserSignUp.Start();
         }
-        else if (input == "1" && loggedIn)
+        else if (input == "1" && UserLogic.IsLoggedIn())
         {
-            MakeReservation.Start();
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("Make reservation is nog niet geimplementeerd");
+            Console.ResetColor();
+
+            // MakeReservation.MakeReservations();
         }
-        else if (input == "2" && loggedIn)
+        else if (input == "2" && UserLogic.IsLoggedIn())
+        
         {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("view your reservations is nog niet geimplementeerd");
+            Console.ResetColor();
+
+
             // MyReservation.ShowReservations();
         }
         else
