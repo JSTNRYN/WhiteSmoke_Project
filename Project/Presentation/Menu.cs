@@ -77,11 +77,7 @@ Opening hours
         }
         else if (input == "1" && UserLogic.IsLoggedIn())
         {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("Make reservation is nog niet geimplementeerd");
-            Console.ResetColor();
-
-            // MakeReservation.MakeReservations();
+            MakeReservation.Start();
         }
         else if (input == "2" && UserLogic.IsLoggedIn())
         

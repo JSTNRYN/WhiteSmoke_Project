@@ -1,4 +1,4 @@
-public class ReservationLogic
+public class MyReservationLogic
 {
     public static List<ReservationModel> GetWithUserID(long UserId)
     {

@@ -1,27 +1,23 @@
 public class ReservationModel : IComparable<ReservationModel>
 {
-    public int Id { get; private set; }
-
+    public int Id { get; set; }
     public string TimeSlot { get; set; }
-
     public DateTime Date { get; set; }
-    
     public int PartySize { get; set; }
-    public int UserId { get; protected set;}
-    public int Table { get; private set; }
-    public ReservationModel() { }
+    public int UserId { get; set; }
+    public int TableId { get; set; }
 
 
-    public ReservationModel(int id, string timeSlot, DateTime date, int partySize, int userid, int table)
+    public ReservationModel(int id, string timeSlot, DateTime date, int partySize, int userId, int tableId)
     {
         Id = id;
         TimeSlot = timeSlot;
         Date = date;
         PartySize = partySize;
-        UserId = userid;    
-        Table = table;
-        
+        UserId = userId;
+        TableId = tableId;
     }
+
     public int CompareTo(ReservationModel? other)
     {
         if (other == null)
@@ -30,11 +26,11 @@ public class ReservationModel : IComparable<ReservationModel>
         }
         int dateComparison = Date.CompareTo(other.Date);
 
-    if (dateComparison != 0)
-    {
-        return dateComparison;
-    }
-    return TimeSlot.CompareTo(other.TimeSlot);
+        if (dateComparison != 0)
+        {
+            return dateComparison;
+        }
+        return TimeSlot.CompareTo(other.TimeSlot);
 
     }
 }
