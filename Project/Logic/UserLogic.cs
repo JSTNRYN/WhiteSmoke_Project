@@ -57,4 +57,14 @@
     {
         return CurrentAccount != null;
     }
+    
+    public static void Logout()
+    {
+        CurrentAccount = null;
+    }
+
+    public static void DeleteAccount(UserModel account)
+    {
+        UserAccess.Delete(account);
+    }
 }

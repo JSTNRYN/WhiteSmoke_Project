@@ -34,7 +34,7 @@ public class UserAccess
         _connection.Close();
     }
 
-    public void Delete(UserModel account)
+    public static void Delete(UserModel account)
     {
         string sql = $"DELETE FROM {Table} WHERE id = @Id";
         _connection.Open();
