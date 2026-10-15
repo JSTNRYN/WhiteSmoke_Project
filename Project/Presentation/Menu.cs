@@ -53,6 +53,7 @@ Opening hours
             Console.ResetColor();
             Console.WriteLine("Enter 1 to make a reservation");
             Console.WriteLine("Enter 2 to view your reservations");
+            Console.WriteLine("Enter 3 to log out");
         }
         else
         {
@@ -63,8 +64,6 @@ Opening hours
             Console.WriteLine("Enter 2 to sign up");
         }
         
-        Console.WriteLine("Enter 3 to do something else in the future");
-
         string input = Console.ReadLine();
 
         if (input == "1" && !UserLogic.IsLoggedIn())
@@ -92,6 +91,12 @@ Opening hours
 
 
             MyReservation.ShowReservations(UserLogic.CurrentAccount!.Id);
+        }
+        else if (input == "3" && UserLogic.IsLoggedIn())
+        
+        {
+            UserLogic.Logout();
+            Start();
         }
         else
         {
