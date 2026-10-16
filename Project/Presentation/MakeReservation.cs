@@ -32,33 +32,7 @@ public static class MakeReservation
             dateInput = Console.ReadLine();
         }
 
-        // Validates if the picked option is 1 or 2
-        Console.WriteLine("Enter the time for your reservation");
-        Console.WriteLine("1) 5:00 PM");
-        Console.WriteLine("2) 9:30 PM");
-        string? timeInput = Console.ReadLine();
-
-        while (timeInput is not ("1" or "2"))
-        {
-            Console.Clear();
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("You can only pick the mentioned options!");
-            Console.ResetColor();
-
-            Console.WriteLine("Pick one of the available times");
-            Console.WriteLine("1) 5:00 PM");
-            Console.WriteLine("2) 9:30 PM");
-            timeInput = Console.ReadLine();
-        }
-
-        if (timeInput == "1")
-        {
-            timeInput = "5:00 PM";
-        }
-        else if (timeInput == "2")
-        {
-            timeInput = "9:30 PM";
-        }
+        string timeInput = TimeSlotMenu.Run();
 
         Console.WriteLine("Enter the number of guests (1-6):");
         string? partySizeInput = Console.ReadLine();
