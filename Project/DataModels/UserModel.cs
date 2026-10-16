@@ -1,7 +1,7 @@
 ﻿public class UserModel
 {
 
-    public Int64 Id { get; set; }
+    public int Id { get; set; }
     public string EmailAddress { get; set; }
 
     public string Password { get; set; }
@@ -18,7 +18,7 @@
     {
     }
 
-    public UserModel(Int64 id, string email, string password, string firstName, string lastName, string phoneNumber, string role)
+    public UserModel(int id, string email, string password, string firstName, string lastName, string phoneNumber, string role)
     {
         Id = id;
         EmailAddress = email;

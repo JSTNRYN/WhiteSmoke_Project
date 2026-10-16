@@ -1,6 +1,7 @@
+
 public static class MyReservation
 {
-    public static void ShowReservations(long UserId)
+    public static void ShowReservations(int UserId)
     {
         List<ReservationModel> reservations =
             ReservationLogic.GetWithUserID(UserId);
@@ -22,11 +23,19 @@ public static class MyReservation
 
         foreach (ReservationModel reservation in reservations)
         {
-            Console.WriteLine($"Name: {UserLogic.CurrentAccount.FirstName} {UserLogic.CurrentAccount.LastName}");
             Console.WriteLine($"Date: {reservation.Date:dd-MM-yyyy}");
             Console.WriteLine($"Time: {reservation.TimeSlot}");
-            Console.WriteLine($"Guests: {reservation.PartySize}");
-            // Console.WriteLine($"Table: {reservation.Table}");
+            Console.WriteLine("Type S to see more, or press Enter to skip.");
+
+            string choice = Console.ReadLine()?.ToLower();
+
+            if (choice == "s")
+            {
+
+                Console.WriteLine($"Guests: {reservation.PartySize}");
+                //Console.WriteLine($"Table: {reservation.Table}");
+            }
+
             Console.WriteLine("--------------------");
         }
     }
