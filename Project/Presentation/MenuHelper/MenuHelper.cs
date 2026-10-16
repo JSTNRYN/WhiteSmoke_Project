@@ -1,5 +1,6 @@
 public static class MenuHelper
 {
+    //This class is the base tool for using menu navigation. If you create a menu you can use this class to navigate through the menu and select an option. It will return the index of the selected option.
     public static int Run(List<string> menuOptions, string? message = null)
     {
         int menuIndex = 0; // Keep track of which option is selected
