@@ -45,7 +45,7 @@ public class UserSignUp
         Console.Write("Please enter your password: ");
         string password = Console.ReadLine();
         _userLogic.CreateAccount(firstName, lastName, email, phoneNumber, password);
-        Menu.Start();
+        MainMenu.Run();
     }
 
     private static string? AskEmail()

@@ -18,7 +18,7 @@ static class UserLogin
 
         if (acc != null)
         {
-            Menu.Start();
+            MainMenu.Run();
         }
         else
         {
