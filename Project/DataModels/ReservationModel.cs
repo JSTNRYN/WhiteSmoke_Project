@@ -1,14 +1,14 @@
 public class ReservationModel : IComparable<ReservationModel>
 {
-    public int Id { get; set; }
+    public Int64 Id { get; set; }
     public string TimeSlot { get; set; }
-    public DateTime Date { get; set; }
-    public int PartySize { get; set; }
-    public int UserId { get; set; }
-    public int TableId { get; set; }
+    public string Date { get; set; }
+    public Int64 PartySize { get; set; }
+    public Int64 UserId { get; set; }
+    public Int64 TableId { get; set; }
 
 
-    public ReservationModel(int id, string timeSlot, DateTime date, int partySize, int userId, int tableId)
+    public ReservationModel(Int64 id, string timeSlot, string date, Int64 partySize, Int64 userId, Int64 tableId)
     {
         Id = id;
         TimeSlot = timeSlot;

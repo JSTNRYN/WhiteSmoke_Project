@@ -10,12 +10,17 @@ public class ReservationLogic
         return ReservationAccess.GetWithUserID(User);
     }
 
+    public static void Write(Int64 partySize, string dateInput, string timeInput, Int64 table)
+    {
+        ReservationAccess.Write(UserLogic.CurrentAccount, partySize, dateInput, timeInput, table);
+    }
+
     public static List<TableModel> GetAvailableTables(DateTime date, int partySize)
     {
         List<ReservationModel> reservations = ReservationAccess.GetAllByDate(date);
         List<TableModel> tables = TableAccess.GetWithMinimumCapacity(partySize);
 
-        HashSet<int> reservedTableIds = new HashSet<int>();
+        HashSet<long> reservedTableIds = new HashSet<long>();
         foreach (ReservationModel reservation in reservations)
         {
             reservedTableIds.Add(reservation.TableId);
