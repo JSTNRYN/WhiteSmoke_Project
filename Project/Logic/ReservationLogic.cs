@@ -5,7 +5,7 @@ public class ReservationLogic
     public ReservationModel? currentReservation { get; private set; }
 
 
-    public static List<ReservationModel> GetWithUserID(int User)
+    public static List<ReservationModel> GetWithUserID(long User)
     {
         return ReservationAccess.GetWithUserID(User);
     }

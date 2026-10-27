@@ -6,7 +6,7 @@ public static class ReservationAccess
     private static SqliteConnection _connection = new SqliteConnection($"Data Source=DataSources/project.db");
     private static string _table = "Reservation";
 
-    public static List<ReservationModel> GetWithUserID(int User)
+    public static List<ReservationModel> GetWithUserID(long User)
     {
         string query = @"
         SELECT Reservation.*, User.FirstName, User.LastName
