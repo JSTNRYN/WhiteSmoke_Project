@@ -1,11 +1,10 @@
 public class TableModel
 {
-    public int Id { get; set; }
+    public Int64 Id { get; set; }
 
-    public int Capacity { get; set; }
+    public Int64 Capacity { get; set; }
 
-
-    public TableModel(int id, int capacity)
+    public TableModel(Int64 id, Int64 capacity)
     {
         Id = id;
         Capacity = capacity;

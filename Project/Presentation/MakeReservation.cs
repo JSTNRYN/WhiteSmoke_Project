@@ -1,3 +1,5 @@
+using System.Globalization;
+
 public static class MakeReservation
 {
     private static readonly string _dateFormat = "dd-MM-yyyy";
@@ -98,7 +100,7 @@ public static class MakeReservation
         while (selectedTable == null)
         {
             Console.WriteLine("Select a available table:");
-            List<TableModel> availableTables = ReservationLogic.GetAvailableTables(DateTime.Parse(dateInput), partySize);
+            List<TableModel> availableTables = ReservationLogic.GetAvailableTables(DateTime.Parse(dateInput, new CultureInfo("nl-NL"), DateTimeStyles.None), partySize);
             foreach (TableModel table in availableTables)
             {
                 Console.WriteLine($"# {table.Id}");
@@ -131,7 +133,7 @@ public static class MakeReservation
         Conformation(partySize, dateInput, timeInput, selectedTable.Id);
     }
 
-    public static void Conformation(int partySize, string dateInput, string timeInput, int table)
+    public static void Conformation(Int64 partySize, string dateInput, string timeInput, Int64 table)
     {
         Console.Clear();
         Console.WriteLine("Your reservation:\n");
@@ -145,8 +147,8 @@ public static class MakeReservation
 
         if (userInput.ToLower() == "yes" || userInput.ToLower() == "y")
         {
+            ReservationLogic.Write(partySize, dateInput, timeInput, table);
             retry = false;
-            // @TODO: Add to database
         }
         else if (userInput.ToLower() == "no" || userInput.ToLower() == "n")
         {
