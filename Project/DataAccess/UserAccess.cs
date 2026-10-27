@@ -9,12 +9,14 @@ public class UserAccess
 
     private static string Table = "User";
 
-    public void Write(UserModel account)
+    public long Write(UserModel account)
     {
-        string sql = $"INSERT INTO {Table} (email, password, firstName, lastName, phonenumber, role) VALUES (@EmailAddress, @Password, @FirstName, @LastName, @PhoneNumber, @Role)";
+        string sql = $"INSERT INTO {Table} (email, password, firstName, lastName, phonenumber, role) VALUES (@EmailAddress, @Password, @FirstName, @LastName, @PhoneNumber, @Role) RETURNING id";
         _connection.Open();
-        _connection.Execute(sql, account);
+        long id = _connection.ExecuteScalar<long>(sql, account);
         _connection.Close();
+
+        return id;
     }
 
     public static UserModel GetByEmail(string email)

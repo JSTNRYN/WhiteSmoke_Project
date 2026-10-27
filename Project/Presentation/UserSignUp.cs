@@ -6,7 +6,7 @@ public class UserSignUp
 
     public static void Start()
     {
-        // Clear the console
+        
         Console.Clear();
         Console.WriteLine("Account Sign up\n");
 
@@ -39,13 +39,11 @@ public class UserSignUp
             email = AskEmail().ToLower();
         }
         
-        Console.Write("Please enter your phone number: ");
-        string phoneNumber = Console.ReadLine();
+        string phoneNumber = AskPhoneNumber();
         
         Console.Write("Please enter your password: ");
         string password = Console.ReadLine();
         _userLogic.CreateAccount(firstName, lastName, email, phoneNumber, password);
-        Menu.Start();
     }
 
     private static string? AskEmail()
@@ -64,6 +62,22 @@ public class UserSignUp
     {
         Console.Write("Please enter your last name: ");
         return Console.ReadLine();
+    }
+
+    private static string AskPhoneNumber()
+    {
+        while (true)
+        {
+            Console.Write("Please enter your phone number: ");
+            string? phoneNumber = Console.ReadLine();
+
+            if (!string.IsNullOrWhiteSpace(phoneNumber) && phoneNumber.All(char.IsDigit))
+            {
+                return phoneNumber;
+            }
+
+            ShowError("Invalid phone number! Please enter numbers only.");
+        }
     }
 
     private static void ShowError(string message)

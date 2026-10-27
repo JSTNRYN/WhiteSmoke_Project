@@ -9,7 +9,7 @@
 
   <ItemGroup>
    <Content Include="DataSources/*">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
    </Content>
 </ItemGroup>
 
