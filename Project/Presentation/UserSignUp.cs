@@ -41,8 +41,7 @@ public class UserSignUp
         
         string phoneNumber = AskPhoneNumber();
         
-        Console.Write("Please enter your password: ");
-        string password = Console.ReadLine();
+        string password = AskPassword();
         _userLogic.CreateAccount(firstName, lastName, email, phoneNumber, password);
     }
 
@@ -62,6 +61,27 @@ public class UserSignUp
     {
         Console.Write("Please enter your last name: ");
         return Console.ReadLine();
+    }
+
+    private static string? AskPassword()
+    {
+        string specialCharacters = "!@#$%&*";
+        while (true)
+        {
+            Console.Write("Please enter your password: ");
+            string? password = Console.ReadLine();
+            // Kijken of er een speciaal karakter in zit.
+            bool hasSpecialChar = password.Any(ch => specialCharacters.Contains(ch));
+
+            if (password.Length < 6 || !hasSpecialChar)
+            {
+                ShowError("Password must be at least 6 characters and contain a special character!");
+            }
+            else
+            {
+                return password;
+            }
+        }
     }
 
     private static string AskPhoneNumber()
