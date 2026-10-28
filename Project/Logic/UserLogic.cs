@@ -9,6 +9,7 @@
 
     public UserModel CheckLogin(string email, string password)
     {
+        email = email.Trim().ToLowerInvariant();
         UserModel acc = UserAccess.GetByEmail(email);
     
         if (acc != null && BCrypt.Net.BCrypt.Verify(password, acc.Password))
@@ -24,7 +25,7 @@
         string hashedPassword = HashPassword(password);
 
         UserModel acc = new UserModel(0, email, hashedPassword, firstname, lastname, phone, role);
-        _access.Write(acc);
+        acc.Id = _access.Write(acc);
         CurrentAccount = acc;
     }
 

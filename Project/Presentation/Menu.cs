@@ -82,7 +82,7 @@ Opening hours
         
         {
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("view your reservations is nog niet geimplementeerd");
+            Console.WriteLine("");
             Console.ResetColor();
 
 
@@ -92,7 +92,6 @@ Opening hours
         
         {
             UserLogic.Logout();
-            Start();
         }
         else
         {

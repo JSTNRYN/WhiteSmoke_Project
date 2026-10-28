@@ -18,12 +18,11 @@ static class UserLogin
 
         if (acc != null)
         {
-            Menu.Start();
+            // Return to the existing menu loop after a successful login.
         }
         else
         {
             ShowError("No account found with that email and password combination.");
-            Start();
         }
     }
 

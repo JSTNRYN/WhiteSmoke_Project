@@ -20,7 +20,7 @@ public static class ReservationAccess
         });
     }
 
-    public static List<ReservationModel> GetWithUserID(int User)
+    public static List<ReservationModel> GetWithUserID(long User)
     {
         string query = @"
         SELECT Reservation.*, User.FirstName, User.LastName
