@@ -1,5 +1,3 @@
-using System.Globalization;
-
 public static class MakeReservation
 {
     private static readonly string _dateFormat = "dd-MM-yyyy";
@@ -40,7 +38,7 @@ public static class MakeReservation
         Console.WriteLine("2) 9:30 PM");
         string? timeInput = Console.ReadLine();
 
-        while (timeInput is not ("1" or "2"))
+        while (timeInput != "1" && timeInput != "2")
         {
             Console.Clear();
             Console.ForegroundColor = ConsoleColor.Red;
@@ -94,17 +92,26 @@ public static class MakeReservation
             }
         }
 
-        // @TODO: get available tables for that day
         TableModel? selectedTable = null;
+        
+        List<TableModel>? availableTables = ReservationLogic.GetAvailableTables(dateInput, partySize, timeInput);
+        if (availableTables.Count == 0)
+        {
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("No tables are available for this date, time, and party size.");
+            Console.ResetColor();
+            return;
+        }
 
         while (selectedTable == null)
         {
             Console.WriteLine("Select a available table:");
-            List<TableModel> availableTables = ReservationLogic.GetAvailableTables(DateTime.Parse(dateInput, new CultureInfo("nl-NL"), DateTimeStyles.None), partySize);
+
             foreach (TableModel table in availableTables)
             {
                 Console.WriteLine($"# {table.Id}");
-                Console.WriteLine($"Seats: {table.Id}");
+                Console.WriteLine($"Seats: {table.Capacity}");
                 Console.WriteLine("-------------------\n");
             }
             string? tableInput = Console.ReadLine();
