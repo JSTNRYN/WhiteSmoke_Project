@@ -44,6 +44,12 @@ public class UserAccess
         _connection.Close();
     }
 
-
-
+    public static List<UserModel> GetAllCustomers_ExceptPassword()
+    {
+        string query = $"SELECT id, email, firstName, lastName, phonenumber, role FROM {Table} WHERE role = 'Customer'";
+        _connection.Open();
+        List<UserModel> customers = _connection.Query<UserModel>(query).ToList();
+        _connection.Close();
+        return customers;
+    }
 }
