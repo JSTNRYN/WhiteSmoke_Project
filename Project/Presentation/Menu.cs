@@ -54,6 +54,12 @@ Opening hours
             Console.WriteLine("Enter 1 to make a reservation");
             Console.WriteLine("Enter 2 to view your reservations");
             Console.WriteLine("Enter 3 to log out");
+            if (UserLogic.IsAdmin())
+            {
+                Console.WriteLine("Enter 4 to edit accounts");
+                Console.WriteLine("Enter 5 to edit reservations");
+            }
+            
         }
         else
         {

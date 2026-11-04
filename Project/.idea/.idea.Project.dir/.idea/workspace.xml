@@ -13,11 +13,18 @@
     <configurations />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3be85243-6a67-4d44-8c62-2c66c5038dbe" name="Changes" comment="" />
+    <list default="true" id="3be85243-6a67-4d44-8c62-2c66c5038dbe" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Project.dir/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Project.dir/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Logic/UserLogic.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Logic/UserLogic.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Presentation/Menu.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Presentation/Menu.cs" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="DpaMonitoringSettings">
+    <option name="firstShow" value="false" />
   </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
@@ -27,6 +34,10 @@
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/ad7bed3662e6424a93c553fdbe2712fdd83a00/_39b51/StringComparison.cs" root0="SKIP_HIGHLIGHTING" />
+  </component>
+  <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 3,
   &quot;fromUser&quot;: false
@@ -38,6 +49,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    ".NET Project.Project.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.cidr.known.project.marker": "true",
@@ -46,7 +58,7 @@
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "cidr.known.project.marker": "true",
     "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "29-presentation-layer-create-show-admin-panel-in-the-homepage-for-the-correct-user",
     "last_opened_file_path": "/Users/hurbie48/Documents/GitHub/WhiteSmoke_Project/Project",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -100,6 +112,7 @@
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="UnityCheckinConfiguration" checkUnsavedScenes="true" />
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />

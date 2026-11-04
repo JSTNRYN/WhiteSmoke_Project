@@ -88,6 +88,11 @@ public class UserLogic
         Console.Write("Please enter your last name: ");
         return Console.ReadLine();
     }
+    
+    public static bool IsAdmin()
+    {
+        return CurrentAccount.Role is "Admin";
+    }
 
     public static string? AskPassword()
     {
