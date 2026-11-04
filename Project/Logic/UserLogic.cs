@@ -130,4 +130,9 @@ public class UserLogic
             UserSignUp.ShowError("Invalid phone number! Please enter numbers only.");
         }
     }
+
+    public static List<UserModel> GetAllCustomers_ExceptPassword()
+    {
+        return UserAccess.GetAllCustomers_ExceptPassword();
+    }
 }
