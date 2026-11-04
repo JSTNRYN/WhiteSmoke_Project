@@ -15,16 +15,15 @@ public class ReservationLogic
         ReservationAccess.Write(UserLogic.CurrentAccount, partySize, dateInput, timeInput, table);
     }
 
-    public static List<TableModel> GetAvailableTables(DateTime date, int partySize)
+    public static List<TableModel> GetAvailableTables(string date, int partySize, string time)
     {
         List<ReservationModel> reservations = ReservationAccess.GetAllByDate(date);
         List<TableModel> tables = TableAccess.GetWithMinimumCapacity(partySize);
 
-        HashSet<long> reservedTableIds = new HashSet<long>();
-        foreach (ReservationModel reservation in reservations)
-        {
-            reservedTableIds.Add(reservation.TableId);
-        }
+        HashSet<long> reservedTableIds = reservations
+            .Where(reservation => reservation.TimeSlot == time)
+            .Select(reservation => reservation.TableId)
+            .ToHashSet();
 
         List<TableModel> availableTables = new List<TableModel>();
         foreach (TableModel table in tables)
@@ -62,8 +61,6 @@ public class ReservationLogic
             return false;
         }
 
-        string[] dateFormats = ["dd.MM.yyyy", "dd-MM-yyyy", "dd/MM/yyyy"];
-
-        return DateTime.TryParseExact(date, dateFormats, new CultureInfo("nl-NL"), DateTimeStyles.None, out _);
+        return DateTime.TryParseExact(date, "dd-MM-yyyy", new CultureInfo("nl-NL"), DateTimeStyles.None, out _);
     }
 }
