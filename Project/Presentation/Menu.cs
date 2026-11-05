@@ -2,19 +2,18 @@ using Project.Presentation;
 
 static class Menu
 {
-
     public static void ShowRestaurantName()
     {
         Console.Clear();
         Console.WriteLine(@"
         (                             
-        (  (         )        )        )\ )                 )        
+        (  (         )        )        )\                 )        
         )\))(   ' ( /( (   ( /(   (   (()/(    )         ( /(    (   
-        ((_)()\ )  )\()))\  )\()) ))\   /(_))  (      (   )\())  ))\  
-        _(())\_)()((_)\((_)(_))/ /((_) (_))    )\  '  )\ ((_)\  /((_) 
-        \ \((_)/ /| |(_)(_) | |_ (_))   / __| _((_))  ((_)| |(_)(_))   
-         \ \/\/ / | ' \ | | |  _|/ -_)  \__ \| '  \()/ _ \| / / / -_)  
-          \_/\_/  |_||_||_| \\__|\___|  |___/|_|_|_| \___/|_\_\ \___|
+       ((_)()\ )  )\()))\  )\()) ))\   /(_))  (      (   )\())  ))\  
+       _(())\_)()((_)\((_)(_))/ /((_) (_))    )\  '  )\ ((_)\  /((_) 
+       \ \((_)/ /| |(_)(_) | |_ (_))   / __| _((_))  ((_)| |(_)(_))  
+        \ \/\/ / | ' \ | | |  _|/ -_)  \__ \| '  \()/ _ \| / / / -_) 
+         \_/\_/  |_||_||_| \\__|\___|  |___/|_|_|_| \___/|_\_\ \___|
 ");
     }
 
@@ -33,76 +32,80 @@ Address
   The Netherlands
 
 Opening hours
-  Monday        Closed
-  Tuesday       Closed
-  Wednesday     5:00 PM - 11:00 PM
-  Thursday      5:00 PM - 11:00 PM
-  Friday        5:00 PM - 11:00 PM
-  Saturday      12:00 PM - 11:00 PM
-  Sunday        12:00 PM - 10:00 PM
+  Monday       Closed
+  Tuesday      Closed
+  Wednesday    5:00 PM - 11:00 PM
+  Thursday     5:00 PM - 11:00 PM
+  Friday       5:00 PM - 11:00 PM
+  Saturday     12:00 PM - 11:00 PM
+  Sunday       12:00 PM - 10:00 PM
 ");
     }
+
     public static void Start()
-{
-    while (true)
     {
-        if (UserLogic.IsLoggedIn())
+        while (true)
         {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"You are logged in as: {UserLogic.CurrentAccount.FirstName} {UserLogic.CurrentAccount.LastName}");
-            Console.ResetColor();
-            Console.WriteLine("Enter 1 to make a reservation");
-            Console.WriteLine("Enter 2 to view your reservations");
-            Console.WriteLine("Enter 3 to log out");
-            if (UserLogic.IsAdmin())
+            if (UserLogic.IsLoggedIn())
             {
-                Console.WriteLine("Enter 4 to edit accounts");
-                Console.WriteLine("Enter 5 to edit reservations");
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine($"You are logged in as: {UserLogic.CurrentAccount.FirstName} {UserLogic.CurrentAccount.LastName}");
+                Console.ResetColor();
+                Console.WriteLine("Enter 1 to make a reservation");
+                Console.WriteLine("Enter 2 to view your reservations");
+                Console.WriteLine("Enter 3 to view the menu");
+                Console.WriteLine("Enter 4 to log out");
+                
+                if (UserLogic.IsAdmin())
+                {
+                    Console.WriteLine("Enter 5 to edit accounts");
+                    Console.WriteLine("Enter 6 to edit reservations");
+                }
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"You are currently not logged in!");
+                Console.ResetColor();
+                Console.WriteLine("Enter 1 to login");
+                Console.WriteLine("Enter 2 to sign up");
             }
             
-        }
-        else
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"You are currently not logged in!");
-            Console.ResetColor();
-            Console.WriteLine("Enter 1 to login");
-            Console.WriteLine("Enter 2 to sign up");
-        }
-        
-        string input = Console.ReadLine();
+            string input = Console.ReadLine();
 
-        if (input == "1" && !UserLogic.IsLoggedIn())
-        {
-            UserLogin.Start();
-        }
-        else if (input == "2" && !UserLogic.IsLoggedIn())
-        {
-            UserSignUp.Start();
-        }
-        else if (input == "1" && UserLogic.IsLoggedIn())
-        {
-            MakeReservation.Start();
-        }
-        else if (input == "2" && UserLogic.IsLoggedIn())
-        
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("");
-            Console.ResetColor();
+            if (input == "1" && !UserLogic.IsLoggedIn())
+            {
+                UserLogin.Start();
+            }
+            else if (input == "2" && !UserLogic.IsLoggedIn())
+            {
+                UserSignUp.Start();
+            }
+            else if (input == "1" && UserLogic.IsLoggedIn())
+            {
+                MakeReservation.Start();
+            }
+            else if (input == "2" && UserLogic.IsLoggedIn())
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("");
+                Console.ResetColor();
 
-
-            MyReservation.ShowReservations(UserLogic.CurrentAccount!.Id);
-        }
-        else if (input == "3" && UserLogic.IsLoggedIn())
-        
-        {
-            UserLogic.Logout();
-        }
-        else
-        {
-            Console.WriteLine("Invalid input");
+                MyReservation.ShowReservations(UserLogic.CurrentAccount!.Id);
+            }
+            else if (input == "3" && UserLogic.IsLoggedIn())
+            {
+                
+                MenuView.ShowMenu(UserLogic.CurrentAccount);
+            }
+            else if (input == "4" && UserLogic.IsLoggedIn())
+            {
+                UserLogic.Logout();
+            }
+            else
+            {
+                Console.WriteLine("Invalid input");
+            }
         }
     }
-}
 }
