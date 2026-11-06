@@ -15,6 +15,7 @@
   <component name="ChangeListManager">
     <list default="true" id="3be85243-6a67-4d44-8c62-2c66c5038dbe" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Project.dir/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Project.dir/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/UserAccess.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/UserAccess.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Logic/UserLogic.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Logic/UserLogic.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Presentation/Menu.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Presentation/Menu.cs" afterDir="false" />
     </list>
@@ -35,6 +36,7 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/a314ee147e1b172ae5fbc0b477aa7acbe6a3f2e07ab946ed05be04ed58b67/String.Comparison.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/ad7bed3662e6424a93c553fdbe2712fdd83a00/_39b51/StringComparison.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
@@ -58,7 +60,7 @@
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "cidr.known.project.marker": "true",
     "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "29-presentation-layer-create-show-admin-panel-in-the-homepage-for-the-correct-user",
+    "git-widget-placeholder": "30-logic-layer-create-get-all-customers-method",
     "last_opened_file_path": "/Users/hurbie48/Documents/GitHub/WhiteSmoke_Project/Project",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",

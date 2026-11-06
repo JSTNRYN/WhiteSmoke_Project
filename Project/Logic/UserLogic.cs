@@ -46,6 +46,16 @@ public class UserLogic
         return UserAccess.GetByEmail(email) != null;
     }
 
+    public static List<UserModel> GetAllCustomers()
+    {
+        return UserAccess.GetAllCustomers();
+    }
+
+    public static UserModel GetCustomerById(int id)
+    {
+        return UserAccess.GetById(id);
+    }
+
     public static bool IsValidEmailFormat(string email)
     {
         return email.Contains("@") && email.Contains(".");
@@ -54,6 +64,47 @@ public class UserLogic
     public static bool ValidateName(string name)
     {
         return (name.Length > 1);
+    }
+
+    public static bool ValidatePhone(string phoneNumber)
+    {
+        if (string.IsNullOrEmpty(phoneNumber))
+        {
+            return false;
+        }
+        int startIndex = 0;
+        if (phoneNumber[0] == '+')
+        {
+            startIndex = 1;
+        }
+        if (startIndex >= phoneNumber.Length)
+        {
+            return false;
+        }
+        for (int i = startIndex; i < phoneNumber.Length; i++)
+        {
+            if (!char.IsDigit(phoneNumber[i]))
+            {
+                return false;
+            }
+        }
+        int totalDigits = phoneNumber.Length - startIndex;
+        if (totalDigits != 10)
+        {
+            return false;
+        }
+
+        return true;
+    }
+    
+    public static bool IsCustomerIdValid(int id)
+    { 
+        var user = UserAccess.GetById(id);
+        if (user == null)
+        {
+            return false;
+        }
+        return true;
     }
 
     public static bool IsLoggedIn()
@@ -83,6 +134,151 @@ public class UserLogic
         return Console.ReadLine();
     }
 
+    public static void AskCustomerToEdit()
+    {
+        var customers = GetAllCustomers();
+        Console.WriteLine($"There are currently: {customers.Count - 1} users.");
+        foreach (var customer in customers)
+        {
+            if (customer.Id != CurrentAccount.Id)
+            {
+                Console.WriteLine($"Id: {customer.Id}");
+                Console.WriteLine($"Name: {customer.FirstName} {customer.LastName}");
+                Console.WriteLine($"Email: {customer.EmailAddress}");
+                Console.WriteLine($"Phone number: {customer.PhoneNumber}");
+                Console.WriteLine("-------------------------");
+            }
+        }
+
+        int customerId = int.Parse(AskCustomerId());
+        if (IsCustomerIdValid(customerId))
+        {
+           ModifyCustomerData(customerId);
+        }
+        else
+        {
+            UserSignUp.ShowError("Invalid input!");
+            AskCustomerToEdit();
+        }
+
+    }
+
+    public static void ModifyCustomerData(int customerId)
+    {
+        bool editing = true;
+        while (editing)
+        {
+            var user = GetCustomerById(customerId);
+            
+            Console.WriteLine($"\nYou have selected {user.FirstName} {user.LastName}");
+            Console.WriteLine("What would you like to change?");
+            Console.WriteLine($"1: First name ({user.FirstName})\n2: Last name ({user.LastName})\n3: Email ({user.EmailAddress})\n4: Phone number ({user.PhoneNumber})");
+            Console.Write("> ");
+            string input = Console.ReadLine();
+
+            if (int.TryParse(input, out int result))
+            {
+                if (result == 1)
+                {
+                    AskFirstNameToEdit(user);
+                }
+                else if (result == 2)
+                {
+                    AskLastNameToEdit(user);
+                }
+                else if (result == 3)
+                {
+                    AskEmailToEdit(user);
+                }
+                else if (result == 4)
+                {
+                    AskPhoneToEdit(user);
+                }
+                else
+                {
+                    UserSignUp.ShowError("Invalid input!");
+                    continue;
+                }
+
+                Console.Write("\nWould you like to edit anything else for this user? (y/n): ");
+                string continueInput = Console.ReadLine()?.Trim().ToLower();
+                
+                if (continueInput != "y")
+                {
+                    editing = false;
+                }
+            }
+            else
+            {
+                UserSignUp.ShowError("Invalid input!");
+            }
+        }
+    }
+
+    public static void AskFirstNameToEdit(UserModel user)
+    {
+        Console.WriteLine($"Old name: {user.FirstName}");
+        Console.Write($"New name: ");
+        string newName = Console.ReadLine();
+    
+        if (ValidateName(newName) == false)
+        {
+            UserSignUp.ShowError("Please enter a name with at least 2 characters.");
+            AskFirstNameToEdit(user);
+        }
+        else
+        {
+            UserAccess.UpdateFirstName(user.Id, newName);
+        }
+    }
+    
+    public static void AskLastNameToEdit(UserModel user)
+    {
+        Console.WriteLine($"Old name: {user.LastName}");
+        Console.Write($"New name: ");
+        string newName = Console.ReadLine();
+        if (ValidateName(newName) == false)
+        {
+            UserSignUp.ShowError("Please enter a name with at least 2 characters.");
+            AskLastNameToEdit(user);
+        }
+        else
+        {
+            UserAccess.UpdateLastName(user.Id, newName);
+        }
+    }
+    
+    public static void AskEmailToEdit(UserModel user)
+    {
+        Console.WriteLine($"Old email: {user.EmailAddress}");
+        Console.Write($"New email: ");
+        string newEmail = Console.ReadLine();
+        if (ValidateEmail(newEmail) == false)
+        {
+            UserSignUp.ShowError("Invalid email format!");
+            AskEmailToEdit(user);
+        }
+        else
+        {
+            UserAccess.UpdateEmail(user.Id, newEmail);
+        }
+    }
+    
+    public static void AskPhoneToEdit(UserModel user)
+    {
+        Console.WriteLine($"Old phone number: {user.PhoneNumber}");
+        Console.Write($"New phone number: ");
+        string newPhoneNumber = Console.ReadLine();
+        if (ValidatePhone(newPhoneNumber) == false)
+        {
+            UserSignUp.ShowError("Please enter a name with at least 2 characters.");
+            AskPhoneToEdit(user);
+        }
+        else
+        {
+            UserAccess.UpdatePhone(user.Id, newPhoneNumber);
+        }
+    }
     public static string? AskLastName()
     {
         Console.Write("Please enter your last name: ");
@@ -93,6 +289,14 @@ public class UserLogic
     {
         return CurrentAccount.Role is "Admin";
     }
+
+    public static string AskCustomerId()
+    {
+        Console.Write("Please enter the id of the user you would like to modify\n> ");
+        return Console.ReadLine();
+    }
+
+    
 
     public static string? AskPassword()
     {

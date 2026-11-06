@@ -99,6 +99,11 @@ Opening hours
         {
             UserLogic.Logout();
         }
+        
+        else if (input == "4" && UserLogic.IsLoggedIn())
+        {
+            UserLogic.AskCustomerToEdit();
+        }
         else
         {
             Console.WriteLine("Invalid input");
