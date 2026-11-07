@@ -8,7 +8,7 @@ public static class MakeReservation
     {
         Console.Clear();
         Console.WriteLine($"Enter the date for your reservation ({_dateFormat}):");
-        string? dateInput = Console.ReadLine();
+        string dateInput = Console.ReadLine() ?? string.Empty;
 
         // Validates if it is in the right format
         while (!ReservationLogic.IsValidDateFormat(dateInput))
@@ -19,7 +19,7 @@ public static class MakeReservation
             Console.ResetColor();
 
             Console.WriteLine($"Enter the date for your reservation ({_dateFormat}):");
-            dateInput = Console.ReadLine();
+            dateInput = Console.ReadLine() ?? string.Empty;
         }
 
         // Validates if its not set in the past
@@ -31,7 +31,7 @@ public static class MakeReservation
             Console.ResetColor();
 
             Console.WriteLine($"Enter the date for your reservation ({_dateFormat}):");
-            dateInput = Console.ReadLine();
+            dateInput = Console.ReadLine() ?? string.Empty;
         }
 
         // Validates if the picked option is 1 or 2
@@ -66,11 +66,7 @@ public static class MakeReservation
         string? partySizeInput = Console.ReadLine();
 
         int partySize;
-        if (partySizeInput != "")
-        {
-            partySize = Int32.Parse(partySizeInput);
-        }
-        else
+        if (!int.TryParse(partySizeInput, out partySize))
         {
             partySize = 0;
         }
@@ -84,11 +80,7 @@ public static class MakeReservation
 
             Console.WriteLine("Enter the number of guests (1-6):");
             partySizeInput = Console.ReadLine();
-            if (partySizeInput != "")
-            {
-                partySize = Int32.Parse(partySizeInput);
-            }
-            else
+            if (!int.TryParse(partySizeInput, out partySize))
             {
                 partySize = 0;
             }
@@ -130,7 +122,7 @@ public static class MakeReservation
         }
 
 
-        Conformation(partySize, dateInput, timeInput, selectedTable.Id);
+        Conformation(partySize, dateInput, timeInput!, selectedTable.Id);
     }
 
     public static void Conformation(Int64 partySize, string dateInput, string timeInput, Int64 table)
@@ -145,12 +137,12 @@ public static class MakeReservation
         string? userInput = Console.ReadLine();
         bool retry = true;
 
-        if (userInput.ToLower() == "yes" || userInput.ToLower() == "y")
+        if (userInput?.ToLowerInvariant() is "yes" or "y")
         {
             ReservationLogic.Write(partySize, dateInput, timeInput, table);
             retry = false;
         }
-        else if (userInput.ToLower() == "no" || userInput.ToLower() == "n")
+        else if (userInput?.ToLowerInvariant() is "no" or "n")
         {
             retry = false;
         }
@@ -165,6 +157,16 @@ public static class MakeReservation
 
             Console.WriteLine($"Do you want to confirm? (Yes/No)");
             userInput = Console.ReadLine();
+
+            if (userInput?.ToLowerInvariant() is "yes" or "y")
+            {
+                ReservationLogic.Write(partySize, dateInput, timeInput, table);
+                retry = false;
+            }
+            else if (userInput?.ToLowerInvariant() is "no" or "n")
+            {
+                retry = false;
+            }
         }
 
         Console.Clear();

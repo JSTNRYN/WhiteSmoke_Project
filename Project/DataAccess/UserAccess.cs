@@ -5,43 +5,41 @@ using Dapper;
 
 public class UserAccess
 {
-    private static SqliteConnection _connection = new SqliteConnection($"Data Source=DataSources/project.db");
-
     private static string Table = "User";
 
     public long Write(UserModel account)
     {
         string sql = $"INSERT INTO {Table} (email, password, firstName, lastName, phonenumber, role) VALUES (@EmailAddress, @Password, @FirstName, @LastName, @PhoneNumber, @Role) RETURNING id";
-        _connection.Open();
-        long id = _connection.ExecuteScalar<long>(sql, account);
-        _connection.Close();
+        using var connection = Database.CreateConnection();
+        connection.Open();
+        long id = connection.ExecuteScalar<long>(sql, account);
 
         return id;
     }
 
-    public static UserModel GetByEmail(string email)
+    public static UserModel? GetByEmail(string email)
     {
         string sql = $"SELECT * FROM {Table} WHERE email = @Email";
-        _connection.Open();
-        var user = _connection.QueryFirstOrDefault<UserModel>(sql, new { Email = email });
-        _connection.Close();
+        using var connection = Database.CreateConnection();
+        connection.Open();
+        var user = connection.QueryFirstOrDefault<UserModel>(sql, new { Email = email });
         return user;
     }
 
     public void Update(UserModel account)
     {
         string sql = $"UPDATE {Table} SET email = @EmailAddress, password = @Password, firstName = @FirstName, lastName = @LastName, phonenumber = @PhoneNumber, role = @Role WHERE id = @Id";
-        _connection.Open();
-        _connection.Execute(sql, account);
-        _connection.Close();
+        using var connection = Database.CreateConnection();
+        connection.Open();
+        connection.Execute(sql, account);
     }
 
     public static void Delete(UserModel account)
     {
         string sql = $"DELETE FROM {Table} WHERE id = @Id";
-        _connection.Open();
-        _connection.Execute(sql, new { Id = account.Id });
-        _connection.Close();
+        using var connection = Database.CreateConnection();
+        connection.Open();
+        connection.Execute(sql, new { Id = account.Id });
     }
 
 

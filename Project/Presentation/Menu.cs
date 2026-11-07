@@ -49,7 +49,7 @@ Opening hours
             if (UserLogic.IsLoggedIn())
             {
                 Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine($"You are logged in as: {UserLogic.CurrentAccount.FirstName} {UserLogic.CurrentAccount.LastName}");
+                Console.WriteLine($"You are logged in as: {UserLogic.CurrentAccount!.FirstName} {UserLogic.CurrentAccount.LastName}");
                 Console.ResetColor();
                 Console.WriteLine("Enter 1 to make a reservation");
                 Console.WriteLine("Enter 2 to view your reservations");
@@ -71,7 +71,7 @@ Opening hours
                 Console.WriteLine("Enter 2 to sign up");
             }
             
-            string input = Console.ReadLine();
+            string input = Console.ReadLine() ?? string.Empty;
 
             if (input == "1" && !UserLogic.IsLoggedIn())
             {
@@ -96,7 +96,7 @@ Opening hours
             else if (input == "3" && UserLogic.IsLoggedIn())
             {
                 
-                MenuView.ShowMenu(UserLogic.CurrentAccount);
+                MenuView.ShowMenu(UserLogic.CurrentAccount!);
             }
             else if (input == "4" && UserLogic.IsLoggedIn())
             {

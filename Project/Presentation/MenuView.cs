@@ -23,7 +23,10 @@ public static class MenuView
             return;
         }
 
-        Console.Clear();
+        if (!Console.IsOutputRedirected)
+        {
+            Console.Clear();
+        }
         Console.WriteLine("=================================");
         Console.WriteLine("        WHITE SMOKE MENU         ");
         Console.WriteLine("=================================");

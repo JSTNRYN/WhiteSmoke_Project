@@ -6,7 +6,7 @@ public class MenuLogic
 
         if (allItems == null)
         {
-            return null;
+            return new Dictionary<string, List<MenuItemModel>>();
         }
 
         Dictionary<string, List<MenuItemModel>> groupedMenu = new Dictionary<string, List<MenuItemModel>>();

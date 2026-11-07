@@ -2,18 +2,24 @@ using Microsoft.Data.Sqlite;
 using Dapper;
 public static class MenuItemAccess
 {
-    private static string connectionString = "Data Source=template.project.db;";
-   
-
     public static List<MenuItemModel> LoadAllMenuItems()
     {
         try
         {
-            using (var conn = new SqliteConnection(connectionString))
+            using (var conn = Database.CreateMenuConnection())
             {
-                string query = "SELECT ID, MENU, NAME, CATEGORY, UNITPRICE, DESCRIPTION FROM MenuItem";
-                
-                
+                conn.Open();
+                string query = @"
+                    SELECT
+                        ID AS Id,
+                        MENU AS Menu,
+                        NAME AS Name,
+                        CATEGORY AS Category,
+                        UNITPRICE AS UnitPrice,
+                        DESCRIPTION AS Description
+                    FROM MenuItem
+                    ORDER BY CATEGORY, NAME";
+
                 List<MenuItemModel> items = conn.Query<MenuItemModel>(query).ToList();
                 return items;
             }
@@ -21,7 +27,7 @@ public static class MenuItemAccess
         catch (Exception ex)
         {
             Console.WriteLine($"Database fout: {ex.Message}");
-            return null;
+            return new List<MenuItemModel>();
         }
     }
 }

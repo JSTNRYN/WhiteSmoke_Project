@@ -9,10 +9,10 @@ public class UserLogic
     {
     }
 
-    public UserModel CheckLogin(string email, string password)
+    public UserModel? CheckLogin(string email, string password)
     {
         email = email.Trim().ToLowerInvariant();
-        UserModel acc = UserAccess.GetByEmail(email);
+        UserModel? acc = UserAccess.GetByEmail(email);
     
         if (acc != null && BCrypt.Net.BCrypt.Verify(password, acc.Password))
         {
@@ -46,14 +46,14 @@ public class UserLogic
         return UserAccess.GetByEmail(email) != null;
     }
 
-    public static bool IsValidEmailFormat(string email)
+    public static bool IsValidEmailFormat(string? email)
     {
-        return email.Contains("@") && email.Contains(".");
+        return !string.IsNullOrWhiteSpace(email) && email.Contains("@") && email.Contains(".");
     }
 
-    public static bool ValidateName(string name)
+    public static bool ValidateName(string? name)
     {
-        return (name.Length > 1);
+        return !string.IsNullOrWhiteSpace(name) && name.Trim().Length > 1;
     }
 
     public static bool IsLoggedIn()
@@ -91,7 +91,7 @@ public class UserLogic
     
     public static bool IsAdmin()
     {
-        return CurrentAccount.Role is "Admin";
+        return CurrentAccount?.Role is "Admin";
     }
 
     public static string? AskPassword()
@@ -101,6 +101,10 @@ public class UserLogic
         {
             Console.Write("Please enter your password: ");
             string? password = Console.ReadLine();
+            if (password is null)
+            {
+                return null;
+            }
             // Kijken of er een speciaal karakter in zit.
             bool hasSpecialChar = password.Any(ch => specialCharacters.Contains(ch));
 

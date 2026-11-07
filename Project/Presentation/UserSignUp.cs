@@ -6,21 +6,21 @@ public class UserSignUp
     {
         Console.Clear();
         Console.WriteLine("Account Sign up\n");
-        string firstName =UserLogic.AskFirstName();
+        string firstName = UserLogic.AskFirstName() ?? string.Empty;
         while (!UserLogic.ValidateName(firstName))
         {
             ShowError("Please enter a name with at least 2 characters.");
-            firstName = UserLogic.AskFirstName();
+            firstName = UserLogic.AskFirstName() ?? string.Empty;
         }
         
-        string lastName = UserLogic.AskLastName();
+        string lastName = UserLogic.AskLastName() ?? string.Empty;
         while (!UserLogic.ValidateName(lastName))
         {
             ShowError("Please enter a name with at least 2 characters.");
-            lastName = UserLogic.AskLastName();
+            lastName = UserLogic.AskLastName() ?? string.Empty;
         }
         
-        string email = UserLogic.AskEmail().ToLower();
+        string email = (UserLogic.AskEmail() ?? string.Empty).ToLowerInvariant();
         while (!UserLogic.ValidateEmail(email))
         {
             if (UserLogic.EmailExists(email))
@@ -31,12 +31,12 @@ public class UserSignUp
             {
                 ShowError("Invalid email format!");
             }
-            email = UserLogic.AskEmail().ToLower();
+            email = (UserLogic.AskEmail() ?? string.Empty).ToLowerInvariant();
         }
         
         string phoneNumber = UserLogic.AskPhoneNumber();
         
-        string password = UserLogic.AskPassword();
+        string password = UserLogic.AskPassword() ?? string.Empty;
         _userLogic.CreateAccount(firstName, lastName, email, phoneNumber, password);
     }
     

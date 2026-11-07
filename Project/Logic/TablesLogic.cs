@@ -1,6 +1,6 @@
 public class TableLogic
 {
-    public static TableModel currentTable { get; private set; }
+    public static TableModel? currentTable { get; private set; }
 
     private TableAccess _access = new();
 

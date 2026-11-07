@@ -10,7 +10,7 @@ public static class MyReservation
             Console.WriteLine("You have no reservations.");
             Console.WriteLine("Would you like to make a reservation? (y/n)");
 
-            string choice = Console.ReadLine()?.ToLower();
+            string choice = Console.ReadLine()?.ToLowerInvariant() ?? string.Empty;
 
             if (choice == "y")
             {
