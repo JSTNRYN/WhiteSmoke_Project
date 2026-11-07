@@ -1,12 +1,21 @@
 public static class MakeReservation
 {
     private static readonly string _dateFormat = "dd-MM-yyyy";
+    private static readonly string _toCancel = "You can cancel by entering 'cancel'.";
+    private static readonly string _cancelled = "Process canceled, you can try again.";
 
     public static void Start()
     {
         Console.Clear();
         Console.WriteLine($"Enter the date for your reservation ({_dateFormat}):");
-        string? dateInput = Console.ReadLine();
+        Console.WriteLine(_toCancel);
+        string dateInput = Console.ReadLine() ?? string.Empty;
+        if (dateInput.ToLower() == "cancel")
+        {
+            Console.Clear();
+            Console.WriteLine(_cancelled);
+            return;
+        }
 
         // Validates if it is in the right format
         while (!ReservationLogic.IsValidDateFormat(dateInput))
@@ -17,7 +26,7 @@ public static class MakeReservation
             Console.ResetColor();
 
             Console.WriteLine($"Enter the date for your reservation ({_dateFormat}):");
-            dateInput = Console.ReadLine();
+            dateInput = Console.ReadLine() ?? string.Empty;
         }
 
         // Validates if its not set in the past
@@ -29,14 +38,22 @@ public static class MakeReservation
             Console.ResetColor();
 
             Console.WriteLine($"Enter the date for your reservation ({_dateFormat}):");
-            dateInput = Console.ReadLine();
+            dateInput = Console.ReadLine() ?? string.Empty;
         }
 
         // Validates if the picked option is 1 or 2
+        Console.Clear();
         Console.WriteLine("Enter the time for your reservation");
         Console.WriteLine("1) 5:00 PM");
         Console.WriteLine("2) 9:30 PM");
-        string? timeInput = Console.ReadLine();
+        Console.WriteLine(_toCancel);
+        string timeInput = Console.ReadLine() ?? string.Empty;
+        if (timeInput.ToLower() == "cancel")
+        {
+            Console.Clear();
+            Console.WriteLine(_cancelled);
+            return;
+        }
 
         while (timeInput != "1" && timeInput != "2")
         {
@@ -48,7 +65,7 @@ public static class MakeReservation
             Console.WriteLine("Pick one of the available times");
             Console.WriteLine("1) 5:00 PM");
             Console.WriteLine("2) 9:30 PM");
-            timeInput = Console.ReadLine();
+            timeInput = Console.ReadLine() ?? string.Empty;
         }
 
         if (timeInput == "1")
@@ -60,8 +77,16 @@ public static class MakeReservation
             timeInput = "9:30 PM";
         }
 
+        Console.Clear();
         Console.WriteLine("Enter the number of guests (1-6):");
-        string? partySizeInput = Console.ReadLine();
+        Console.WriteLine(_toCancel);
+        string partySizeInput = Console.ReadLine() ?? string.Empty;
+        if (partySizeInput.ToLower() == "cancel")
+        {
+            Console.Clear();
+            Console.WriteLine(_cancelled);
+            return;
+        }
 
         int partySize;
         if (partySizeInput != "")
@@ -81,7 +106,7 @@ public static class MakeReservation
             Console.ResetColor();
 
             Console.WriteLine("Enter the number of guests (1-6):");
-            partySizeInput = Console.ReadLine();
+            partySizeInput = Console.ReadLine() ?? string.Empty;
             if (partySizeInput != "")
             {
                 partySize = Int32.Parse(partySizeInput);
@@ -106,6 +131,7 @@ public static class MakeReservation
 
         while (selectedTable == null)
         {
+            Console.Clear();
             Console.WriteLine("Select a available table:");
 
             foreach (TableModel table in availableTables)
@@ -114,7 +140,7 @@ public static class MakeReservation
                 Console.WriteLine($"Seats: {table.Capacity}");
                 Console.WriteLine("-------------------\n");
             }
-            string? tableInput = Console.ReadLine();
+            string tableInput = Console.ReadLine() ?? string.Empty;
 
             if (!int.TryParse(tableInput, out int selectedId))
             {
@@ -149,29 +175,29 @@ public static class MakeReservation
         Console.WriteLine($"People attending: {partySize}");
         Console.WriteLine($"Table: #{table}\n");
         Console.WriteLine($"Do you want to confirm? (Yes/No)");
-        string? userInput = Console.ReadLine();
-        bool retry = true;
+        string userInput = Console.ReadLine() ?? string.Empty;
 
-        if (userInput.ToLower() == "yes" || userInput.ToLower() == "y")
+        while (userInput.ToLower() is not ("yes" or "y" or "no" or "n"))
         {
-            ReservationLogic.Write(partySize, dateInput, timeInput, table);
-            retry = false;
-        }
-        else if (userInput.ToLower() == "no" || userInput.ToLower() == "n")
-        {
-            retry = false;
-        }
-
-        while (retry)
-        {
-
             Console.Clear();
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine("Wrong input! only Yes/No are allowed.");
             Console.ResetColor();
 
             Console.WriteLine($"Do you want to confirm? (Yes/No)");
-            userInput = Console.ReadLine();
+            userInput = Console.ReadLine() ?? string.Empty;
+        }
+
+        if (userInput.ToLower() is "no" or "n")
+        {
+            Console.Clear();
+            Console.WriteLine(_cancelled);
+            return;
+        }
+
+        if (userInput.ToLower() is "yes" or "y")
+        {
+            ReservationLogic.Write(partySize, dateInput, timeInput, table);
         }
 
         Console.Clear();
