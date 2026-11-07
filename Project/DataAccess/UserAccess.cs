@@ -43,12 +43,20 @@ public class UserAccess
         _connection.Execute(sql, new { Id = account.Id });
         _connection.Close();
     }
+    public static UserModel? GetById(int id)
+    {
+        string sql = $"SELECT id, firstName, lastName, phonenumber, email AS EmailAddress, role FROM {Table} WHERE id = @id";
+        _connection.Open();
+        var user = _connection.QueryFirstOrDefault<UserModel>(sql, new { id = id });
+        _connection.Close();
+        return user;
+    }
 
     public static List<UserModel> GetAllCustomers_ExceptPassword()
     {
-        string query = $"SELECT id, email, firstName, lastName, phonenumber, role FROM {Table} WHERE role = 'Customer'";
+        string sql = $"SELECT id, firstName, lastName, phonenumber, email AS EmailAddress, role FROM {Table}";
         _connection.Open();
-        List<UserModel> customers = _connection.Query<UserModel>(query).ToList();
+        List<UserModel> customers = _connection.Query<UserModel>(sql).ToList();
         _connection.Close();
         return customers;
     }
