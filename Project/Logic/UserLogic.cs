@@ -51,6 +51,23 @@ public class UserLogic
         return email.Contains("@") && email.Contains(".");
     }
 
+    public static bool ValidatePhoneNumber(string phoneNumber)
+    {
+        if (string.IsNullOrWhiteSpace(phoneNumber))
+        {
+            return false;
+        }
+
+        string digits = phoneNumber.StartsWith("+") ? phoneNumber.Substring(1) : phoneNumber;
+
+        if (digits.Length == 0 || !digits.All(char.IsDigit))
+        {
+            return false;
+        }
+
+        return digits.Length >= 8 && digits.Length <= 15;
+    }
+
     public static bool ValidateName(string name)
     {
         return (name.Length > 1);
