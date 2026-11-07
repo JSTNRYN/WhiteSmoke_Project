@@ -152,4 +152,24 @@ public class UserLogic
     {
         return UserAccess.GetAllCustomers_ExceptPassword();
     }
+
+    public static void UpdateFirstName(UserModel customer, string newFirstName)
+    {
+        UserAccess.UpdateFirstName(customer, newFirstName);
+    }
+
+    public static void UpdateLastName(UserModel customer, string newLastName)
+    {
+        UserAccess.UpdateLastName(customer, newLastName);
+    }
+
+    public static void UpdateEmail(UserModel customer, string newEmail)
+    {
+        UserAccess.UpdateEmail(customer, newEmail);
+    }
+
+    public static void UpdatePhoneNumber(UserModel customer, string newPhoneNumber)
+    {
+        UserAccess.UpdatePhoneNumber(customer, newPhoneNumber);
+    }
 }
