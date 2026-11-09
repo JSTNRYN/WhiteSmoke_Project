@@ -74,7 +74,7 @@ Opening hours
 
             string input = Console.ReadLine();
 
-            if (input == "1" && !UserLogic.IsLoggedIn())
+            switch (input, UserLogic.IsLoggedIn())
             {
                 UserLogin.Start();
             }
