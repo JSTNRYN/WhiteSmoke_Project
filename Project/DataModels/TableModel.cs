@@ -1,10 +1,14 @@
 public class TableModel
 {
-    public Int64 Id { get; set; }
+    public int Id { get; set; }
+    public int Capacity { get; set; }
+    public int? X { get; set; }
+    public int? Y { get; set; }
+    public bool? IsOccupied { get; set; }
 
-    public Int64 Capacity { get; set; }
+    public TableModel() { }
 
-    public TableModel(Int64 id, Int64 capacity)
+    public TableModel(int id, int capacity)
     {
         Id = id;
         Capacity = capacity;
