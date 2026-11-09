@@ -14,7 +14,7 @@ public class ReservationLogic
     {
         if (UserLogic.CurrentAccount is null)
         {
-            throw new InvalidOperationException("Je moet ingelogd zijn om een reservering te maken.");
+            throw new InvalidOperationException("You must be logged in to make a reservation.");
         }
 
         return ReservationAccess.Write(UserLogic.CurrentAccount, partySize, dateInput, timeInput, table);

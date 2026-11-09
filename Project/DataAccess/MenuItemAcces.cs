@@ -68,4 +68,11 @@ public static class MenuItemAccess
         connection.Execute("UPDATE MenuItem SET ISAVAILABLE = 0 WHERE ID = @Id", new { Id = id });
     }
 
+    public static void Activate(int id)
+    {
+        using var connection = Database.CreateConnection();
+        connection.Open();
+        connection.Execute("UPDATE MenuItem SET ISAVAILABLE = 1 WHERE ID = @Id", new { Id = id });
+    }
+
 }

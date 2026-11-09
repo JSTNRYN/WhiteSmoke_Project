@@ -74,7 +74,7 @@ public static class MakeReservation
         }
 
         List<OrderLineModel>? orderLines = OrderLogic.AskForOrder();
-        if (orderLines == null) { Console.WriteLine("Reservering geannuleerd."); return; }
+        if (orderLines == null) { Console.WriteLine("Reservation cancelled."); return; }
         Conformation(partySize, dateInput, timeInput, selectedTable.Id, orderLines);
     }
 

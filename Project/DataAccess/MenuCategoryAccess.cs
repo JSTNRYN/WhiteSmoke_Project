@@ -6,7 +6,7 @@ public static class MenuCategoryAccess
     {
         using var connection = Database.CreateConnection();
         connection.Open();
-        return connection.Query<MenuCategoryModel>("SELECT ID AS Id, NAME AS Name, ISCUSTOM AS IsCustom FROM MenuCategory ORDER BY IsCustom, Name").ToList();
+        return connection.Query<MenuCategoryModel>("SELECT ID AS Id, NAME AS Name, ISCUSTOM AS IsCustom FROM MenuCategory ORDER BY NAME COLLATE NOCASE, ID").ToList();
     }
 
     public static MenuCategoryModel? GetById(int id)

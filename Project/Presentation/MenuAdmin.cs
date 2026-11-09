@@ -47,7 +47,7 @@ public static class MenuAdmin
             }
 
             Console.ForegroundColor = item.IsAvailable ? ConsoleColor.White : ConsoleColor.DarkGray;
-            Console.WriteLine($"ID {item.Id,-4} {item.Name,-40} EUR {item.UnitPrice,7:F2}  {(item.IsAvailable ? "ACTIEF" : "VERWIJDERD")}");
+            Console.WriteLine($"ID {item.Id,-4} {item.Name,-40} EUR {item.UnitPrice,7:F2}  {(item.IsAvailable ? "ACTIVE" : "REMOVED")}");
             Console.ResetColor();
         }
         Pause();
@@ -57,11 +57,40 @@ public static class MenuAdmin
     {
         try
         {
+            Console.WriteLine("1) Create a new item");
+            Console.WriteLine("2) Reactivate a removed item");
+            Console.WriteLine("3) Cancel");
+            string action = Console.ReadLine()?.Trim() ?? string.Empty;
+            if (action == "2")
+            {
+                ReactivateItem();
+                return;
+            }
+            if (action != "1") return;
             MenuItemModel input = ReadItem(null);
             int id = MenuAdminLogic.Add(input.Name, input.Category, input.UnitPrice, input.Description, input.Adult);
             Console.WriteLine($"Item {id} was added.");
         }
         catch (Exception ex) { Console.WriteLine(ex.Message); }
+        Pause();
+    }
+
+    private static void ReactivateItem()
+    {
+        List<MenuItemModel> removedItems = MenuAdminLogic.GetItems().Where(item => !item.IsAvailable).ToList();
+        if (removedItems.Count == 0)
+        {
+            Console.WriteLine("There are no removed items to reactivate.");
+            Pause();
+            return;
+        }
+
+        foreach (MenuItemModel item in removedItems)
+            Console.WriteLine($"ID {item.Id} | {item.Name} | {item.Category} | EUR {item.UnitPrice:F2}");
+        Console.Write("Menu item ID to reactivate: ");
+        if (!int.TryParse(Console.ReadLine(), out int id)) throw new ArgumentException("ID must be a number.");
+        MenuAdminLogic.Reactivate(id);
+        Console.WriteLine($"Item {id} was reactivated.");
         Pause();
     }
 
@@ -118,7 +147,7 @@ public static class MenuAdmin
             Console.WriteLine($"Reservations for ID {item.Id}: {item.Name}");
             if (reservations.Count == 0) Console.WriteLine("No reservations found.");
             foreach (AdminReservationModel reservation in reservations)
-                Console.WriteLine($"Reservation #{reservation.ReservationId} | {reservation.Date} {reservation.TimeSlot} | {reservation.FirstName} {reservation.LastName} | {reservation.Email} | {reservation.PartySize} gasten");
+                Console.WriteLine($"Reservation #{reservation.ReservationId} | {reservation.Date} {reservation.TimeSlot} | {reservation.FirstName} {reservation.LastName} | {reservation.Email} | {reservation.PartySize} guests");
         }
         catch (Exception ex) { Console.WriteLine(ex.Message); }
         Pause();
@@ -126,12 +155,12 @@ public static class MenuAdmin
 
     private static MenuItemModel ReadItem(MenuItemModel? current)
     {
-        Console.Write($"Naam{Default(current?.Name)}: ");
+        Console.Write($"Name{Default(current?.Name)}: ");
         string name = Required(current?.Name);
         string category = ReadCategory(current?.Category);
         Console.Write($"Price{Default(current?.UnitPrice.ToString("F2"))}: ");
         double price = Price(current?.UnitPrice);
-        Console.Write($"Beschrijving{Default(current?.Description)}: ");
+        Console.Write($"Description{Default(current?.Description)}: ");
         string description = Required(current?.Description);
         Console.Write($"18+ item (yes/no){Default(current?.Adult == true ? "yes" : "no")}: ");
         bool adult = BooleanValue(current?.Adult);
@@ -150,7 +179,7 @@ public static class MenuAdmin
         List<MenuCategoryModel> categories = MenuAdminLogic.GetCategories();
         Console.WriteLine("Categories:");
         foreach (MenuCategoryModel category in categories)
-            Console.WriteLine($"{category.Id}) {category.Name}{(category.IsCustom ? " (eigen)" : "")}");
+            Console.WriteLine($"{category.Id}) {category.Name}{(category.IsCustom ? " (custom)" : "")}");
         Console.Write($"Category ID{(current == null ? "" : $" [{categories.FirstOrDefault(c => c.Name.Equals(current, StringComparison.OrdinalIgnoreCase))?.Id}]")}: ");
         string input = Console.ReadLine()?.Trim() ?? string.Empty;
         if (input.Length == 0 && current != null) return current;
@@ -166,7 +195,7 @@ public static class MenuAdmin
             Clear();
             Console.WriteLine("CATEGORIES");
             foreach (MenuCategoryModel category in MenuAdminLogic.GetCategories())
-                Console.WriteLine($"{category.Id}) {category.Name}{(category.IsCustom ? " (eigen)" : " (vast)")}");
+                Console.WriteLine($"{category.Id}) {category.Name}{(category.IsCustom ? " (custom)" : " (fixed)")}");
             Console.WriteLine("N) New category");
             Console.WriteLine("D) Delete custom category");
             Console.WriteLine("B) Back");

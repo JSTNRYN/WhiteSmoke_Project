@@ -72,6 +72,16 @@ public static class MenuAdminLogic
         MenuItemAccess.Archive(item.Id);
     }
 
+    public static void Reactivate(int id)
+    {
+        RequireAdmin();
+        MenuItemModel item = MenuItemAccess.GetById(id) ?? throw new ArgumentException("Menu item not found.");
+        if (item.IsAvailable) throw new InvalidOperationException("Menu item is already active.");
+        if (!MenuCategoryAccess.NameExists(item.Category)) throw new InvalidOperationException("The item's category no longer exists.");
+        if (MenuItemAccess.NameExists(item.Name, item.Category, item.Id)) throw new InvalidOperationException("Another item with this name already exists in this category.");
+        MenuItemAccess.Activate(item.Id);
+    }
+
     private static MenuItemModel Validate(int id, string name, string category, double price, string description, bool adult)
     {
         name = name.Trim();
