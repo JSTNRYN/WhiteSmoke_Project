@@ -4,7 +4,7 @@ public static class AdminFunctions
     {
         List<UserModel> customers = UserLogic.GetAllCustomers_ExceptPassword();
         Console.Clear();
-        Console.WriteLine("List of Customers (Amount: {customers.Count}):");
+        Console.WriteLine($"List of Customers (Amount: {customers.Count}):");
         foreach (var customer in customers)
         {
             if (customer == null)
