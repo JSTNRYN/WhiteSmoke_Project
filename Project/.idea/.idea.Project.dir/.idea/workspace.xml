@@ -15,9 +15,6 @@
   <component name="ChangeListManager">
     <list default="true" id="3be85243-6a67-4d44-8c62-2c66c5038dbe" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Project.dir/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Project.dir/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataAccess/UserAccess.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/UserAccess.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Logic/UserLogic.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Logic/UserLogic.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Presentation/Menu.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Presentation/Menu.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

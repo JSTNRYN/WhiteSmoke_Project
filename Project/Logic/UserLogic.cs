@@ -271,7 +271,7 @@ public class UserLogic
         string newPhoneNumber = Console.ReadLine();
         if (ValidatePhone(newPhoneNumber) == false)
         {
-            UserSignUp.ShowError("Please enter a name with at least 2 characters.");
+            UserSignUp.ShowError("Invalid phone number!");
             AskPhoneToEdit(user);
         }
         else
