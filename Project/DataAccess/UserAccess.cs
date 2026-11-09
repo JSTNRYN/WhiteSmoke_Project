@@ -43,7 +43,54 @@ public class UserAccess
         _connection.Execute(sql, new { Id = account.Id });
         _connection.Close();
     }
+    public static UserModel? GetById(int id)
+    {
+        string sql = $"SELECT id, firstName, lastName, phonenumber, email AS EmailAddress, role FROM {Table} WHERE id = @id";
+        _connection.Open();
+        var user = _connection.QueryFirstOrDefault<UserModel>(sql, new { id = id });
+        _connection.Close();
+        return user;
+    }
 
+    public static List<UserModel> GetAllCustomers_ExceptPassword()
+    {
+        string sql = $"SELECT id, firstName, lastName, phonenumber, email AS EmailAddress, role FROM {Table}";
+        _connection.Open();
+        List<UserModel> customers = _connection.Query<UserModel>(sql).ToList();
+        _connection.Close();
+        return customers;
+    }
 
+    public static void UpdateFirstName(UserModel customer, string newFirstName)
+    {
+        string sql = $"UPDATE {Table} SET firstName = @NewFirstName WHERE id = @Id";
+        _connection.Open();
+        _connection.Execute(sql, new { NewFirstName = newFirstName, Id = customer.Id });
+        _connection.Close();
+    }
+
+    public static void UpdateLastName(UserModel customer, string newLastName)
+    {
+        string sql = $"UPDATE {Table} SET lastName = @NewLastName WHERE id = @Id";
+        _connection.Open();
+        _connection.Execute(sql, new { NewLastName = newLastName, Id = customer.Id });
+        _connection.Close();
+    }
+
+    public static void UpdatePhoneNumber(UserModel customer, string newPhoneNumber)
+    {
+        string sql = $"UPDATE {Table} SET phonenumber = @NewPhoneNumber WHERE id = @Id";
+        _connection.Open();
+        _connection.Execute(sql, new { NewPhoneNumber = newPhoneNumber, Id = customer.Id });
+        _connection.Close();
+    }
+
+    public static void UpdateEmail(UserModel customer, string newEmail)
+    {
+        string sql = $"UPDATE {Table} SET email = @NewEmail WHERE id = @Id";
+        _connection.Open();
+        _connection.Execute(sql, new { NewEmail = newEmail, Id = customer.Id });
+        _connection.Close();
+    }
 
 }

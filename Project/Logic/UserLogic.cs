@@ -51,6 +51,23 @@ public class UserLogic
         return email.Contains("@") && email.Contains(".");
     }
 
+    public static bool ValidatePhoneNumber(string phoneNumber)
+    {
+        if (string.IsNullOrWhiteSpace(phoneNumber))
+        {
+            return false;
+        }
+
+        string digits = phoneNumber.StartsWith("+") ? phoneNumber.Substring(1) : phoneNumber;
+
+        if (digits.Length == 0 || !digits.All(char.IsDigit))
+        {
+            return false;
+        }
+
+        return digits.Length >= 8 && digits.Length <= 15;
+    }
+
     public static bool ValidateName(string name)
     {
         return (name.Length > 1);
@@ -121,7 +138,7 @@ public class UserLogic
         {
             Console.Write("Please enter your phone number: ");
             string? phoneNumber = Console.ReadLine();
-
+            // Check if the phone number is not null or whitespace and contains only digits
             if (!string.IsNullOrWhiteSpace(phoneNumber) && phoneNumber.All(char.IsDigit))
             {
                 return phoneNumber;
@@ -129,5 +146,35 @@ public class UserLogic
 
             UserSignUp.ShowError("Invalid phone number! Please enter numbers only.");
         }
+    }
+
+    public static List<UserModel> GetAllCustomers_ExceptPassword()
+    {
+        return UserAccess.GetAllCustomers_ExceptPassword();
+    }
+
+    public static void UpdateFirstName(UserModel customer, string newFirstName)
+    {
+        UserAccess.UpdateFirstName(customer, newFirstName);
+    }
+
+    public static void UpdateLastName(UserModel customer, string newLastName)
+    {
+        UserAccess.UpdateLastName(customer, newLastName);
+    }
+
+    public static void UpdateEmail(UserModel customer, string newEmail)
+    {
+        UserAccess.UpdateEmail(customer, newEmail);
+    }
+
+    public static void UpdatePhoneNumber(UserModel customer, string newPhoneNumber)
+    {
+        UserAccess.UpdatePhoneNumber(customer, newPhoneNumber);
+    }
+
+    public static UserModel GetCustomerById(int id)
+    {
+        return UserAccess.GetById(id);
     }
 }
