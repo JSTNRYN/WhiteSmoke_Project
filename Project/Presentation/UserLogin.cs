@@ -9,12 +9,14 @@ static class UserLogin
     {
 
         Console.Write("Please enter your e-mail: ");
-        string email = Console.ReadLine();
+        string? email = Console.ReadLine();
         
         Console.Write("Please enter your password: ");
-        string password = Console.ReadLine();
+        string? password = Console.ReadLine();
         
-        UserModel acc = _userLogic.CheckLogin(email, password);
+        UserModel? acc = email is not null && password is not null
+            ? _userLogic.CheckLogin(email, password)
+            : null;
 
         if (acc != null)
         {
@@ -33,7 +35,7 @@ static class UserLogin
         Console.ResetColor();
     }
 
-    private static string askEmail()
+    private static string? askEmail()
     {
         Console.Write("Please enter your e-mail: ");
         return Console.ReadLine();

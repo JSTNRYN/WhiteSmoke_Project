@@ -1,4 +1,6 @@
 ﻿
+Database.Initialize();
+
 Menu.ShowRestaurantName();
 Menu.ShowRestaurantDescription();
 
