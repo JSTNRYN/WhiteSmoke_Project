@@ -73,42 +73,38 @@ Opening hours
 
             string input = Console.ReadLine();
 
-            if (input == "1" && !UserLogic.IsLoggedIn())
+            switch (input, UserLogic.IsLoggedIn())
             {
-                UserLogin.Start();
-            }
-            else if (input == "2" && !UserLogic.IsLoggedIn())
-            {
-                UserSignUp.Start();
-            }
-            else if (input == "3" && !UserLogic.IsLoggedIn())
-            {
-                Menu.About();
-            }
-            else if (input == "1" && UserLogic.IsLoggedIn())
-            {
-                MakeReservation.Start();
-            }
-            else if (input == "2" && UserLogic.IsLoggedIn())
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("");
-                Console.ResetColor();
-
-
-                MyReservation.ShowReservations(UserLogic.CurrentAccount!.Id);
-            }
-            else if (input == "3" && UserLogic.IsLoggedIn())
-            {
-                About();
-            }
-            else if (input == "4" && UserLogic.IsLoggedIn())
-            {
-                UserLogic.Logout();
-            }
-            else
-            {
-                Console.WriteLine("Invalid input");
+                case ("1", false):
+                    UserLogin.Start();
+                    break;
+                case ("2", false):
+                    UserSignUp.Start();
+                    break;
+                case ("3", false):
+                    Menu.About();
+                    break;
+                case ("1", true):
+                    MakeReservation.Start();
+                    break;
+                case ("2", true):
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("");
+                    Console.ResetColor();
+                    MyReservation.ShowReservations(UserLogic.CurrentAccount!.Id);
+                    break;
+                case ("3", true):
+                    About();
+                    break;
+                case ("4", true):
+                    UserLogic.Logout();
+                    break;
+                case ("5", true) when UserLogic.IsAdmin():
+                    AdminFunctions.ShowCustomers();
+                    break;
+                default:
+                    Console.WriteLine("Invalid input");
+                    break;
             }
         }
     }
