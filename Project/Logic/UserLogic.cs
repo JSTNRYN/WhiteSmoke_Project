@@ -48,6 +48,10 @@ public class UserLogic
 
     public static bool IsValidEmailFormat(string email)
     {
+        if (email.ToLower() == "q")
+        {
+            Menu.Start();
+        }
         return email.Contains("@") && email.Contains(".");
     }
 
@@ -70,6 +74,10 @@ public class UserLogic
 
     public static bool ValidateName(string name)
     {
+        if (name.ToLower() == "q")
+        {
+            Menu.Start();
+        }
         return (name.Length > 1);
     }
 
@@ -90,19 +98,19 @@ public class UserLogic
     
     public static string? AskEmail()
     {
-        Console.Write("Please enter your e-mail: ");
+        Console.Write("Please enter your e-mail (Or type q and enter to go back): ");
         return Console.ReadLine();
     }
     
     public static string? AskFirstName()
     {
-        Console.Write("Please enter your first name: ");
+        Console.Write("Please enter your first name (Or type q and enter to go back): ");
         return Console.ReadLine();
     }
 
     public static string? AskLastName()
     {
-        Console.Write("Please enter your last name: ");
+        Console.Write("Please enter your last name (Or type q and enter to go back): ");
         return Console.ReadLine();
     }
     
