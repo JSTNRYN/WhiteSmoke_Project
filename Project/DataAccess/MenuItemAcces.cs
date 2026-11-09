@@ -1,4 +1,3 @@
-using Microsoft.Data.Sqlite;
 using Dapper;
 public static class MenuItemAccess
 {
@@ -6,7 +5,7 @@ public static class MenuItemAccess
     {
         try
         {
-            using (var conn = Database.CreateMenuConnection())
+            using (var conn = Database.CreateConnection())
             {
                 conn.Open();
                 string query = @"
@@ -15,7 +14,7 @@ public static class MenuItemAccess
                         MENU AS Menu,
                         NAME AS Name,
                         CATEGORY AS Category,
-                        UNITPRICE AS UnitPrice,
+                        CAST(UNITPRICE AS REAL) AS UnitPrice,
                         DESCRIPTION AS Description
                     FROM MenuItem
                     ORDER BY CATEGORY, NAME";

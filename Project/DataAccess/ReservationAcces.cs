@@ -6,12 +6,12 @@ public static class ReservationAccess
     private static string _table = "Reservation";
 
 
-    public static void Write(UserModel user, Int64 partySize, string date, string timeslot, Int64 table)
+    public static long Write(UserModel user, Int64 partySize, string date, string timeslot, Int64 table)
     {
-        string query = $"INSERT INTO {_table} (Timeslot, Date, PartySize, UserID, TableID) VALUES (@Timeslot, @Date, @PartySize, @UserID, @TableID)";
+        string query = $"INSERT INTO {_table} (Timeslot, Date, PartySize, UserID, TableID) VALUES (@Timeslot, @Date, @PartySize, @UserID, @TableID) RETURNING ID";
         using var connection = Database.CreateConnection();
         connection.Open();
-        connection.Execute(query, new
+        return connection.ExecuteScalar<long>(query, new
         {
             Timeslot = timeslot,
             Date = date,

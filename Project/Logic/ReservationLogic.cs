@@ -10,14 +10,14 @@ public class ReservationLogic
         return ReservationAccess.GetWithUserID(User);
     }
 
-    public static void Write(Int64 partySize, string dateInput, string timeInput, Int64 table)
+    public static long Write(Int64 partySize, string dateInput, string timeInput, Int64 table)
     {
         if (UserLogic.CurrentAccount is null)
         {
             throw new InvalidOperationException("Je moet ingelogd zijn om een reservering te maken.");
         }
 
-        ReservationAccess.Write(UserLogic.CurrentAccount, partySize, dateInput, timeInput, table);
+        return ReservationAccess.Write(UserLogic.CurrentAccount, partySize, dateInput, timeInput, table);
     }
 
     public static List<TableModel> GetAvailableTables(DateTime date, int partySize)

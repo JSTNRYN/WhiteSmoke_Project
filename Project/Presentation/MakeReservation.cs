@@ -10,7 +10,6 @@ public static class MakeReservation
         Console.WriteLine($"Enter the date for your reservation ({_dateFormat}):");
         string dateInput = Console.ReadLine() ?? string.Empty;
 
-        // Validates if it is in the right format
         while (!ReservationLogic.IsValidDateFormat(dateInput))
         {
             Console.Clear();
@@ -22,7 +21,6 @@ public static class MakeReservation
             dateInput = Console.ReadLine() ?? string.Empty;
         }
 
-        // Validates if its not set in the past
         while (!ReservationLogic.IsValidateDate(dateInput))
         {
             Console.Clear();
@@ -34,7 +32,6 @@ public static class MakeReservation
             dateInput = Console.ReadLine() ?? string.Empty;
         }
 
-        // Validates if the picked option is 1 or 2
         Console.WriteLine("Enter the time for your reservation");
         Console.WriteLine("1) 5:00 PM");
         Console.WriteLine("2) 9:30 PM");
@@ -86,7 +83,6 @@ public static class MakeReservation
             }
         }
 
-        // @TODO: get available tables for that day
         TableModel? selectedTable = null;
 
         while (selectedTable == null)
@@ -122,10 +118,17 @@ public static class MakeReservation
         }
 
 
-        Conformation(partySize, dateInput, timeInput!, selectedTable.Id);
+        List<OrderLineModel>? orderLines = OrderLogic.AskForOrder();
+        if (orderLines == null)
+        {
+            Console.WriteLine("Reservering geannuleerd.");
+            return;
+        }
+
+        Conformation(partySize, dateInput, timeInput!, selectedTable.Id, orderLines);
     }
 
-    public static void Conformation(Int64 partySize, string dateInput, string timeInput, Int64 table)
+    public static void Conformation(Int64 partySize, string dateInput, string timeInput, Int64 table, List<OrderLineModel> orderLines)
     {
         Console.Clear();
         Console.WriteLine("Your reservation:\n");
@@ -133,13 +136,14 @@ public static class MakeReservation
         Console.WriteLine($"Time: {timeInput}");
         Console.WriteLine($"People attending: {partySize}");
         Console.WriteLine($"Table: #{table}\n");
+        Console.WriteLine($"Order total: €{OrderLogic.GetTotal(orderLines):F2}\n");
         Console.WriteLine($"Do you want to confirm? (Yes/No)");
         string? userInput = Console.ReadLine();
         bool retry = true;
 
         if (userInput?.ToLowerInvariant() is "yes" or "y")
         {
-            ReservationLogic.Write(partySize, dateInput, timeInput, table);
+            SaveReservation(partySize, dateInput, timeInput, table, orderLines);
             retry = false;
         }
         else if (userInput?.ToLowerInvariant() is "no" or "n")
@@ -160,7 +164,7 @@ public static class MakeReservation
 
             if (userInput?.ToLowerInvariant() is "yes" or "y")
             {
-                ReservationLogic.Write(partySize, dateInput, timeInput, table);
+                SaveReservation(partySize, dateInput, timeInput, table, orderLines);
                 retry = false;
             }
             else if (userInput?.ToLowerInvariant() is "no" or "n")
@@ -173,5 +177,15 @@ public static class MakeReservation
         Console.ForegroundColor = ConsoleColor.Blue;
         Console.WriteLine($"Reservation made for {partySize} guests on {dateInput} at {timeInput}.");
         Console.ResetColor();
+    }
+
+    private static void SaveReservation(Int64 partySize, string dateInput, string timeInput, Int64 table, List<OrderLineModel> orderLines)
+    {
+        long reservationId = ReservationLogic.Write(partySize, dateInput, timeInput, table);
+
+        if (orderLines.Count > 0)
+        {
+            OrderAccess.Save(reservationId, orderLines);
+        }
     }
 }
