@@ -2,7 +2,7 @@ using Dapper;
 
 public static class MenuItemAccess
 {
-    public static List<MenuItemModel> LoadAllMenuItems()
+    public static List<MenuItemModel> LoadAllMenuItems(bool includeUnavailable = false)
     {
         try
         {
@@ -17,18 +17,13 @@ public static class MenuItemAccess
                     CATEGORY AS Category,
                     CAST(UNITPRICE AS REAL) AS UnitPrice,
                     DESCRIPTION AS Description,
-                    CAST(ADULT AS INTEGER) AS Adult
+                    CAST(ADULT AS INTEGER) AS Adult,
+                    COALESCE(ISAVAILABLE, 1) AS IsAvailable
                 FROM MenuItem
+                WHERE @IncludeUnavailable = 1 OR COALESCE(ISAVAILABLE, 1) = 1
                 ORDER BY CATEGORY, NAME";
 
-            List<MenuItemModel> items = conn.Query<MenuItemModel>(query).ToList();
-            foreach (MenuItemModel item in items)
-            {
-                item.Name = CleanEncoding(item.Name);
-                item.Description = CleanEncoding(item.Description);
-                item.Category = CleanEncoding(item.Category);
-            }
-
+            List<MenuItemModel> items = conn.Query<MenuItemModel>(query, new { IncludeUnavailable = includeUnavailable ? 1 : 0 }).ToList();
             return items;
         }
         catch (Exception ex)
@@ -38,24 +33,39 @@ public static class MenuItemAccess
         }
     }
 
-    private static string CleanEncoding(string value)
+    public static MenuItemModel? GetById(int id)
     {
-        const string replacementCharacter = "\uFFFD";
-
-        return value
-            .Replace($"K{replacementCharacter}sekrainer", "K\u00E4sekrainer")
-            .Replace($"C{replacementCharacter}te", "C\u00F4te")
-            .Replace($"jalape{replacementCharacter}os", "jalape\u00F1os")
-            .Replace($"saut{replacementCharacter}ed", "saut\u00E9ed")
-            .Replace($"Spinach {replacementCharacter} la Cr{replacementCharacter}me", "Spinach \u00E0 la Cr\u00E8me")
-            .Replace($"Ard{replacementCharacter}che", "Ard\u00E8che")
-            .Replace($"Ros{replacementCharacter}", "Ros\u00E9")
-            .Replace($"Mo{replacementCharacter}t", "Mo\u00EBt")
-            .Replace($"Imp{replacementCharacter}rial", "Imp\u00E9rial")
-            .Replace($"Marqu{replacementCharacter}s", "Marqu\u00E9s")
-            .Replace($"A{replacementCharacter}n{replacementCharacter}", "A\u00EEn\u00E9")
-            .Replace($"C{replacementCharacter}dres", "C\u00E8dres")
-            .Replace($"Ch{replacementCharacter}teauneuf", "Ch\u00E2teauneuf")
-            .Replace($"Rh{replacementCharacter}ne", "Rh\u00F4ne");
+        using var connection = Database.CreateConnection();
+        connection.Open();
+        return connection.QueryFirstOrDefault<MenuItemModel>("SELECT ID AS Id, MENU AS Menu, NAME AS Name, CATEGORY AS Category, UNITPRICE AS UnitPrice, DESCRIPTION AS Description, ADULT AS Adult, COALESCE(ISAVAILABLE, 1) AS IsAvailable FROM MenuItem WHERE ID = @Id", new { Id = id });
     }
+
+    public static bool NameExists(string name, string category, int? exceptId = null)
+    {
+        using var connection = Database.CreateConnection();
+        connection.Open();
+        return connection.ExecuteScalar<long>("SELECT COUNT(*) FROM MenuItem WHERE LOWER(NAME) = LOWER(@Name) AND LOWER(CATEGORY) = LOWER(@Category) AND (@ExceptId IS NULL OR ID <> @ExceptId)", new { Name = name, Category = category, ExceptId = exceptId }) > 0;
+    }
+
+    public static int Create(MenuItemModel item)
+    {
+        using var connection = Database.CreateConnection();
+        connection.Open();
+        return connection.ExecuteScalar<int>("INSERT INTO MenuItem (MENU, NAME, CATEGORY, UNITPRICE, DESCRIPTION, ADULT, ISAVAILABLE) VALUES (@Menu, @Name, @Category, @UnitPrice, @Description, @Adult, 1) RETURNING ID", item);
+    }
+
+    public static void Update(MenuItemModel item)
+    {
+        using var connection = Database.CreateConnection();
+        connection.Open();
+        connection.Execute("UPDATE MenuItem SET MENU = @Menu, NAME = @Name, CATEGORY = @Category, UNITPRICE = @UnitPrice, DESCRIPTION = @Description, ADULT = @Adult WHERE ID = @Id", item);
+    }
+
+    public static void Archive(int id)
+    {
+        using var connection = Database.CreateConnection();
+        connection.Open();
+        connection.Execute("UPDATE MenuItem SET ISAVAILABLE = 0 WHERE ID = @Id", new { Id = id });
+    }
+
 }

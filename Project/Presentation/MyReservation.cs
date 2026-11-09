@@ -24,6 +24,13 @@ public static class MyReservation
             Console.WriteLine($"Guests: {reservation.PartySize}");
             Console.WriteLine($"Table: #{reservation.TableId}");
 
+            foreach (ReservationNoticeModel notice in ReservationNoticeAccess.GetForReservation(reservation.Id))
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"NOTICE: {notice.Message}");
+                Console.ResetColor();
+            }
+
             List<OrderLineModel> order = MyReservationLogic.GetOrder(reservation.Id);
             if (order.Count == 0)
             {

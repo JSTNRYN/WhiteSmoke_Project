@@ -6,9 +6,12 @@ public static class OrderAccess
     public static List<OrderLineModel> GetLines(long reservationId)
     {
         const string query = @"
-            SELECT MenuItem.ID AS Id, MenuItem.MENU AS Menu, MenuItem.NAME AS Name,
-                   MenuItem.CATEGORY AS Category, MenuItem.UNITPRICE AS UnitPrice,
-                   MenuItem.DESCRIPTION AS Description, MenuItem.ADULT AS Adult,
+            SELECT MenuItem.ID AS Id, MenuItem.MENU AS Menu,
+                   COALESCE(OrderItem.ItemName, MenuItem.NAME) AS Name,
+                   COALESCE(OrderItem.Category, MenuItem.CATEGORY) AS Category,
+                   COALESCE(OrderItem.UnitPrice, MenuItem.UNITPRICE) AS UnitPrice,
+                   COALESCE(OrderItem.Description, MenuItem.DESCRIPTION) AS Description,
+                   COALESCE(OrderItem.Adult, MenuItem.ADULT) AS Adult,
                    OrderItem.Quantity
             FROM OrderItem
             JOIN ""Order"" ON ""Order"".ID = OrderItem.OrderID
@@ -43,8 +46,8 @@ public static class OrderAccess
         foreach (OrderLineModel line in orderLines)
         {
             connection.Execute(
-                "INSERT INTO OrderItem (OrderID, MenuItemID, Quantity) VALUES (@OrderID, @MenuItemID, @Quantity)",
-                new { OrderID = orderId, MenuItemID = line.MenuItem.Id, Quantity = line.Quantity }, transaction);
+                "INSERT INTO OrderItem (OrderID, MenuItemID, Quantity, ItemName, UnitPrice, Category, Description, Adult) VALUES (@OrderID, @MenuItemID, @Quantity, @ItemName, @UnitPrice, @Category, @Description, @Adult)",
+                new { OrderID = orderId, MenuItemID = line.MenuItem.Id, Quantity = line.Quantity, ItemName = line.MenuItem.Name, UnitPrice = line.MenuItem.UnitPrice, Category = line.MenuItem.Category, Description = line.MenuItem.Description, Adult = line.MenuItem.Adult ? 1 : 0 }, transaction);
         }
 
         RecalculateTotal(connection, transaction, orderId);
@@ -73,7 +76,7 @@ public static class OrderAccess
         connection.Execute(@"
             UPDATE ""Order""
             SET TotalPrice = COALESCE((
-                SELECT SUM(OrderItem.Quantity * MenuItem.UNITPRICE)
+                SELECT SUM(OrderItem.Quantity * COALESCE(OrderItem.UnitPrice, MenuItem.UNITPRICE))
                 FROM OrderItem
                 JOIN MenuItem ON MenuItem.ID = OrderItem.MenuItemID
                 WHERE OrderItem.OrderID = ""Order"".ID

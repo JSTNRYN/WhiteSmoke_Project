@@ -17,6 +17,7 @@ public class MenuLogic
         return input.Trim() switch
         {
             "1" or "2" or "3" or "4" when isLoggedIn => true,
+            "5" or "6" when isLoggedIn && isAdmin => true,
             "1" or "2" or "3" when !isLoggedIn => true,
             _ => false
         };
@@ -35,17 +36,28 @@ public class MenuLogic
 
         foreach (var item in allItems)
         {
-            if (!groupedMenu.ContainsKey(item.Category))
+            string category = NormalizeCategory(item.Category);
+            if (!groupedMenu.ContainsKey(category))
             {
-                groupedMenu[item.Category] = new List<MenuItemModel>();
+                groupedMenu[category] = new List<MenuItemModel>();
             }
 
-            groupedMenu[item.Category].Add(item);
+            item.Category = category;
+            groupedMenu[category].Add(item);
         }
 
         foreach (List<MenuItemModel> items in groupedMenu.Values)
             items.Sort((left, right) => string.Compare(left.Name, right.Name, StringComparison.OrdinalIgnoreCase));
 
         return groupedMenu;
+    }
+
+    private static string NormalizeCategory(string category)
+    {
+        return category.Trim().ToLowerInvariant() switch
+        {
+            "dessert" or "desserts" or "sweets" => "Desserts",
+            _ => category.Trim()
+        };
     }
 }

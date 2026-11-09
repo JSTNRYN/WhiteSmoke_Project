@@ -46,4 +46,28 @@ public static class ReservationAccess
         return reservations;
     }
 
+    public static List<AdminReservationModel> GetByMenuItemId(long menuItemId)
+    {
+        const string query = @"
+            SELECT DISTINCT
+                Reservation.ID AS ReservationId,
+                Reservation.Date,
+                Reservation.Timeslot AS TimeSlot,
+                Reservation.PartySize,
+                Reservation.UserID AS UserId,
+                User.FirstName,
+                User.LastName,
+                User.Email
+            FROM OrderItem
+            JOIN ""Order"" ON ""Order"".ID = OrderItem.OrderID
+            JOIN Reservation ON Reservation.ID = ""Order"".ReservationID
+            JOIN User ON User.ID = Reservation.UserID
+            WHERE OrderItem.MenuItemID = @MenuItemId
+            ORDER BY Reservation.Date, Reservation.Timeslot, Reservation.ID";
+
+        using var connection = Database.CreateConnection();
+        connection.Open();
+        return connection.Query<AdminReservationModel>(query, new { MenuItemId = menuItemId }).ToList();
+    }
+
 }

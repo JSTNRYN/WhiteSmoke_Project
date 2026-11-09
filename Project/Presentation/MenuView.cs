@@ -16,25 +16,41 @@ public static class MenuView
         }
 
         if (!Console.IsOutputRedirected) Console.Clear();
-
-        Console.WriteLine("========================================");
-        Console.WriteLine("             WHITE SMOKE MENU           ");
-        Console.WriteLine("========================================");
+        Console.ForegroundColor = ConsoleColor.DarkYellow;
+        Console.WriteLine("==========================================================================");
+        Console.WriteLine("                            WHITE SMOKE MENU                              ");
+        Console.WriteLine("==========================================================================");
+        Console.ResetColor();
 
         foreach (KeyValuePair<string, List<MenuItemModel>> category in groupedMenu)
         {
-            Console.WriteLine($"\n--- {category.Key.ToUpperInvariant()} ---");
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine($"\n[{category.Key.ToUpperInvariant()}]");
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine(new string('-', 74));
+            Console.ResetColor();
+
             foreach (MenuItemModel item in category.Value)
             {
-                Console.WriteLine($"{item.Name}  |  EUR {item.UnitPrice:F2}");
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.WriteLine($"ID {item.Id,-4} {item.Name}");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine($"  EUR {item.UnitPrice,6:F2}");
                 if (MenuLogic.IsAdultItem(item))
-                    Console.WriteLine("  ADULT ITEM (18+)");
-                if (!string.IsNullOrWhiteSpace(item.Description))
-                    Console.WriteLine($"  {item.Description}");
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("  18+ item");
+                }
+                Console.ForegroundColor = ConsoleColor.Gray;
+                Console.WriteLine($"  {item.Description}");
+                Console.WriteLine();
+                Console.ResetColor();
             }
         }
 
-        Console.WriteLine("\nPress Enter to return...");
+        Console.ForegroundColor = ConsoleColor.DarkYellow;
+        Console.WriteLine("Press Enter to return...");
+        Console.ResetColor();
         Console.ReadLine();
     }
 }
