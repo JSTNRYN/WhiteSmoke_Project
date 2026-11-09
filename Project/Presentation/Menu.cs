@@ -44,7 +44,6 @@ Opening hours
 
     public static void Start()
     {
-        Console.OutputEncoding = System.Text.Encoding.UTF8;
 
         while (true)
         {
