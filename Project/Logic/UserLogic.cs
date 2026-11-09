@@ -69,31 +69,16 @@ public class UserLogic
     public static bool ValidatePhone(string phoneNumber)
     {
         if (string.IsNullOrEmpty(phoneNumber))
-        {
             return false;
-        }
-        int startIndex = 0;
-        if (phoneNumber[0] == '+')
-        {
-            startIndex = 1;
-        }
-        if (startIndex >= phoneNumber.Length)
-        {
+        if (!phoneNumber.StartsWith("+"))
             return false;
-        }
-        for (int i = startIndex; i < phoneNumber.Length; i++)
+        if (phoneNumber.Length != 12)
+            return false;
+        for (int i = 1; i < phoneNumber.Length; i++)
         {
             if (!char.IsDigit(phoneNumber[i]))
-            {
                 return false;
-            }
         }
-        int totalDigits = phoneNumber.Length - startIndex;
-        if (totalDigits != 10)
-        {
-            return false;
-        }
-
         return true;
     }
     
@@ -335,3 +320,4 @@ public class UserLogic
         }
     }
 }
+
