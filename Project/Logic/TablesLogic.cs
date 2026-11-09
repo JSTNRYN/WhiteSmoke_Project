@@ -1,18 +1,31 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
-// Hier staan de regels van het restaurant (welke capaciteit mag, welke posities bestaan).
-// De logica-laag controleert de invoer en roept daarna TableAccess aan om op te slaan.
-// Bij een fout gooit hij een exception met een duidelijke melding; de UI laat die zien.
+// Hier staan de regels van het restaurant. De logica-laag controleert de invoer
+// en roept daarna TableAccess aan. Bij een fout gooit hij een exception met een
+// duidelijke melding; de UI laat die zien.
 public static class TableLogic
 {
-    // Grootte van het raster. 0 t/m 4 = 5 kolommen, 0 t/m 5 = 6 rijen.
-    // Staat hier als constante zodat de UI dezelfde waardes gebruikt.
-    public const int MaxX = 4;
-    public const int MaxY = 5;
+
+ public const int MaxX = 2;   // kolommen 0-2 (3 kolommen)
+public const int MaxY = 5;   // rijen 0-5
 
     // Toegestane tafelgroottes volgens de regels van White Smoke
     private static readonly int[] AllowedCapacities = { 2, 4, 6 };
+
+    // Geeft alle tafels door aan de UI, zodat de UI niet zelf bij de database hoeft
+    public static List<TableModel> GetAllTables()
+    {
+        return TableAccess.GetAll();
+    }
+
+    // Controleert of een tafel bestaat (voor de directe foutmelding in de UI)
+    public static void ValidateTableExists(int id)
+    {
+        if (TableAccess.GetById(id) == null)
+            throw new ArgumentException($"Table {id} could not be found.");
+    }
 
     // Controleert of de capaciteit 2, 4 of 6 is
     public static void ValidateCapacity(int capacity)
@@ -37,8 +50,7 @@ public static class TableLogic
     }
 
     // Controleert een complete positie: binnen het raster én nog vrij.
-    // ignoreTableId is voor het verplaatsen: de tafel zelf telt dan niet als "bezette plek",
-    // anders zou je een tafel niet op zijn eigen plek kunnen laten staan.
+    // ignoreTableId is voor het verplaatsen: de tafel zelf telt dan niet als "bezette plek".
     public static void ValidatePosition(int x, int y, int? ignoreTableId = null)
     {
         ValidateColumn(x);
@@ -53,8 +65,7 @@ public static class TableLogic
     }
 
     // Voegt een tafel toe nadat alles gecontroleerd is.
-    // Ook als de UI al gecontroleerd heeft, doen we het hier nog een keer
-    // zodat ongeldige data nooit in de database kan komen.
+    // Dubbele controle zodat ongeldige data nooit in de database kan komen.
     public static void AddNewTable(int capacity, int x, int y)
     {
         ValidateCapacity(capacity);
@@ -65,7 +76,6 @@ public static class TableLogic
     // Verplaatst een tafel naar een nieuwe, geldige en vrije positie
     public static void MoveTable(int id, int x, int y)
     {
-        // Bestaat de tafel? Zo niet, dan melden we dat met een exception ("table not found")
         var table = TableAccess.GetById(id)
             ?? throw new InvalidOperationException($"Table {id} could not be found.");
 
