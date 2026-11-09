@@ -29,6 +29,18 @@ public sealed class CustomerManageTest
         // Assert
         Assert.IsFalse(emailIsValid, "Email address should be invalid.");
     }
-    
+
     [DataTestMethod]
+    [DataRow("")]
+    public void TestCustomerNameValidation_EmptyName(string emptyName)
+    {
+        // Arrange
+
+        // Act
+        bool nameIsValid = UserLogic.ValidateName(emptyName);
+
+        // Assert
+        Assert.IsFalse(nameIsValid, "Name should be invalid.");
+    }
 }
+
