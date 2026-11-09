@@ -4,7 +4,7 @@ public static class AdminFunctions
     {
         List<UserModel> customers = UserLogic.GetAllCustomers_ExceptPassword();
         Console.Clear();
-        Console.WriteLine($"List of Customers (Amount: {customers.Count}):");
+        Console.WriteLine($"List of Customers (Amount: {customers.Count-1}):");
         foreach (var customer in customers)
         {
             if (customer == null)
@@ -12,11 +12,19 @@ public static class AdminFunctions
                 Console.WriteLine("Customer is null.");
                 continue;
             }
-            Console.WriteLine($"ID: {customer.Id}");
-            Console.WriteLine($"Name: {customer.FirstName} {customer.LastName}");
-            Console.WriteLine($"Email: {customer.EmailAddress}");
-            Console.WriteLine($"Phone Number: {customer.PhoneNumber}");
+
+            if (customer.Id == UserLogic.CurrentAccount.Id)
+            {
+                continue;
+            }
+            else
+            {
+                Console.WriteLine($"ID: {customer.Id}");
+                Console.WriteLine($"Name: {customer.FirstName} {customer.LastName}");
+                Console.WriteLine($"Email: {customer.EmailAddress}");
+                Console.WriteLine($"Phone Number: {customer.PhoneNumber}");
                 Console.WriteLine("-----------------------------");
+            }
         }
         Console.WriteLine("Enter the ID of the customer you want to edit, or type 'q' to return to the main menu:");
         string input = Console.ReadLine();
@@ -30,7 +38,14 @@ public static class AdminFunctions
             UserModel customer = UserLogic.GetCustomerById(customerId);
             if (customer != null)
             {
-                EditCustomer(customer);
+                if (UserLogic.CurrentAccount.Id == customerId)
+                {
+                    Console.WriteLine("Customer not found.");
+                }
+                else
+                {
+                    EditCustomer(customer);
+                }
             }
             else
             {

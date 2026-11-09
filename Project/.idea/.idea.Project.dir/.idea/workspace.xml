@@ -15,8 +15,7 @@
   <component name="ChangeListManager">
     <list default="true" id="3be85243-6a67-4d44-8c62-2c66c5038dbe" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Project.dir/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Project.dir/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Logic/UserLogic.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Logic/UserLogic.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Presentation/Menu.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Presentation/Menu.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Presentation/AdminFunctions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Presentation/AdminFunctions.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -58,7 +57,7 @@
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "cidr.known.project.marker": "true",
     "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "29-presentation-layer-create-show-admin-panel-in-the-homepage-for-the-correct-user",
+    "git-widget-placeholder": "BacklogItem-Manage-View-Customers",
     "last_opened_file_path": "/Users/hurbie48/Documents/GitHub/WhiteSmoke_Project/Project",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
