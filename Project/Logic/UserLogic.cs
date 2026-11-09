@@ -138,7 +138,7 @@ public class UserLogic
         {
             Console.Write("Please enter your phone number: ");
             string? phoneNumber = Console.ReadLine();
-
+            // Check if the phone number is not null or whitespace and contains only digits
             if (!string.IsNullOrWhiteSpace(phoneNumber) && phoneNumber.All(char.IsDigit))
             {
                 return phoneNumber;
