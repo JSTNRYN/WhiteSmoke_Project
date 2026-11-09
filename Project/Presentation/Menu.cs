@@ -2,7 +2,6 @@ using Project.Presentation;
 
 static class Menu
 {
-
     public static void ShowRestaurantName()
     {
         Console.Clear();
@@ -43,70 +42,114 @@ Opening hours
 ");
     }
     public static void Start()
-{
-    while (true)
     {
-        if (UserLogic.IsLoggedIn())
+        while (true)
         {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"You are logged in as: {UserLogic.CurrentAccount.FirstName} {UserLogic.CurrentAccount.LastName}");
-            Console.ResetColor();
-            Console.WriteLine("Enter 1 to make a reservation");
-            Console.WriteLine("Enter 2 to view your reservations");
-            Console.WriteLine("Enter 3 to log out");
-            if (UserLogic.IsAdmin())
+            if (UserLogic.IsLoggedIn())
             {
-                Console.WriteLine("Enter 4 to edit accounts");
-                Console.WriteLine("Enter 5 to edit reservations");
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine($"You are logged in as: {UserLogic.CurrentAccount.FirstName} {UserLogic.CurrentAccount.LastName}");
+                Console.ResetColor();
+                Console.WriteLine("Enter 1 to make a reservation");
+                Console.WriteLine("Enter 2 to view your reservations");
+                Console.WriteLine("Enter 3 to view the about page");
+                Console.WriteLine("Enter 4 to log out\n");
+                if (UserLogic.IsAdmin())
+                {
+                    Console.WriteLine("Enter 5 to edit accounts");
+                    Console.WriteLine("Enter 6 to edit reservations");
+                }
+
             }
-            
-        }
-        else
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"You are currently not logged in!");
-            Console.ResetColor();
-            Console.WriteLine("Enter 1 to login");
-            Console.WriteLine("Enter 2 to sign up");
-        }
-        
-        string input = Console.ReadLine();
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"You are currently not logged in!");
+                Console.ResetColor();
+                Console.WriteLine("Enter 1 to login");
+                Console.WriteLine("Enter 2 to sign up");
+                Console.WriteLine("Enter 3 to the view about page");
+            }
 
-        if (input == "1" && !UserLogic.IsLoggedIn())
-        {
-            UserLogin.Start();
-        }
-        else if (input == "2" && !UserLogic.IsLoggedIn())
-        {
-            UserSignUp.Start();
-        }
-        else if (input == "1" && UserLogic.IsLoggedIn())
-        {
-            MakeReservation.Start();
-        }
-        else if (input == "2" && UserLogic.IsLoggedIn())
-        
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("");
-            Console.ResetColor();
+            string input = Console.ReadLine();
+
+            if (input == "1" && !UserLogic.IsLoggedIn())
+            {
+                UserLogin.Start();
+            }
+            else if (input == "2" && !UserLogic.IsLoggedIn())
+            {
+                UserSignUp.Start();
+            }
+            else if (input == "3" && !UserLogic.IsLoggedIn())
+            {
+                Menu.About();
+            }
+            else if (input == "1" && UserLogic.IsLoggedIn())
+            {
+                MakeReservation.Start();
+            }
+            else if (input == "2" && UserLogic.IsLoggedIn())
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("");
+                Console.ResetColor();
 
 
-            MyReservation.ShowReservations(UserLogic.CurrentAccount!.Id);
-        }
-        else if (input == "3" && UserLogic.IsLoggedIn())
-        
-        {
-            UserLogic.Logout();
-        }
-        else if (input == "4" && UserLogic.IsLoggedIn())
-        {
-            AdminFunctions.ShowCustomers();
-        }
-        else
-        {
-            Console.WriteLine("Invalid input");
+                MyReservation.ShowReservations(UserLogic.CurrentAccount!.Id);
+            }
+            else if (input == "3" && UserLogic.IsLoggedIn())
+            {
+                About();
+            }
+            else if (input == "4" && UserLogic.IsLoggedIn())
+            {
+                UserLogic.Logout();
+            }
+            else
+            {
+                Console.WriteLine("Invalid input");
+            }
         }
     }
-}
+
+    public static void About()
+    {
+        Console.Clear();
+        bool repeat = true;
+        while (repeat)
+        {
+            ShowRestaurantName();
+            Console.WriteLine("About\n");
+            Console.WriteLine(@"
+White Smoke is built around one idea: cook with fire, and let the ingredients do the talking.
+Our pitmasters tend an open fire daily, slowly cooking meat, fish, and vegetables until they develop deep, smoky flavour without losing their freshness.
+Every dish is finished light and bright, so the smoke adds depth instead of weight.
+We keep the menu honest and the method simple, because good fire-cooked food doesn’t need much else.
+
+Pull up a chair. The fire is already lit.
+
+The crew:
+ - Marcus Hale, Head Pitmaster: runs the fire and the cooking schedule.
+ - Elena Voss, Pitmaster, Fish and Vegetables: handles the delicate cooks over open flame.
+ - Tomás Rivera, Sous Chef: finishes the dishes and keeps the plates light and fresh.
+ - Priya Nair, Front of House Manager: seats guests and runs the floor.
+            ");
+
+            Console.WriteLine("enter 1 to back");
+            string? input = Console.ReadLine();
+            if (input == "1")
+            {
+                return;
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Wrong input!");
+                Console.ResetColor();
+                Thread.Sleep(1000);
+                Console.Clear();
+            }
+        }
+    }
 }

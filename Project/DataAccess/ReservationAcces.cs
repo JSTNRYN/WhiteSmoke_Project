@@ -33,7 +33,7 @@ public static class ReservationAccess
         return MyReservation;
     }
 
-    public static List<ReservationModel> GetAllByDate(DateTime date)
+    public static List<ReservationModel> GetAllByDate(string date)
     {
         string query = $"SELECT * FROM {_table} WHERE Date = @Date";
         List<ReservationModel> reservations = _connection.Query<ReservationModel>(query, new { Date = date }).ToList();
