@@ -56,11 +56,6 @@ Opening hours
                 Console.WriteLine("Enter 3 to view the menu");
                 Console.WriteLine("Enter 4 to log out");
                 
-                if (UserLogic.IsAdmin())
-                {
-                    Console.WriteLine("Enter 5 to edit accounts");
-                    Console.WriteLine("Enter 6 to edit reservations");
-                }
             }
             else
             {
@@ -71,21 +66,29 @@ Opening hours
                 Console.WriteLine("Enter 2 to sign up");
             }
             
-            string input = Console.ReadLine() ?? string.Empty;
+            string? input = Console.ReadLine()?.Trim();
+            bool isLoggedIn = UserLogic.IsLoggedIn();
+            bool isAdmin = UserLogic.IsAdmin();
 
-            if (input == "1" && !UserLogic.IsLoggedIn())
+            if (!MenuLogic.IsKnownChoice(input, isLoggedIn, isAdmin))
+            {
+                Console.WriteLine("Invalid input");
+                continue;
+            }
+
+            if (input == "1" && !isLoggedIn)
             {
                 UserLogin.Start();
             }
-            else if (input == "2" && !UserLogic.IsLoggedIn())
+            else if (input == "2" && !isLoggedIn)
             {
                 UserSignUp.Start();
             }
-            else if (input == "1" && UserLogic.IsLoggedIn())
+            else if (input == "1" && isLoggedIn)
             {
                 MakeReservation.Start();
             }
-            else if (input == "2" && UserLogic.IsLoggedIn())
+            else if (input == "2" && isLoggedIn)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("");
@@ -93,18 +96,13 @@ Opening hours
 
                 MyReservation.ShowReservations(UserLogic.CurrentAccount!.Id);
             }
-            else if (input == "3" && UserLogic.IsLoggedIn())
+            else if (input == "3" && isLoggedIn)
             {
-                
                 MenuView.ShowMenu(UserLogic.CurrentAccount!);
             }
-            else if (input == "4" && UserLogic.IsLoggedIn())
+            else if (input == "4" && isLoggedIn)
             {
                 UserLogic.Logout();
-            }
-            else
-            {
-                Console.WriteLine("Invalid input");
             }
         }
     }

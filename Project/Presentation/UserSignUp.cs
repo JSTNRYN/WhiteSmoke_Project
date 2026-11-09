@@ -19,6 +19,8 @@ public class UserSignUp
             ShowError("Please enter a name with at least 2 characters.");
             lastName = UserLogic.AskLastName() ?? string.Empty;
         }
+
+        DateTime dateOfBirth = UserLogic.AskDateOfBirth();
         
         string email = (UserLogic.AskEmail() ?? string.Empty).ToLowerInvariant();
         while (!UserLogic.ValidateEmail(email))
@@ -37,7 +39,7 @@ public class UserSignUp
         string phoneNumber = UserLogic.AskPhoneNumber();
         
         string password = UserLogic.AskPassword() ?? string.Empty;
-        _userLogic.CreateAccount(firstName, lastName, email, phoneNumber, password);
+        _userLogic.CreateAccount(firstName, lastName, email, phoneNumber, password, dateOfBirth);
     }
     
     public static void ShowError(string message)

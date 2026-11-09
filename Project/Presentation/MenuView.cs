@@ -4,51 +4,37 @@ public static class MenuView
     {
         if (currentUser == null)
         {
-            Console.WriteLine("Je moet eerst inloggen om het menu te kunnen bekijken!");
+            Console.WriteLine("You must log in before viewing the menu.");
             return;
         }
 
-        MenuLogic logic = new MenuLogic();
-        Dictionary<string, List<MenuItemModel>> groupedMenu = logic.GetMenuGroupedByCategory();
-
-        if (groupedMenu == null)
-        {
-            Console.WriteLine("Er is een probleem opgetreden bij het laden van het menu uit de database.");
-            return;
-        }
-
+        Dictionary<string, List<MenuItemModel>> groupedMenu = new MenuLogic().GetMenuGroupedByCategory();
         if (groupedMenu.Count == 0)
         {
-            Console.WriteLine("Er zijn momenteel geen gerechten beschikbaar op het menu.");
+            Console.WriteLine("There are currently no dishes available.");
             return;
         }
 
-        if (!Console.IsOutputRedirected)
-        {
-            Console.Clear();
-        }
-        Console.WriteLine("=================================");
-        Console.WriteLine("        WHITE SMOKE MENU         ");
-        Console.WriteLine("=================================");
+        if (!Console.IsOutputRedirected) Console.Clear();
 
-        foreach (var categoryPair in groupedMenu)
-        {
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine($"\n--- {categoryPair.Key.ToUpper()} ---");
-            Console.ResetColor();
+        Console.WriteLine("========================================");
+        Console.WriteLine("             WHITE SMOKE MENU           ");
+        Console.WriteLine("========================================");
 
-            foreach (var item in categoryPair.Value)
+        foreach (KeyValuePair<string, List<MenuItemModel>> category in groupedMenu)
+        {
+            Console.WriteLine($"\n--- {category.Key.ToUpperInvariant()} ---");
+            foreach (MenuItemModel item in category.Value)
             {
-                Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.Write($"{item.Name}");
-                Console.ResetColor();
-                Console.WriteLine($" - €{item.UnitPrice:F2}");
-
-                Console.WriteLine($"   {item.Description}");
+                Console.WriteLine($"{item.Name}  |  EUR {item.UnitPrice:F2}");
+                if (MenuLogic.IsAdultItem(item))
+                    Console.WriteLine("  ADULT ITEM (18+)");
+                if (!string.IsNullOrWhiteSpace(item.Description))
+                    Console.WriteLine($"  {item.Description}");
             }
         }
 
-        Console.WriteLine("\nDruk op Enter om terug te gaan naar het hoofdmenu...");
+        Console.WriteLine("\nPress Enter to return...");
         Console.ReadLine();
     }
 }

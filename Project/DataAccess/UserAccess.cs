@@ -9,7 +9,7 @@ public class UserAccess
 
     public long Write(UserModel account)
     {
-        string sql = $"INSERT INTO {Table} (email, password, firstName, lastName, phonenumber, role) VALUES (@EmailAddress, @Password, @FirstName, @LastName, @PhoneNumber, @Role) RETURNING id";
+        string sql = $"INSERT INTO {Table} (email, password, firstName, lastName, phonenumber, role, DateOfBirth) VALUES (@EmailAddress, @Password, @FirstName, @LastName, @PhoneNumber, @Role, @DateOfBirth) RETURNING id";
         using var connection = Database.CreateConnection();
         connection.Open();
         long id = connection.ExecuteScalar<long>(sql, account);

@@ -43,6 +43,7 @@ public class ReservationLogic
         return availableTables;
     }
 
+
     public static bool IsValidateDate(string date)
     {
         if (date == null || date == "")

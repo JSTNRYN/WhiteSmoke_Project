@@ -6,6 +6,7 @@ public class MenuItemModel
     public string Category { get; set; } = string.Empty;
     public double UnitPrice { get; set; }
     public string Description { get; set; } = string.Empty;
+    public bool Adult { get; set; }
 
     public MenuItemModel()
     {

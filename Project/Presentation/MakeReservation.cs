@@ -89,12 +89,21 @@ public static class MakeReservation
         {
             Console.WriteLine("Select a available table:");
             List<TableModel> availableTables = ReservationLogic.GetAvailableTables(DateTime.Parse(dateInput, new CultureInfo("nl-NL"), DateTimeStyles.None), partySize);
+            if (availableTables.Count == 0)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("There are no available tables for this date and number of guests.");
+                Console.ResetColor();
+                return;
+            }
+
+            Console.WriteLine("Available tables:");
             foreach (TableModel table in availableTables)
             {
-                Console.WriteLine($"# {table.Id}");
-                Console.WriteLine($"Seats: {table.Id}");
+                Console.WriteLine($"Table #{table.Id}  |  Seats: {table.Capacity}");
                 Console.WriteLine("-------------------\n");
             }
+            Console.Write("Enter the table number: ");
             string? tableInput = Console.ReadLine();
 
             if (!int.TryParse(tableInput, out int selectedId))
@@ -117,7 +126,6 @@ public static class MakeReservation
             }
         }
 
-
         List<OrderLineModel>? orderLines = OrderLogic.AskForOrder();
         if (orderLines == null)
         {
@@ -136,7 +144,7 @@ public static class MakeReservation
         Console.WriteLine($"Time: {timeInput}");
         Console.WriteLine($"People attending: {partySize}");
         Console.WriteLine($"Table: #{table}\n");
-        Console.WriteLine($"Order total: €{OrderLogic.GetTotal(orderLines):F2}\n");
+        Console.WriteLine($"Order total: EUR {OrderLogic.GetTotal(orderLines):F2}\n");
         Console.WriteLine($"Do you want to confirm? (Yes/No)");
         string? userInput = Console.ReadLine();
         bool retry = true;
