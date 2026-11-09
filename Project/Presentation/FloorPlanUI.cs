@@ -47,6 +47,12 @@ public static class FloorPlanUI
     // Hoofdscherm van de plattegrond. Blijft herhalen tot de admin 0 kiest.
     public static void Show()
     {
+        if (!UserLogic.IsLoggedIn() || !UserLogic.IsAdmin())
+        {
+            Console.WriteLine("Only logged-in administrators can access the floor plan.");
+            return;
+        }
+
         while (true)
         {
             Console.Clear();
@@ -63,7 +69,9 @@ public static class FloorPlanUI
                 case "1": AddTableMenu(); break;
                 case "2": MoveTableMenu(); break;
                 case "3": DeleteTableMenu(); break;
-                case "0": return;   // Terug naar het hoofdmenu
+                case "0":
+                    Console.Clear();
+                    return;   // Terug naar het hoofdmenu
                 default:
                     PrintError("Invalid choice.");
                     Pause();

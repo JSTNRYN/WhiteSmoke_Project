@@ -58,6 +58,7 @@ Opening hours
                 {
                     Console.WriteLine("Enter 5 to edit accounts");
                     Console.WriteLine("Enter 6 to edit reservations");
+                    Console.WriteLine("Enter 7 to view and edit the floor plan");
                 }
 
             }
@@ -105,6 +106,10 @@ Opening hours
             else if (input == "4" && UserLogic.IsLoggedIn())
             {
                 UserLogic.Logout();
+            }
+            else if (input == "7" && UserLogic.IsLoggedIn() && UserLogic.IsAdmin())
+            {
+                FloorPlanUI.Show();
             }
             else
             {
