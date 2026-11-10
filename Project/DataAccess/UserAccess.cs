@@ -54,7 +54,7 @@ public class UserAccess
 
     public static List<UserModel> GetAllCustomers_ExceptPassword()
     {
-        string sql = $"SELECT id, firstName, lastName, phonenumber, email AS EmailAddress, role FROM {Table}";
+        string sql = $"SELECT id, firstName, lastName, phonenumber, email AS EmailAddress, role FROM {Table} WHERE role = 'Customer'";
         _connection.Open();
         List<UserModel> customers = _connection.Query<UserModel>(sql).ToList();
         _connection.Close();
