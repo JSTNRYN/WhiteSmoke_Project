@@ -4,6 +4,11 @@ public static class AdminFunctions
     {
         List<UserModel> customers = UserLogic.GetAllCustomers_ExceptPassword();
         Console.Clear();
+        if (customers.Count == 0)
+        {
+            Console.WriteLine("No customers found.");
+            return;
+        }
         Console.WriteLine($"List of Customers (Amount: {customers.Count-1}):");
         foreach (var customer in customers)
         {
