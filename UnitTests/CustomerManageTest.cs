@@ -42,5 +42,18 @@ public sealed class CustomerManageTest
         // Assert
         Assert.IsFalse(nameIsValid, "Name should be invalid.");
     }
+
+    [DataTestMethod]
+    [DataRow("641")]
+    public void TestCustomerPhoneNumberValidation_TooShort(string shortPhoneNumber)
+    {
+        // Arrange
+
+        // Act
+        bool phoneNumberIsValid = UserLogic.ValidatePhoneNumber(shortPhoneNumber);
+
+        // Assert
+        Assert.IsFalse(phoneNumberIsValid, "Phone number should be invalid.");
+    }
 }
 
