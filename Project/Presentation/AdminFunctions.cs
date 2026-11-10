@@ -40,27 +40,18 @@ public static class AdminFunctions
         if (int.TryParse(input, out int customerId))
         {
             UserModel customer = UserLogic.GetCustomerById(customerId);
-            if (customer != null)
+
+            if (customer == null || customerId == UserLogic.CurrentAccount.Id)
             {
-                if (UserLogic.CurrentAccount.Id == customerId)
-                {
-                    Console.Clear();
-                    Console.WriteLine("Customer not found.");
-                }
-                if(customerId >= customers.Count)
-                {
-                    Console.Clear();
-                    Console.WriteLine("No customer found with the provided ID.");
-                }
-                else
-                {
-                    Console.Clear();
-                    EditCustomer(customer);
-                }
+                Console.Clear();
+                Console.WriteLine("No customer found with the provided ID.");
+                Console.WriteLine("Press any key to return...");
+                Console.ReadKey();
             }
             else
             {
-                Console.WriteLine("Customer not found.");
+                Console.Clear();
+                EditCustomer(customer);
             }
         }
         else
