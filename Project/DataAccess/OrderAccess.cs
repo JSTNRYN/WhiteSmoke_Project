@@ -7,7 +7,7 @@ public static class OrderAccess
     {
         const string query = @"
             SELECT MenuItem.ID AS Id, MenuItem.MENU AS Menu, MenuItem.NAME AS Name,
-                   MenuItem.CATEGORY AS Category, MenuItem.UNITPRICE AS UnitPrice,
+                   MenuItem.CATEGORY AS Category, CAST(MenuItem.UNITPRICE AS REAL) AS UnitPrice,
                    MenuItem.DESCRIPTION AS Description, MenuItem.ADULT AS Adult,
                    OrderItem.Quantity
             FROM OrderItem

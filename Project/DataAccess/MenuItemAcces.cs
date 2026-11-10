@@ -8,7 +8,7 @@ public static class MenuItemAccess
         connection.Open();
         return connection.Query<MenuItemModel>(@"
             SELECT ID AS Id, MENU AS Menu, NAME AS Name, CATEGORY AS Category,
-                   UNITPRICE AS UnitPrice, DESCRIPTION AS Description, ADULT AS Adult
+                   CAST(UNITPRICE AS REAL) AS UnitPrice, DESCRIPTION AS Description, ADULT AS Adult
             FROM MenuItem
             ORDER BY CATEGORY, ID").ToList();
     }
@@ -19,7 +19,7 @@ public static class MenuItemAccess
         connection.Open();
         return connection.QueryFirstOrDefault<MenuItemModel>(@"
             SELECT ID AS Id, MENU AS Menu, NAME AS Name, CATEGORY AS Category,
-                   UNITPRICE AS UnitPrice, DESCRIPTION AS Description, ADULT AS Adult
+                   CAST(UNITPRICE AS REAL) AS UnitPrice, DESCRIPTION AS Description, ADULT AS Adult
             FROM MenuItem WHERE ID = @Id", new { Id = id });
     }
 
