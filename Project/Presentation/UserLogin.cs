@@ -1,29 +1,19 @@
-using System;
-using System.Text;
-
 static class UserLogin
 {
-    private static UserLogic _userLogic = new UserLogic();
+    private static readonly UserLogic UserLogic = new();
 
     public static void Start()
     {
-
         Console.Write("Please enter your e-mail: ");
-        string email = Console.ReadLine();
-        
+        string? email = Console.ReadLine();
         Console.Write("Please enter your password: ");
-        string password = Console.ReadLine();
-        
-        UserModel acc = _userLogic.CheckLogin(email, password);
+        string? password = Console.ReadLine();
 
-        if (acc != null)
-        {
-            // Return to the existing menu loop after a successful login.
-        }
-        else
-        {
-            ShowError("No account found with that email and password combination.");
-        }
+        UserModel? account = email != null && password != null
+            ? UserLogic.CheckLogin(email, password)
+            : null;
+
+        if (account == null) ShowError("No account found with that email and password combination.");
     }
 
     private static void ShowError(string message)
@@ -32,12 +22,4 @@ static class UserLogin
         Console.WriteLine($"\n{message}");
         Console.ResetColor();
     }
-
-    private static string askEmail()
-    {
-        Console.Write("Please enter your e-mail: ");
-        return Console.ReadLine();
-    }
-
-    
 }
