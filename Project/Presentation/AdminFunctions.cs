@@ -124,7 +124,7 @@ public static class AdminFunctions
                 string newPhoneNumber = Console.ReadLine();
                 while (!UserLogic.ValidatePhoneNumber(newPhoneNumber))
                 {
-                    Console.WriteLine("Invalid phone number (8 to 15 digits, optional leading +). Please try again.");
+                    Console.WriteLine("Invalid phone number (optional leading +). Please try again.");
                     Console.Write("Enter new phone number: ");
                     newPhoneNumber = Console.ReadLine();
                 }
