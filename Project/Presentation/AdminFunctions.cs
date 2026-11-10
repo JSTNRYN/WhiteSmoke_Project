@@ -115,7 +115,7 @@ public static class AdminFunctions
                     newEmail = Console.ReadLine();
                 }
                 UserLogic.UpdateEmail(customer, newEmail.Trim());
-                Console.WriteLine("Email updated successfully.");
+                Console.WriteLine("Email succesfully updated.");
                 return;
             }
             else if (option == "4")
