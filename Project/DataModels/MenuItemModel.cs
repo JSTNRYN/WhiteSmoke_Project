@@ -7,7 +7,6 @@ public class MenuItemModel
     public double UnitPrice { get; set; }
     public string Description { get; set; } = string.Empty;
     public bool Adult { get; set; }
-    public bool IsAvailable { get; set; } = true;
 
     public MenuItemModel()
     {

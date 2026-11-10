@@ -27,7 +27,7 @@ public class UserLogic
         string hashedPassword = HashPassword(password);
 
         UserModel acc = new UserModel(0, email, hashedPassword, firstname, lastname, phone, role, dateOfBirth);
-        acc.Id = _access.Write(acc);
+        acc.Id = _access.Create(acc);
         CurrentAccount = acc;
     }
 
@@ -83,11 +83,6 @@ public class UserLogic
         CurrentAccount = null;
     }
 
-    public static void DeleteAccount(UserModel account)
-    {
-        UserAccess.Delete(account);
-    }
-    
     public static string? AskEmail()
     {
         Console.Write("Please enter your e-mail (Or type q and enter to go back): ");
@@ -152,7 +147,6 @@ public class UserLogic
             {
                 return null;
             }
-            // Kijken of er een speciaal karakter in zit.
             bool hasSpecialChar = password.Any(ch => specialCharacters.Contains(ch));
 
             if (password.Length < 6 || !hasSpecialChar)
@@ -172,7 +166,6 @@ public class UserLogic
         {
             Console.Write("Please enter your phone number: ");
             string? phoneNumber = Console.ReadLine();
-            // Check if the phone number is not null or whitespace and contains only digits
             if (!string.IsNullOrWhiteSpace(phoneNumber) && phoneNumber.All(char.IsDigit))
             {
                 return phoneNumber;
@@ -182,33 +175,4 @@ public class UserLogic
         }
     }
 
-    public static List<UserModel> GetAllCustomers_ExceptPassword()
-    {
-        return UserAccess.GetAllCustomers_ExceptPassword();
-    }
-
-    public static void UpdateFirstName(UserModel customer, string newFirstName)
-    {
-        UserAccess.UpdateFirstName(customer, newFirstName);
-    }
-
-    public static void UpdateLastName(UserModel customer, string newLastName)
-    {
-        UserAccess.UpdateLastName(customer, newLastName);
-    }
-
-    public static void UpdateEmail(UserModel customer, string newEmail)
-    {
-        UserAccess.UpdateEmail(customer, newEmail);
-    }
-
-    public static void UpdatePhoneNumber(UserModel customer, string newPhoneNumber)
-    {
-        UserAccess.UpdatePhoneNumber(customer, newPhoneNumber);
-    }
-
-    public static UserModel GetCustomerById(int id)
-    {
-        return UserAccess.GetById(id);
-    }
 }

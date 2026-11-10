@@ -2,7 +2,7 @@ public static class OrderLogic
 {
     public static List<OrderLineModel>? AskForOrder()
     {
-        List<MenuItemModel> menuItems = MenuItemAccess.LoadAllMenuItems();
+        List<MenuItemModel> menuItems = MenuItemAccess.GetAll();
         List<OrderLineModel> orderLines = new();
 
         if (menuItems.Count == 0)

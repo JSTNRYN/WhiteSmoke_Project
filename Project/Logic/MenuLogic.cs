@@ -17,7 +17,7 @@ public class MenuLogic
         return input.Trim() switch
         {
             "1" or "2" or "3" or "4" when isLoggedIn => true,
-            "5" or "6" when isLoggedIn && isAdmin => true,
+            "5" when isLoggedIn && isAdmin => true,
             "1" or "2" or "3" when !isLoggedIn => true,
             _ => false
         };
@@ -25,7 +25,7 @@ public class MenuLogic
 
     public Dictionary<string, List<MenuItemModel>> GetMenuGroupedByCategory()
     {
-        List<MenuItemModel> allItems = MenuItemAccess.LoadAllMenuItems();
+        List<MenuItemModel> allItems = MenuItemAccess.GetAll();
 
         if (allItems == null)
         {

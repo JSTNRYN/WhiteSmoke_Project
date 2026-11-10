@@ -30,10 +30,7 @@ for deep flavour with a light, fresh finish.");
                 Console.WriteLine("Enter 3 to view the menu");
                 Console.WriteLine("Enter 4 to log out");
                 if (UserLogic.IsAdmin())
-                {
                     Console.WriteLine("Enter 5 to manage the menu");
-                    Console.WriteLine("Enter 6 to manage customers");
-                }
             }
             else
             {
@@ -60,7 +57,6 @@ for deep flavour with a light, fresh finish.");
             else if (input == "3" && isLoggedIn) MenuView.ShowMenu(UserLogic.CurrentAccount!);
             else if (input == "4" && isLoggedIn) UserLogic.Logout();
             else if (input == "5" && isLoggedIn && UserLogic.IsAdmin()) MenuAdmin.Start();
-            else if (input == "6" && isLoggedIn && UserLogic.IsAdmin()) AdminFunctions.ShowCustomers();
         }
     }
 
