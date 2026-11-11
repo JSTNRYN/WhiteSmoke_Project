@@ -68,14 +68,13 @@ public class UserLogic
         return digits.Length >= 8 && digits.Length <= 15;
     }
     
-    public static string ReadPassword(string prompt = "Please enter your password: ")
+    public static string InterceptPassword()
     {
-        Console.Write(prompt);
-        var password = new StringBuilder();
+        Console.Write("Please enter your password: ");
+        string password = "";
         while (true)
         {
-            ConsoleKeyInfo key = Console.ReadKey(intercept: true); // true = don't echo the key
-
+            ConsoleKeyInfo key = Console.ReadKey(intercept: true);
             if (key.Key == ConsoleKey.Enter)
             {
                 Console.WriteLine();
@@ -85,18 +84,18 @@ public class UserLogic
             {
                 if (password.Length > 0)
                 {
-                    password.Length--;   
+                    password = password.Substring(0, password.Length - 1);
                     Console.Write("\b \b");
                 }
                 continue;
             }
             if (!char.IsControl(key.KeyChar))
             {
-                password.Append(key.KeyChar);
+                password += key.KeyChar;
                 Console.Write('*');
             }
         }
-        return password.ToString();
+        return password;
     }
 
     public static bool ValidateName(string? name)

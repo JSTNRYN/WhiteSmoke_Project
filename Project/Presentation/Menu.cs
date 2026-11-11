@@ -90,7 +90,7 @@ Opening hours
 
         if (!isAdmin) return;
 
-        Console.WriteLine("5. Manage menu items (unavailable)");
+        Console.WriteLine("5. Manage menu items");
         Console.WriteLine("6. View and edit the floor plan");
         Console.WriteLine("7. View and Manage customers");
     }
