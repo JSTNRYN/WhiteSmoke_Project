@@ -9,10 +9,10 @@ public class UserLogic
     {
     }
 
-    public UserModel? CheckLogin(string email, string password)
+    public UserModel CheckLogin(string email, string password)
     {
         email = email.Trim().ToLowerInvariant();
-        UserModel? acc = UserAccess.GetByEmail(email);
+        UserModel acc = UserAccess.GetByEmail(email);
     
         if (acc != null && BCrypt.Net.BCrypt.Verify(password, acc.Password))
         {
@@ -22,12 +22,12 @@ public class UserLogic
         return null;
     }
 
-    public void CreateAccount(string firstname, string lastname, string email, string phone, string password, DateTime dateOfBirth, string role = "Customer")
+    public void CreateAccount(string firstname, string lastname, string email, string phone, string password, string role = "Customer")
     {
         string hashedPassword = HashPassword(password);
 
-        UserModel acc = new UserModel(0, email, hashedPassword, firstname, lastname, phone, role, dateOfBirth);
-        acc.Id = _access.Create(acc);
+        UserModel acc = new UserModel(0, email, hashedPassword, firstname, lastname, phone, role);
+        acc.Id = _access.Write(acc);
         CurrentAccount = acc;
     }
 
@@ -46,9 +46,13 @@ public class UserLogic
         return UserAccess.GetByEmail(email) != null;
     }
 
-    public static bool IsValidEmailFormat(string? email)
+    public static bool IsValidEmailFormat(string email)
     {
-        return !string.IsNullOrWhiteSpace(email) && email.Contains("@") && email.Contains(".");
+        if (email.ToLower() == "q")
+        {
+            Menu.Start();
+        }
+        return email.Contains("@") && email.Contains(".");
     }
 
     public static bool ValidatePhoneNumber(string phoneNumber)
@@ -68,9 +72,13 @@ public class UserLogic
         return digits.Length >= 8 && digits.Length <= 15;
     }
 
-    public static bool ValidateName(string? name)
+    public static bool ValidateName(string name)
     {
-        return !string.IsNullOrWhiteSpace(name) && name.Trim().Length > 1;
+        if (name.ToLower() == "q")
+        {
+            Menu.Start();
+        }
+        return (name.Length > 1);
     }
 
     public static bool IsLoggedIn()
@@ -83,6 +91,11 @@ public class UserLogic
         CurrentAccount = null;
     }
 
+    public static void DeleteAccount(UserModel account)
+    {
+        UserAccess.Delete(account);
+    }
+    
     public static string? AskEmail()
     {
         Console.Write("Please enter your e-mail (Or type q and enter to go back): ");
@@ -103,69 +116,9 @@ public class UserLogic
     
     public static bool IsAdmin()
     {
-        return CurrentAccount?.Role is "Admin";
+        return CurrentAccount.Role is "Admin";
     }
 
-    public static DateTime AskDateOfBirth()
-    {
-        const string format = "dd-MM-yyyy";
-
-        while (true)
-        {
-            Console.Write($"Date of birth ({format}): ");
-            string? input = Console.ReadLine();
-
-            if (DateTime.TryParseExact(input, format, null, System.Globalization.DateTimeStyles.None, out DateTime date)
-                && date.Date <= DateTime.Today
-                && date.Date >= DateTime.Today.AddYears(-120))
-            {
-                return date.Date;
-            }
-
-            UserSignUp.ShowError($"Please enter a valid date in {format} format.");
-        }
-    }
-
-    public static bool IsAdult(DateTime? dateOfBirth)
-    {
-        if (dateOfBirth == null) return false;
-
-        DateTime today = DateTime.Today;
-        int age = today.Year - dateOfBirth.Value.Year;
-        if (dateOfBirth.Value.Date > today.AddYears(-age)) age--;
-        return age >= 18;
-    }
-    
-    public static string ReadPassword()
-    {
-        Console.Write("Please enter your password: ");
-        string password = "";
-        while (true)
-        {
-            ConsoleKeyInfo key = Console.ReadKey(true);
-            if (key.Key == ConsoleKey.Enter)
-            {
-                Console.WriteLine();
-                break;
-            }
-            else if (key.Key == ConsoleKey.Backspace)
-            {
-                if (password.Length > 0)
-                {
-                    password = password.Substring(0, password.Length - 1);
-                    Console.Write("\b \b");
-                }
-            }
-            else
-            {
-                password += key.KeyChar;
-                Console.Write("*");
-            }
-        }
-
-        return password;
-    }
-    
     public static string? AskPassword()
     {
         string specialCharacters = "!@#$%&*";
@@ -173,10 +126,7 @@ public class UserLogic
         {
             Console.Write("Please enter your password: ");
             string? password = Console.ReadLine();
-            if (password is null)
-            {
-                return null;
-            }
+            // Kijken of er een speciaal karakter in zit.
             bool hasSpecialChar = password.Any(ch => specialCharacters.Contains(ch));
 
             if (password.Length < 6 || !hasSpecialChar)
@@ -196,6 +146,7 @@ public class UserLogic
         {
             Console.Write("Please enter your phone number: ");
             string? phoneNumber = Console.ReadLine();
+            // Check if the phone number is not null or whitespace and contains only digits
             if (!string.IsNullOrWhiteSpace(phoneNumber) && phoneNumber.All(char.IsDigit))
             {
                 return phoneNumber;
@@ -205,4 +156,33 @@ public class UserLogic
         }
     }
 
+    public static List<UserModel> GetAllCustomers_ExceptPassword()
+    {
+        return UserAccess.GetAllCustomers_ExceptPassword();
+    }
+
+    public static void UpdateFirstName(UserModel customer, string newFirstName)
+    {
+        UserAccess.UpdateFirstName(customer, newFirstName);
+    }
+
+    public static void UpdateLastName(UserModel customer, string newLastName)
+    {
+        UserAccess.UpdateLastName(customer, newLastName);
+    }
+
+    public static void UpdateEmail(UserModel customer, string newEmail)
+    {
+        UserAccess.UpdateEmail(customer, newEmail);
+    }
+
+    public static void UpdatePhoneNumber(UserModel customer, string newPhoneNumber)
+    {
+        UserAccess.UpdatePhoneNumber(customer, newPhoneNumber);
+    }
+
+    public static UserModel GetCustomerById(int id)
+    {
+        return UserAccess.GetById(id);
+    }
 }
