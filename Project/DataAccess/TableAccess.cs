@@ -1,4 +1,5 @@
 using Dapper;
+using Microsoft.Data.Sqlite;
 
 public static class TableAccess
 {
@@ -41,9 +42,20 @@ public static class TableAccess
         connection.Execute($"UPDATE {Table} SET X = @X, Y = @Y WHERE ID = @Id", new { Id = id, X = x, Y = y });
     }
 
-    public static void Delete(int id)
+    // Verwijdert een tafel definitief uit de database.
+    // Geeft true terug als de tafel is verwijderd, false als dat niet mag omdat
+    // er nog iets naar de tafel verwijst (bijvoorbeeld een reservering).
+    public static bool Delete(int id)
     {
-        using var connection = Open();
-        connection.Execute($"DELETE FROM {Table} WHERE ID = @Id", new { Id = id });
+        try
+        {
+            using var conn = Open();
+            int affectedRows = conn.Execute($"DELETE FROM {Table} WHERE ID = @Id", new { Id = id });
+            return affectedRows > 0;
+        }
+        catch (SqliteException ex) when (ex.SqliteErrorCode == 19) // FOREIGN KEY constraint failed
+        {
+            return false;
+        }
     }
 }
