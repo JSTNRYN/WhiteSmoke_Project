@@ -1,4 +1,5 @@
-﻿using Project.Presentation;
+﻿using System.Text;
+using Project.Presentation;
 
 public class UserLogic
 {
@@ -13,7 +14,6 @@ public class UserLogic
     {
         email = email.Trim().ToLowerInvariant();
         UserModel? acc = UserAccess.GetByEmail(email);
-    
         if (acc != null && BCrypt.Net.BCrypt.Verify(password, acc.Password))
         {
             CurrentAccount = acc;
@@ -66,6 +66,37 @@ public class UserLogic
         }
 
         return digits.Length >= 8 && digits.Length <= 15;
+    }
+    
+    public static string ReadPassword(string prompt = "Please enter your password: ")
+    {
+        Console.Write(prompt);
+        var password = new StringBuilder();
+        while (true)
+        {
+            ConsoleKeyInfo key = Console.ReadKey(intercept: true); // true = don't echo the key
+
+            if (key.Key == ConsoleKey.Enter)
+            {
+                Console.WriteLine();
+                break;
+            }
+            if (key.Key == ConsoleKey.Backspace)
+            {
+                if (password.Length > 0)
+                {
+                    password.Length--;   
+                    Console.Write("\b \b");
+                }
+                continue;
+            }
+            if (!char.IsControl(key.KeyChar))
+            {
+                password.Append(key.KeyChar);
+                Console.Write('*');
+            }
+        }
+        return password.ToString();
     }
 
     public static bool ValidateName(string? name)
