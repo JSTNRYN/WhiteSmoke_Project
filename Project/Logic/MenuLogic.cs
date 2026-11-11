@@ -17,7 +17,6 @@ public class MenuLogic
         return input.Trim() switch
         {
             "1" or "2" or "3" or "4" when isLoggedIn => true,
-            "5" when isLoggedIn && isAdmin => true,
             "1" or "2" or "3" when !isLoggedIn => true,
             _ => false
         };
