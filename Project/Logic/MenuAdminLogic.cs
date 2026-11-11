@@ -3,19 +3,19 @@ public static class MenuAdminLogic
     public static List<MenuItemModel> GetItems()
     {
         RequireAdmin();
-        return MenuItemAccess.GetAll();
+        return MenuLogic.GetMenuItemsForDisplay();
     }
 
-    public static MenuItemModel GetItem(int id)
+    public static MenuItemModel GetItem(int menuNumber)
     {
         RequireAdmin();
-        return MenuItemAccess.GetById(id) ?? throw new ArgumentException("Menu item not found.");
+        return GetItems().ElementAtOrDefault(menuNumber - 1) ?? throw new ArgumentException("Menu item not found.");
     }
 
-    public static void Edit(int id, string name, double price, string description)
+    public static void Edit(int menuNumber, string name, double price, string description)
     {
         RequireAdmin();
-        MenuItemModel item = GetItem(id);
+        MenuItemModel item = GetItem(menuNumber);
         name = name.Trim();
         description = description.Trim();
         if (name.Length == 0) throw new ArgumentException("Name is required.");
@@ -27,11 +27,11 @@ public static class MenuAdminLogic
         MenuItemAccess.Update(item);
     }
 
-    public static List<AdminReservationModel> GetReservations(int menuItemId)
+    public static List<AdminReservationModel> GetReservations(int menuNumber)
     {
         RequireAdmin();
-        GetItem(menuItemId);
-        return ReservationAccess.GetByMenuItemId(menuItemId);
+        MenuItemModel item = GetItem(menuNumber);
+        return ReservationAccess.GetByMenuItemId(item.Id);
     }
 
     private static void RequireAdmin()

@@ -2,7 +2,7 @@ public static class OrderLogic
 {
     public static List<OrderLineModel>? AskForOrder()
     {
-        List<MenuItemModel> menuItems = MenuItemAccess.GetAll();
+        List<MenuItemModel> menuItems = MenuLogic.GetMenuItemsForDisplay();
         List<OrderLineModel> orderLines = new();
 
         if (menuItems.Count == 0)
@@ -36,33 +36,7 @@ public static class OrderLogic
     private static void MakeOrder(List<MenuItemModel> menuItems, List<OrderLineModel> orderLines)
     {
         Console.WriteLine();
-        menuItems = menuItems
-            .OrderBy(item => item.Category, StringComparer.OrdinalIgnoreCase)
-            .ThenBy(item => item.Name, StringComparer.OrdinalIgnoreCase)
-            .ToList();
-        string? displayedCategory = null;
-        for (int i = 0; i < menuItems.Count; i++)
-        {
-            MenuItemModel item = menuItems[i];
-            if (!string.Equals(displayedCategory, item.Category, StringComparison.OrdinalIgnoreCase))
-            {
-                displayedCategory = item.Category;
-                Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.WriteLine($"\n[{item.Category.ToUpperInvariant()}]");
-                Console.ForegroundColor = ConsoleColor.DarkGray;
-                Console.WriteLine(new string('-', 74));
-                Console.ResetColor();
-            }
-
-            string adultLabel = MenuLogic.IsAdultItem(item) ? " [ADULT ITEM]" : string.Empty;
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine($"{i + 1,3}) ID {item.Id,-4} {item.Name}{adultLabel}");
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine($"      EUR {item.UnitPrice,6:F2}");
-            Console.ForegroundColor = ConsoleColor.Gray;
-            if (!string.IsNullOrWhiteSpace(item.Description)) Console.WriteLine($"      {item.Description}");
-            Console.ResetColor();
-        }
+        MenuView.PrintItems(menuItems);
 
         while (true)
         {

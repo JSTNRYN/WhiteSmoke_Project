@@ -9,18 +9,28 @@ public static class MenuAdmin
             Clear();
             Console.WriteLine("MENU ADMINISTRATION");
             Console.WriteLine("===================");
-            Console.WriteLine("1) View menu items");
+            Console.WriteLine("1) View menu");
             Console.WriteLine("2) Edit menu item");
             Console.WriteLine("3) View item reservations");
             Console.WriteLine("4) Log out");
+            Console.WriteLine("0) Back to main menu");
 
-            switch (Console.ReadLine()?.Trim())
+            try
             {
-                case "1": ViewItems(); break;
-                case "2": EditItem(); break;
-                case "3": ViewReservations(); break;
-                case "4": UserLogic.Logout(); return;
-                default: Console.WriteLine("Invalid choice."); Pause(); break;
+                switch (Console.ReadLine()?.Trim())
+                {
+                    case "1": ViewItems(); break;
+                    case "2": EditItem(); break;
+                    case "3": ViewReservations(); break;
+                    case "4": UserLogic.Logout(); return;
+                    case "0": return;
+                    default: Console.WriteLine("Invalid choice."); Pause(); break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Something went wrong: {ex.Message}");
+                Pause();
             }
         }
     }
@@ -28,31 +38,32 @@ public static class MenuAdmin
     private static void ViewItems()
     {
         Clear();
-        string? category = null;
-        foreach (MenuItemModel item in MenuAdminLogic.GetItems())
-        {
-            if (!string.Equals(category, item.Category, StringComparison.OrdinalIgnoreCase))
-            {
-                category = item.Category;
-                Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.WriteLine($"\n[{category.ToUpperInvariant()}]");
-                Console.ResetColor();
-            }
-
-            Console.WriteLine($"ID {item.Id,-4} {item.Name,-40} EUR {item.UnitPrice,7:F2}");
-        }
+        PrintItems();
         Pause();
+    }
+
+    private static void PrintItems()
+    {
+        MenuView.PrintItems(MenuAdminLogic.GetItems());
     }
 
     private static void EditItem()
     {
         try
         {
-            int id = ReadId();
-            MenuItemModel item = MenuAdminLogic.GetItem(id);
+            Clear();
+            Console.WriteLine("EDIT MENU ITEM");
+            Console.WriteLine("==============\n");
+            PrintItems();
+            Console.WriteLine("\n[0] Back to admin panel");
+
+            int menuNumber = ReadMenuNumber();
+            if (menuNumber == 0) return;
+
+            MenuItemModel item = MenuAdminLogic.GetItem(menuNumber);
             Console.WriteLine("Warning: saved changes are immediately visible on existing reservations containing this item.");
             Console.WriteLine("Reservations containing this menu item:");
-            List<AdminReservationModel> reservations = MenuAdminLogic.GetReservations(id);
+            List<AdminReservationModel> reservations = MenuAdminLogic.GetReservations(menuNumber);
             if (reservations.Count == 0) Console.WriteLine("No reservations found.");
             foreach (AdminReservationModel reservation in reservations)
                 Console.WriteLine($"Reservation #{reservation.ReservationId} | {reservation.Date} {reservation.TimeSlot} | {reservation.FirstName} {reservation.LastName} | {reservation.Email}");
@@ -64,7 +75,7 @@ public static class MenuAdmin
             Console.Write($"Description [{item.Description}]: ");
             string description = ReadOrDefault(item.Description);
 
-            MenuAdminLogic.Edit(id, name, price, description);
+            MenuAdminLogic.Edit(menuNumber, name, price, description);
             Console.WriteLine("Menu item updated.");
         }
         catch (Exception ex)
@@ -78,11 +89,22 @@ public static class MenuAdmin
     {
         try
         {
-            int id = ReadId();
-            List<AdminReservationModel> reservations = MenuAdminLogic.GetReservations(id);
+            Clear();
+            Console.WriteLine("VIEW ITEM RESERVATIONS");
+            Console.WriteLine("======================\n");
+            PrintItems();
+            Console.WriteLine("\n[0] Back to admin panel");
+
+            int menuNumber = ReadMenuNumber();
+            if (menuNumber == 0) return;
+
+            List<AdminReservationModel> reservations = MenuAdminLogic.GetReservations(menuNumber);
             if (reservations.Count == 0) Console.WriteLine("No reservations found.");
             foreach (AdminReservationModel reservation in reservations)
                 Console.WriteLine($"Reservation #{reservation.ReservationId} | {reservation.Date} {reservation.TimeSlot} | {reservation.FirstName} {reservation.LastName} | {reservation.Email}");
+
+            WaitForAdminBack();
+            return;
         }
         catch (Exception ex)
         {
@@ -91,11 +113,16 @@ public static class MenuAdmin
         Pause();
     }
 
-    private static int ReadId()
+    private static int ReadMenuNumber()
     {
-        Console.Write("Menu item ID: ");
-        if (!int.TryParse(Console.ReadLine(), out int id) || id <= 0) throw new ArgumentException("ID must be a positive number.");
-        return id;
+        while (true)
+        {
+            Console.Write("Choose a menu number (0 to go back): ");
+            string? input = Console.ReadLine();
+            if (input == null) return 0;
+            if (int.TryParse(input.Trim(), out int menuNumber) && menuNumber >= 0) return menuNumber;
+            Console.WriteLine("Enter a number from the menu, or 0 to go back.");
+        }
     }
 
     private static string ReadOrDefault(string fallback)
@@ -106,15 +133,25 @@ public static class MenuAdmin
 
     private static double ReadPrice(double fallback)
     {
-        string value = Console.ReadLine()?.Trim() ?? string.Empty;
-        if (value.Length == 0) return fallback;
-        if (!double.TryParse(value, System.Globalization.NumberStyles.Number, System.Globalization.CultureInfo.InvariantCulture, out double price)) throw new ArgumentException("Price must be a valid number.");
-        return price;
+        while (true)
+        {
+            string value = Console.ReadLine()?.Trim() ?? string.Empty;
+            if (value.Length == 0) return fallback;
+            if (double.TryParse(value, System.Globalization.NumberStyles.Number, System.Globalization.CultureInfo.InvariantCulture, out double price) && price > 0)
+                return price;
+            Console.Write("Price must be greater than zero. Try again: ");
+        }
     }
 
     private static void Pause()
     {
         Console.WriteLine("Press Enter to continue.");
+        Console.ReadLine();
+    }
+
+    private static void WaitForAdminBack()
+    {
+        Console.Write("\nEnter 0 to return to the admin panel: ");
         Console.ReadLine();
     }
 

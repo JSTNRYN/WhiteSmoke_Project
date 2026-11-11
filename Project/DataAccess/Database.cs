@@ -7,15 +7,16 @@ public static class Database
 
     private static string ResolveDatabasePath()
     {
+        string? projectDatabase = null;
         DirectoryInfo? directory = Directory.GetParent(AppContext.BaseDirectory);
         while (directory != null)
         {
             string path = Path.Combine(directory.FullName, "DataSources", "project.db");
-            if (File.Exists(path)) return path;
+            if (File.Exists(path)) projectDatabase = path;
             directory = directory.Parent;
         }
 
-        return Path.Combine(AppContext.BaseDirectory, "DataSources", "project.db");
+        return projectDatabase ?? Path.Combine(AppContext.BaseDirectory, "DataSources", "project.db");
     }
 
     public static SqliteConnection CreateConnection() => new($"Data Source={DatabasePath}");
@@ -48,6 +49,12 @@ public static class Database
             );");
 
         AddColumnIfMissing(connection, "User", "DATEOFBIRTH", "TEXT");
+        AddColumnIfMissing(connection, "MenuItem", "MENU", "TEXT");
+        AddColumnIfMissing(connection, "MenuItem", "NAME", "TEXT NOT NULL DEFAULT ''");
+        AddColumnIfMissing(connection, "MenuItem", "CATEGORY", "TEXT");
+        AddColumnIfMissing(connection, "MenuItem", "UNITPRICE", "REAL NOT NULL DEFAULT 0");
+        AddColumnIfMissing(connection, "MenuItem", "DESCRIPTION", "TEXT NOT NULL DEFAULT ''");
+        AddColumnIfMissing(connection, "MenuItem", "ADULT", "INTEGER NOT NULL DEFAULT 0");
         EnsureAdmin(connection);
 
         if (connection.ExecuteScalar<long>("SELECT COUNT(*) FROM MenuItem") == 0)
