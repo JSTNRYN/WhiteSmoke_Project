@@ -44,10 +44,15 @@ Opening hours
 
     public static void Start()
     {
+        ShowRestaurantName();
+        ShowRestaurantDescription();
+        bool firstMenu = true;
 
         while (true)
         {
-            ShowRestaurantName(); // wist ook het scherm
+            if (!firstMenu)
+                ShowRestaurantName();
+            firstMenu = false;
 
             bool loggedIn = UserLogic.IsLoggedIn();
             bool isAdmin = loggedIn && UserLogic.IsAdmin();
@@ -143,6 +148,21 @@ The crew:
  - Elena Voss, Pitmaster, Fish and Vegetables: handles the delicate cooks over open flame.
  - Tomás Rivera, Sous Chef: finishes the dishes and keeps the plates light and fresh.
  - Priya Nair, Front of House Manager: seats guests and runs the floor.
+
+ Address
+  White Smoke
+  Wijnhaven 107
+  3011 WN Rotterdam
+  The Netherlands
+
+Opening hours
+  Monday        Closed
+  Tuesday       Closed
+  Wednesday     5:00 PM - 11:00 PM
+  Thursday      5:00 PM - 11:00 PM
+  Friday        5:00 PM - 11:00 PM
+  Saturday      12:00 PM - 11:00 PM
+  Sunday        12:00 PM - 10:00 PM
             ");
 
             Console.WriteLine("enter 1 to back");
