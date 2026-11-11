@@ -1,16 +1,11 @@
-using System;
-using System.Text;
-
 static class UserLogin
 {
-    private static UserLogic _userLogic = new UserLogic();
+    private static readonly UserLogic UserLogic = new();
 
     public static void Start()
     {
-
         Console.Write("Please enter your e-mail: ");
-        string email = Console.ReadLine();
-        
+        string? email = Console.ReadLine();
         Console.Write("Please enter your password: ");
         string password = AskPassword();
         

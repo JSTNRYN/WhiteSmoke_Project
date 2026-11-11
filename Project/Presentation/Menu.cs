@@ -4,13 +4,13 @@ static class Menu
 {
     public static void ShowRestaurantName()
     {
-        Console.Clear();
+        if (!Console.IsOutputRedirected) Console.Clear();
         Console.WriteLine(@"
         (                             
         (  (         )        )        )\ )                 )        
         )\))(   ' ( /( (   ( /(   (   (()/(    )         ( /(    (   
         ((_)()\ )  )\()))\  )\()) ))\   /(_))  (      (   )\())  ))\  
-        _(())\_)()((_)\((_)(_))/ /((_) (_))    )\  '  )\ ((_)\  /((_) 
+        _(())\_)()((_)(_))/ /((_) (_))    )\  '  )\ ((_\  /((_) 
         \ \((_)/ /| |(_)(_) | |_ (_))   / __| _((_))  ((_)| |(_)(_))   
          \ \/\/ / | ' \ | | |  _|/ -_)  \__ \| '  \()/ _ \| / / / -_)  
           \_/\_/  |_||_||_| \\__|\___|  |___/|_|_|_| \___/|_\_\ \___|
@@ -41,72 +41,90 @@ Opening hours
   Sunday        12:00 PM - 10:00 PM
 ");
     }
+
     public static void Start()
     {
+        ShowRestaurantName();
+        ShowRestaurantDescription();
+        bool firstMenu = true;
+
         while (true)
         {
-            if (UserLogic.IsLoggedIn())
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine($"You are logged in as: {UserLogic.CurrentAccount.FirstName} {UserLogic.CurrentAccount.LastName}");
-                Console.ResetColor();
-                Console.WriteLine("Enter 1 to make a reservation");
-                Console.WriteLine("Enter 2 to view your reservations");
-                Console.WriteLine("Enter 3 to view the about page");
-                Console.WriteLine("Enter 4 to log out\n");
-                if (UserLogic.IsAdmin())
-                {
-                    Console.WriteLine("Enter 5 to edit accounts");
-                    Console.WriteLine("Enter 6 to edit reservations");
-                }
+            if (!firstMenu)
+                ShowRestaurantName();
+            firstMenu = false;
 
-            }
+            bool loggedIn = UserLogic.IsLoggedIn();
+            bool isAdmin = loggedIn && UserLogic.IsAdmin();
+            ShowMainOptions(loggedIn, isAdmin);
+
+            string? choice = Console.ReadLine()?.Trim();
+            if (loggedIn)
+                HandleLoggedInChoice(choice, isAdmin);
             else
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"You are currently not logged in!");
-                Console.ResetColor();
-                Console.WriteLine("Enter 1 to login");
-                Console.WriteLine("Enter 2 to sign up");
-                Console.WriteLine("Enter 3 to the view about page");
-            }
-
-            string input = Console.ReadLine();
-
-            switch (input, UserLogic.IsLoggedIn())
-            {
-                case ("1", false):
-                    UserLogin.Start();
-                    break;
-                case ("2", false):
-                    UserSignUp.Start();
-                    break;
-                case ("3", false):
-                    Menu.About();
-                    break;
-                case ("1", true):
-                    MakeReservation.Start();
-                    break;
-                case ("2", true):
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("");
-                    Console.ResetColor();
-                    MyReservation.ShowReservations(UserLogic.CurrentAccount!.Id);
-                    break;
-                case ("3", true):
-                    About();
-                    break;
-                case ("4", true):
-                    UserLogic.Logout();
-                    break;
-                case ("5", true) when UserLogic.IsAdmin():
-                    AdminFunctions.ShowCustomers();
-                    break;
-                default:
-                    Console.WriteLine("Invalid input");
-                    break;
-            }
+                HandleGuestChoice(choice);
         }
+    }
+
+    private static void ShowMainOptions(bool loggedIn, bool isAdmin)
+    {
+        if (!loggedIn)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("You are currently not logged in.");
+            Console.ResetColor();
+            Console.WriteLine("1. Log in");
+            Console.WriteLine("2. Sign up");
+            Console.WriteLine("3. About");
+            return;
+        }
+
+        var account = UserLogic.CurrentAccount!;
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine($"Logged in as: {account.FirstName} {account.LastName}");
+        Console.ResetColor();
+        Console.WriteLine("1. Make a reservation");
+        Console.WriteLine("2. View your reservations");
+        Console.WriteLine("3. About");
+        Console.WriteLine("4. Log out");
+
+        if (!isAdmin) return;
+
+        Console.WriteLine("5. Manage menu items");
+        Console.WriteLine("6. View and edit the floor plan");
+    }
+
+    private static void HandleGuestChoice(string? choice)
+    {
+        switch (choice)
+        {
+            case "1": UserLogin.Start(); break;
+            case "2": UserSignUp.Start(); break;
+            case "3": About(); break;
+            default: ShowInvalidChoice(); break;
+        }
+    }
+
+    private static void HandleLoggedInChoice(string? choice, bool isAdmin)
+    {
+        switch (choice)
+        {
+            case "1": MakeReservation.Start(); break;
+            case "2": MyReservation.ShowReservations(UserLogic.CurrentAccount!.Id); break;
+            case "3": About(); break;
+            case "4": UserLogic.Logout(); break;
+            case "5" when isAdmin: MenuAdmin.Start(); break;
+            case "6" when isAdmin: FloorPlanUI.Show(); break;
+            default: ShowInvalidChoice(); break;
+        }
+    }
+
+    private static void ShowInvalidChoice()
+    {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine("Invalid input.");
+        Console.ResetColor();
+        Thread.Sleep(1000);
     }
 
     public static void About()
@@ -130,6 +148,7 @@ The crew:
  - Elena Voss, Pitmaster, Fish and Vegetables: handles the delicate cooks over open flame.
  - Tomás Rivera, Sous Chef: finishes the dishes and keeps the plates light and fresh.
  - Priya Nair, Front of House Manager: seats guests and runs the floor.
+
             ");
 
             Console.WriteLine("enter 1 to back");
