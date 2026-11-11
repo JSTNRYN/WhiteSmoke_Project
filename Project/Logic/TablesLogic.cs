@@ -89,10 +89,8 @@ public const int MaxY = 5;   // rijen 0-5
         var table = TableAccess.GetById(id)
             ?? throw new InvalidOperationException($"Table {id} could not be found.");
 
-        TableAccess.Delete(table.Id);
-
         if (!TableAccess.Delete(id))
-        throw new InvalidOperationException(
-            $"Table {id} can't be deleted because it still has reservations.");
+            throw new InvalidOperationException(
+                $"Table {id} can't be deleted because it still has reservations.");
     }
 }

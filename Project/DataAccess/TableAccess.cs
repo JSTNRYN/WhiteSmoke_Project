@@ -1,4 +1,5 @@
 using Dapper;
+using Microsoft.Data.Sqlite;
 
 public static class TableAccess
 {
@@ -49,8 +50,8 @@ public static class TableAccess
         try
         {
             using var conn = Open();
-            conn.Execute($"DELETE FROM {Table} WHERE ID = @Id", new { Id = id });
-            return true;
+            int affectedRows = conn.Execute($"DELETE FROM {Table} WHERE ID = @Id", new { Id = id });
+            return affectedRows > 0;
         }
         catch (SqliteException ex) when (ex.SqliteErrorCode == 19) // FOREIGN KEY constraint failed
         {
