@@ -92,6 +92,7 @@ Opening hours
 
         Console.WriteLine("5. Manage menu items");
         Console.WriteLine("6. View and edit the floor plan");
+        Console.WriteLine("7. View and Manage customers");
     }
 
     private static void HandleGuestChoice(string? choice)
@@ -115,6 +116,7 @@ Opening hours
             case "4": UserLogic.Logout(); break;
             case "5" when isAdmin: MenuAdmin.Start(); break;
             case "6" when isAdmin: FloorPlanUI.Show(); break;
+            case "7" when isAdmin: AdminFunctions.ShowCustomers(); break;
             default: ShowInvalidChoice(); break;
         }
     }
