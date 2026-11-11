@@ -3,8 +3,6 @@ using Dapper;
 
 public class MyReservationAccess
 {
-    private static SqliteConnection _connection = new SqliteConnection($"Data Source=DataSources/project.db");
-
     public static List<ReservationModel> GetWithUserID(long UserId)
     {
         string query = @"
@@ -12,8 +10,10 @@ public class MyReservationAccess
         FROM Reservation
         WHERE UserID = @UserId";
         
+        using var connection = Database.CreateConnection();
+        connection.Open();
         List<ReservationModel> MyReservation =
-            _connection.Query<ReservationModel>(query, new { UserId }).ToList();
+            connection.Query<ReservationModel>(query, new { UserId }).ToList();
 
         return MyReservation;
     }
