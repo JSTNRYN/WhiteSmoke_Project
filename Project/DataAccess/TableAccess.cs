@@ -59,10 +59,20 @@ public static class TableAccess
             new { Id = id, X = x, Y = y });
     }
 
-    // Verwijdert een tafel definitief uit de database
-    public static void Delete(int id)
+    // Verwijdert een tafel definitief uit de database.
+    // Geeft true terug als de tafel is verwijderd, false als dat niet mag omdat
+    // er nog iets naar de tafel verwijst (bijvoorbeeld een reservering).
+    public static bool Delete(int id)
     {
-        using var conn = Open();
-        conn.Execute($"DELETE FROM {Table} WHERE ID = @Id", new { Id = id });
+        try
+        {
+            using var conn = Open();
+            conn.Execute($"DELETE FROM {Table} WHERE ID = @Id", new { Id = id });
+            return true;
+        }
+        catch (SqliteException ex) when (ex.SqliteErrorCode == 19) // FOREIGN KEY constraint failed
+        {
+            return false;
+        }
     }
 }
