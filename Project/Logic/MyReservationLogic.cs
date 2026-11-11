@@ -9,4 +9,10 @@ public class MyReservationLogic
 
         return reservations;
     }
+
+    public static List<OrderLineModel> GetOrder(long reservationId)
+    {
+        return OrderAccess.GetLines(reservationId);
+    }
+
 }
