@@ -135,7 +135,37 @@ public class UserLogic
         if (dateOfBirth.Value.Date > today.AddYears(-age)) age--;
         return age >= 18;
     }
+    
+    public static string ReadPassword()
+    {
+        Console.Write("Please enter your password: ");
+        string password = "";
+        while (true)
+        {
+            ConsoleKeyInfo key = Console.ReadKey(true);
+            if (key.Key == ConsoleKey.Enter)
+            {
+                Console.WriteLine();
+                break;
+            }
+            else if (key.Key == ConsoleKey.Backspace)
+            {
+                if (password.Length > 0)
+                {
+                    password = password.Substring(0, password.Length - 1);
+                    Console.Write("\b \b");
+                }
+            }
+            else
+            {
+                password += key.KeyChar;
+                Console.Write("*");
+            }
+        }
 
+        return password;
+    }
+    
     public static string? AskPassword()
     {
         string specialCharacters = "!@#$%&*";
