@@ -25,7 +25,7 @@ public class MenuLogic
 
     public Dictionary<string, List<MenuItemModel>> GetMenuGroupedByCategory()
     {
-        List<MenuItemModel> allItems = MenuItemAccess.GetAll();
+        List<MenuItemModel> allItems = GetMenuItemsForDisplay();
 
         if (allItems == null)
         {
@@ -46,10 +46,19 @@ public class MenuLogic
             groupedMenu[category].Add(item);
         }
 
-        foreach (List<MenuItemModel> items in groupedMenu.Values)
-            items.Sort((left, right) => string.Compare(left.Name, right.Name, StringComparison.OrdinalIgnoreCase));
-
         return groupedMenu;
+    }
+
+    public static List<MenuItemModel> GetMenuItemsForDisplay()
+    {
+        List<MenuItemModel> items = MenuItemAccess.GetAll();
+        foreach (MenuItemModel item in items)
+            item.Category = NormalizeCategory(item.Category);
+
+        return items
+            .OrderBy(item => item.Category, StringComparer.OrdinalIgnoreCase)
+            .ThenBy(item => item.Name, StringComparer.OrdinalIgnoreCase)
+            .ToList();
     }
 
     private static string NormalizeCategory(string category)
