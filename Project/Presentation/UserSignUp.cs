@@ -38,7 +38,7 @@ public class UserSignUp
         
         string phoneNumber = UserLogic.AskPhoneNumber();
         
-        string password = UserLogic.AskPassword() ?? string.Empty;
+        string password = UserLogic.ReadPassword() ?? string.Empty;
         _userLogic.CreateAccount(firstName, lastName, email, phoneNumber, password, dateOfBirth);
     }
     
