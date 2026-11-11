@@ -12,10 +12,10 @@ static class UserLogin
         string email = Console.ReadLine();
         
         Console.Write("Please enter your password: ");
-        string password = Console.ReadLine();
+        string password = AskPassword();
         
         UserModel acc = _userLogic.CheckLogin(email, password);
-
+        
         if (acc != null)
         {
             // Return to the existing menu loop after a successful login.
@@ -37,6 +37,37 @@ static class UserLogin
     {
         Console.Write("Please enter your e-mail: ");
         return Console.ReadLine();
+    }
+    
+    
+    public static string AskPassword()
+    {
+        Console.Write("Please enter your password: ");
+        string password = "";
+
+        while (true)
+        {
+            ConsoleKeyInfo key = Console.ReadKey(true);
+            if (key.Key == ConsoleKey.Enter)
+            {
+                Console.WriteLine();
+                break;
+            }
+            else if (key.Key == ConsoleKey.Backspace)
+            {
+                if (password.Length > 0)
+                {
+                    password = password.Substring(0, password.Length - 1);
+                    Console.Write("\b \b");
+                }
+            }
+            else
+            {
+                password += key.KeyChar;
+                Console.Write("*");
+            }
+        }
+        return password;
     }
 
     
