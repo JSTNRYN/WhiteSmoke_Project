@@ -6,8 +6,7 @@ static class UserLogin
     {
         Console.Write("Please enter your e-mail: ");
         string? email = Console.ReadLine();
-        Console.Write("Please enter your password: ");
-        string? password = Console.ReadLine();
+        string? password = UserLogic.ReadPassword();
 
         UserModel? account = email != null && password != null
             ? UserLogic.CheckLogin(email, password)
