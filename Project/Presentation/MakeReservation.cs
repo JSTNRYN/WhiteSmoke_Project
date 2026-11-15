@@ -16,6 +16,7 @@ public static class MakeReservation
             Console.Clear();
             Console.WriteLine($"Invalid date format. Please enter the date in {_dateFormat} format:");
             dateInput = Console.ReadLine() ?? string.Empty;
+            if (dateInput.Equals("cancel", StringComparison.OrdinalIgnoreCase)) { Console.WriteLine(_cancelled); return; }
         }
 
         while (!ReservationLogic.IsValidateDate(dateInput))
@@ -24,6 +25,7 @@ public static class MakeReservation
             Console.WriteLine("You cannot make a reservation that is in the past or more than a year!");
             Console.WriteLine($"Enter the date for your reservation ({_dateFormat}):");
             dateInput = Console.ReadLine() ?? string.Empty;
+            if (dateInput.Equals("cancel", StringComparison.OrdinalIgnoreCase)) { Console.WriteLine(_cancelled); return; }
         }
 
         Console.Clear();
@@ -37,6 +39,7 @@ public static class MakeReservation
         {
             Console.WriteLine("You can only pick the mentioned options!");
             timeInput = Console.ReadLine() ?? string.Empty;
+            if (dateInput.Equals("cancel", StringComparison.OrdinalIgnoreCase)) { Console.WriteLine(_cancelled); return; }
         }
         timeInput = timeInput == "1" ? "5:00 PM" : "9:30 PM";
 
@@ -50,11 +53,19 @@ public static class MakeReservation
         {
             Console.WriteLine("Invalid number of guests. You can only have between 1-6:");
             partySizeInput = Console.ReadLine() ?? string.Empty;
+            if (dateInput.Equals("cancel", StringComparison.OrdinalIgnoreCase)) { Console.WriteLine(_cancelled); return; }
             int.TryParse(partySizeInput, out partySize);
         }
 
         List<TableModel> availableTables = ReservationLogic.GetAvailableTables(dateInput, partySize, timeInput);
-        if (availableTables.Count == 0) { Console.WriteLine("No tables are available for this date, time, and party size."); return; }
+        if (availableTables.Count == 0)
+        {
+            Console.Clear();
+            Console.WriteLine("No tables are available for this date, time, and party size.");
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey(true);
+            return;
+        }
 
         TableModel? selectedTable = null;
         while (selectedTable == null)
@@ -64,9 +75,11 @@ public static class MakeReservation
             foreach (TableModel table in availableTables) Console.WriteLine($"Table #{table.Id}  |  Seats: {table.Capacity}");
             Console.Write("Enter the table number: ");
             string tableInput = Console.ReadLine() ?? string.Empty;
+            if (dateInput.Equals("cancel", StringComparison.OrdinalIgnoreCase)) { Console.WriteLine(_cancelled); return; }
             if (!int.TryParse(tableInput, out int selectedId))
             {
                 Console.WriteLine("You must pick a table number.");
+                if (dateInput.Equals("cancel", StringComparison.OrdinalIgnoreCase)) { Console.WriteLine(_cancelled); return; }
                 continue;
             }
             selectedTable = availableTables.FirstOrDefault(table => table.Id == selectedId);
