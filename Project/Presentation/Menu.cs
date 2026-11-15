@@ -2,6 +2,7 @@ using Project.Presentation;
 
 static class Menu
 {
+    private static string _homepageMessage = "Enter on of the option numbers";
     public static void ShowRestaurantName()
     {
         if (!Console.IsOutputRedirected) Console.Clear();
@@ -17,35 +18,9 @@ static class Menu
 ");
     }
 
-    public static void ShowRestaurantDescription()
-    {
-        Console.WriteLine(@"
-Welcome to White Smoke, where fire and smoke bring every dish to life.
-Our pitmasters slowly cook meat, fish and vegetables over an open fire,
-for deep flavour with a light, fresh finish.
-Take a seat, the fire is already lit.
-
-Address
-  White Smoke
-  Wijnhaven 107
-  3011 WN Rotterdam
-  The Netherlands
-
-Opening hours
-  Monday        Closed
-  Tuesday       Closed
-  Wednesday     5:00 PM - 11:00 PM
-  Thursday      5:00 PM - 11:00 PM
-  Friday        5:00 PM - 11:00 PM
-  Saturday      12:00 PM - 11:00 PM
-  Sunday        12:00 PM - 10:00 PM
-");
-    }
-
     public static void Start()
     {
         ShowRestaurantName();
-        ShowRestaurantDescription();
         bool firstMenu = true;
 
         while (true)
@@ -73,6 +48,7 @@ Opening hours
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine("You are currently not logged in.");
             Console.ResetColor();
+            Console.WriteLine(_homepageMessage);
             Console.WriteLine("1. Log in");
             Console.WriteLine("2. Sign up");
             Console.WriteLine("3. About");
@@ -83,6 +59,7 @@ Opening hours
         Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine($"Logged in as: {account.FirstName} {account.LastName}");
         Console.ResetColor();
+        Console.WriteLine(_homepageMessage);
         Console.WriteLine("1. Make a reservation");
         Console.WriteLine("2. View your reservations");
         Console.WriteLine("3. About");
@@ -139,7 +116,7 @@ Opening hours
             Console.WriteLine("About\n");
             Console.WriteLine(@"
 White Smoke is built around one idea: cook with fire, and let the ingredients do the talking.
-Our pitmasters tend an open fire daily, slowly cooking meat, fish, and vegetables until they develop deep, smoky flavour without losing their freshness.
+Our Pitmasters tend an open fire daily, slowly cooking meat, fish, and vegetables until they develop deep, smoky flavour without losing their freshness.
 Every dish is finished light and bright, so the smoke adds depth instead of weight.
 We keep the menu honest and the method simple, because good fire-cooked food doesn’t need much else.
 
@@ -152,6 +129,28 @@ The crew:
  - Priya Nair, Front of House Manager: seats guests and runs the floor.
 
             ");
+
+            Console.WriteLine(@"
+Welcome to White Smoke, where fire and smoke bring every dish to life.
+Our pitmasters slowly cook meat, fish and vegetables over an open fire,
+for deep flavour with a light, fresh finish.
+Take a seat, the fire is already lit.
+
+Address
+  White Smoke
+  Wijnhaven 107
+  3011 WN Rotterdam
+  The Netherlands
+
+Opening hours
+  Monday        Closed
+  Tuesday       Closed
+  Wednesday     5:00 PM - 11:00 PM
+  Thursday      5:00 PM - 11:00 PM
+  Friday        5:00 PM - 11:00 PM
+  Saturday      12:00 PM - 11:00 PM
+  Sunday        12:00 PM - 10:00 PM
+");
 
             Console.WriteLine("enter 1 to back");
             string? input = Console.ReadLine();
