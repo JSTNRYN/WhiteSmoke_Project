@@ -11,17 +11,17 @@ public static class MakeReservation
         Console.WriteLine(_toCancel);
         string dateInput = Console.ReadLine() ?? string.Empty;
         if (dateInput.Equals("cancel", StringComparison.OrdinalIgnoreCase)) { Console.WriteLine(_cancelled); return; }
-
         while (!ReservationLogic.IsValidDateFormat(dateInput))
         {
             Console.Clear();
             Console.WriteLine($"Invalid date format. Please enter the date in {_dateFormat} format:");
             dateInput = Console.ReadLine() ?? string.Empty;
         }
+
         while (!ReservationLogic.IsValidateDate(dateInput))
         {
             Console.Clear();
-            Console.WriteLine("You cannot make a reservation that is in the past!");
+            Console.WriteLine("You cannot make a reservation that is in the past or more than a year!");
             Console.WriteLine($"Enter the date for your reservation ({_dateFormat}):");
             dateInput = Console.ReadLine() ?? string.Empty;
         }
