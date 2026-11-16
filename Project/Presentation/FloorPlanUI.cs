@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 // Menukeuzes als enum (Enum)
 public enum MenuChoice
 {
@@ -8,6 +5,37 @@ public enum MenuChoice
     Add = 1,
     Move = 2,
     Delete = 3
+}
+
+public static class TextHelper
+{
+    // Geeft een string met n spaties
+    public static string Spaces(int n)
+    {
+        string result = "";
+        for (int i = 0; i < n; i++)
+        {
+            result += " ";
+        }
+        return result;
+    }
+
+    // Tekst links uitgelijnd rechts aangevuld met spaties
+    public static string FillRight(string text, int width)
+    {
+        if (text.Length >= width) return text.Substring(0, width);
+        return text + Spaces(width - text.Length);
+    }
+
+    // Tekst in het midden links en rechts aangevuld met spaties
+    public static string Middle(string text, int width)
+    {
+        if (text.Length >= width) return text.Substring(0, width);
+
+        int spacesLeft = (width - text.Length) / 2;
+        int spacesRight = width - text.Length - spacesLeft;
+        return Spaces(spacesLeft) + text + Spaces(spacesRight);
+    }
 }
 
 // Contract voor alles wat in de plattegrond getekend kan worden (Interface)
@@ -19,16 +47,6 @@ public interface IFloorSection
 // Gedeelde basis voor alle vakken (Abstract class + Inheritance)
 public abstract class FloorSection : IFloorSection
 {
-    // Alleen kindklassen mogen dit gebruiken (Access modifiers)
-    protected static string CenterText(string text, int width)
-    {
-        if (text.Length >= width) return text.Substring(0, width);
-
-        int left = (width - text.Length) / 2;
-        int right = width - text.Length - left;
-        return new string(' ', left) + text + new string(' ', right);
-    }
-
     public abstract List<string> Draw();
 }
 
@@ -84,20 +102,20 @@ public class DiningSection : FloorSection
         }
 
         string border = "+" + new string('-', InnerWidth) + "+";
-        string blank = "|" + new string(' ', InnerWidth) + "|";
+        string blank = "|" + TextHelper.Spaces(InnerWidth) + "|";
 
         var box = new List<string>();
         box.Add(border);
-        box.Add("|" + CenterText("TABLES & DINING", InnerWidth) + "|");
+        box.Add("|" + TextHelper.Middle("TABLES & DINING", InnerWidth) + "|");
 
-        string header = new string(' ', LabelWidth);
+        string header = TextHelper.Spaces(LabelWidth);
         for (int x = 0; x < cols; x++)
-            header += CenterText($"X{x}", cellWidth);
-        box.Add("|" + header.PadRight(InnerWidth) + "|");
+            header += TextHelper.Middle($"X{x}", cellWidth);
+        box.Add("|" + TextHelper.FillRight(header, InnerWidth) + "|");
 
         for (int y = 0; y < rows; y++)
         {
-            string row = $"Y{y}".PadRight(LabelWidth);
+            string row = TextHelper.FillRight($"Y{y}", LabelWidth);
 
             for (int x = 0; x < cols; x++)
             {
@@ -106,10 +124,10 @@ public class DiningSection : FloorSection
                     ? ""
                     : $"[T{t.Id}: {t.Capacity}p{(t.IsOccupied == true ? "*" : "")}]";
 
-                row += CenterText(text, cellWidth);
+                row += TextHelper.Middle(text, cellWidth);
             }
 
-            box.Add("|" + row.PadRight(InnerWidth) + "|");
+            box.Add("|" + TextHelper.FillRight(row, InnerWidth) + "|");
             if (y < rows - 1) box.Add(blank);
         }
 
@@ -141,13 +159,13 @@ public class FloorPlanRenderer
     public void Draw()
     {
         string frame = new string('=', FrameWidth);
-        string empty = "|" + new string(' ', FrameWidth - 2) + "|";
+        string empty = "|" + TextHelper.Spaces(FrameWidth - 2) + "|";
 
         Console.WriteLine(frame);
-        Console.WriteLine("|" + Center("WHITE SMOKE", FrameWidth - 2) + "|");
-        Console.WriteLine("|" + Center("Wijnhaven 107, 3011 WN Rotterdam", FrameWidth - 2) + "|");
+        Console.WriteLine("|" + TextHelper.Middle("WHITE SMOKE", FrameWidth - 2) + "|");
+        Console.WriteLine("|" + TextHelper.Middle("Wijnhaven 107, 3011 WN Rotterdam", FrameWidth - 2) + "|");
         Console.WriteLine(frame);
-        Console.WriteLine("|" + " [ ENTRANCE / RECEPTION ]".PadRight(FrameWidth - 2) + "|");
+        Console.WriteLine("|" + TextHelper.FillRight(" [ ENTRANCE / RECEPTION ]", FrameWidth - 2) + "|");
         Console.WriteLine(empty);
 
         List<string> left = _left.Draw();
@@ -159,19 +177,12 @@ public class FloorPlanRenderer
             string l = i < left.Count ? left[i] : "";
             string r = i < right.Count ? right[i] : "";
 
-            Console.WriteLine("| " + l.PadRight(LeftWidth) + "    " + r.PadRight(RightWidth) + " |");
+            Console.WriteLine("| " + TextHelper.FillRight(l, LeftWidth) + "    "
+                              + TextHelper.FillRight(r, RightWidth) + " |");
         }
 
         Console.WriteLine(frame);
         Console.WriteLine("* = occupied");
-    }
-
-    private static string Center(string text, int width)
-    {
-        if (text.Length >= width) return text.Substring(0, width);
-
-        int left = (width - text.Length) / 2;
-        return new string(' ', left) + text + new string(' ', width - text.Length - left);
     }
 }
 
@@ -224,7 +235,6 @@ public static class FloorPlanUI
 
         while (true)
         {
-            Console.Clear();
             DrawFloorPlan();
             PrintRecentActions();
             Console.WriteLine();
@@ -242,7 +252,6 @@ public static class FloorPlanUI
                 case MenuChoice.Move: MoveTableMenu(); break;
                 case MenuChoice.Delete: DeleteTableMenu(); break;
                 case MenuChoice.Back:
-                    Console.Clear();
                     return;
                 default:
                     PrintError("Invalid choice.");
@@ -262,9 +271,7 @@ public static class FloorPlanUI
         renderer.Draw();
     }
 
-    // ---------- Helpers ----------
 
-    // Zet de invoer om naar een enum. Null als het geen geldige keuze is.
     private static MenuChoice? ReadMenuChoice()
     {
         string? input = Console.ReadLine()?.Trim();
@@ -283,7 +290,7 @@ public static class FloorPlanUI
         Console.WriteLine("Recent actions:");
 
         int shown = 0;
-        foreach (string action in ActionLog)   // Stack geeft nieuwste eerst
+        foreach (string action in ActionLog)  
         {
             Console.WriteLine(" - " + action);
             if (++shown == 3) break;
@@ -352,7 +359,6 @@ public static class FloorPlanUI
         Console.ReadKey(true);
     }
 
-    // ---------- Menu's ----------
 
     private static void AddTableMenu()
     {
