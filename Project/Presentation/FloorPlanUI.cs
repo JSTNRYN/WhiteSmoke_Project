@@ -435,4 +435,17 @@ public static class FloorPlanUI
         }
         Pause();
     }
+    static string GetMessage(TableError error)
+    {
+    return error switch
+    {
+        TableError.NotFound        => "Table could not be found.",
+        TableError.InvalidCapacity => "Invalid table capacity. A table must have a capacity of 2, 4, or 6 persons.",
+        TableError.InvalidColumn   => $"Invalid column. X must be between 0 and {TableLogic.MaxX}.",
+        TableError.InvalidRow      => $"Invalid row. Y must be between 0 and {TableLogic.MaxY}.",
+        TableError.PositionTaken   => "That position is already occupied by another table.",
+        TableError.HasReservations => "Table can't be deleted because it still has reservations.",
+        _                          => "Something went wrong."
+    };
+    }   
 }
