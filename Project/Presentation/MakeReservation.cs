@@ -111,6 +111,6 @@ public static class MakeReservation
     private static void SaveReservation(long partySize, string dateInput, string timeInput, long table, List<OrderLineModel> orderLines)
     {
         long reservationId = ReservationLogic.Write(partySize, dateInput, timeInput, table);
-        if (orderLines.Count > 0) OrderAccess.Save(reservationId, orderLines);
+        if (orderLines.Count > 0) OrderLogic.Save(reservationId, orderLines);
     }
 }

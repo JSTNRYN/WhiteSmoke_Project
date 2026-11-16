@@ -148,4 +148,145 @@ public static class AdminFunctions
             }
         }
     }
+        public static void ShowReservations()
+    {
+        Console.Clear();
+        List<ReservationModel> reservations = ReservationLogic.GetAll();
+
+        if (reservations.Count == 0)
+        {
+            Console.WriteLine("No reservations found.");
+            Console.WriteLine("Press any key to return...");
+            Console.ReadKey();
+            return;
+        }
+
+        Console.WriteLine($"List of Reservations (Total: {reservations.Count}):");
+        Console.WriteLine(new string('-', 65));
+        foreach (ReservationModel res in reservations)
+        {
+            Console.WriteLine($"ID: #{res.Id,-4} | Date: {res.Date,-10} | Time: {res.TimeSlot,-8} | Guests: {res.PartySize,-2} | Table: #{res.TableId}");
+        }
+        Console.WriteLine(new string('-', 65));
+
+        Console.WriteLine("Enter the ID of the reservation you want to edit, or type 'q' to return:");
+        string? input = Console.ReadLine()?.Trim();
+        if (string.Equals(input, "q", StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        if (long.TryParse(input, out long reservationId))
+        {
+            ReservationModel? reservation = ReservationLogic.GetById(reservationId);
+            if (reservation == null)
+            {
+                Console.WriteLine("No reservation found with the provided ID.");
+                Console.WriteLine("Press any key to return...");
+                Console.ReadKey();
+            }
+            else
+            {
+                EditReservation(reservation);
+            }
+        }
+        else
+        {
+            Console.WriteLine("Invalid ID entered.");
+            Console.WriteLine("Press any key to return...");
+            Console.ReadKey();
+        }
+    }
+
+    private static void EditReservation(ReservationModel reservation)
+    {
+        while (true)
+        {
+            Console.Clear();
+            Console.WriteLine($"Editing Reservation #{reservation.Id}");
+            Console.WriteLine($"1. Date:       {reservation.Date}");
+            Console.WriteLine($"2. Time:       {reservation.TimeSlot}");
+            Console.WriteLine($"3. Guests:     {reservation.PartySize}");
+            Console.WriteLine($"4. Table:      #{reservation.TableId}");
+            Console.WriteLine("5. Cancel this reservation (Delete)");
+            Console.WriteLine("6. Return to menu");
+            Console.Write("Choose an option: ");
+            string? option = Console.ReadLine()?.Trim();
+
+            if (option == "1")
+            {
+                Console.Write("Enter new date (dd-MM-yyyy): ");
+                string newDate = Console.ReadLine() ?? string.Empty;
+                if (!ReservationLogic.IsValidDateFormat(newDate) || !ReservationLogic.IsValidateDate(newDate))
+                {
+                    Console.WriteLine("Invalid date or date is in the past! Press any key...");
+                    Console.ReadKey();
+                    continue;
+                }
+                reservation.Date = newDate;
+                ReservationLogic.Update(reservation.Id, reservation.Date, reservation.TimeSlot, (int)reservation.PartySize, reservation.TableId);
+                Console.WriteLine("Date updated successfully! Press any key...");
+                Console.ReadKey();
+            }
+            else if (option == "2")
+            {
+                Console.WriteLine("Choose new time:\n1) 5:00 PM\n2) 9:30 PM");
+                string timeChoice = Console.ReadLine()?.Trim() ?? string.Empty;
+                if (timeChoice != "1" && timeChoice != "2")
+                {
+                    Console.WriteLine("Invalid choice! Press any key...");
+                    Console.ReadKey();
+                    continue;
+                }
+                reservation.TimeSlot = timeChoice == "1" ? "5:00 PM" : "9:30 PM";
+                ReservationLogic.Update(reservation.Id, reservation.Date, reservation.TimeSlot, (int)reservation.PartySize, reservation.TableId);
+                Console.WriteLine("Time updated successfully! Press any key...");
+                Console.ReadKey();
+            }
+            else if (option == "3")
+            {
+                Console.Write("Enter new number of guests (1-6): ");
+                if (!int.TryParse(Console.ReadLine(), out int guests) || !SeatCount.WithinRange(guests))
+                {
+                    Console.WriteLine("Invalid number of guests! Must be 1-6. Press any key...");
+                    Console.ReadKey();
+                    continue;
+                }
+                reservation.PartySize = guests;
+                ReservationLogic.Update(reservation.Id, reservation.Date, reservation.TimeSlot, (int)reservation.PartySize, reservation.TableId);
+                Console.WriteLine("Guests updated successfully! Press any key...");
+                Console.ReadKey();
+            }
+            else if (option == "4")
+            {
+                Console.Write("Enter new table number: ");
+                if (!long.TryParse(Console.ReadLine(), out long tableId))
+                {
+                    Console.WriteLine("Invalid table number! Press any key...");
+                    Console.ReadKey();
+                    continue;
+                }
+                reservation.TableId = tableId;
+                ReservationLogic.Update(reservation.Id, reservation.Date, reservation.TimeSlot, (int)reservation.PartySize, reservation.TableId);
+                Console.WriteLine("Table updated successfully! Press any key...");
+                Console.ReadKey();
+            }
+            else if (option == "5")
+            {
+                Console.Write("Are you sure you want to cancel/delete this reservation? (yes/no): ");
+                string? confirm = Console.ReadLine()?.Trim().ToLower();
+                if (confirm == "yes" || confirm == "y")
+                {
+                    ReservationLogic.Delete(reservation.Id);
+                    Console.WriteLine("Reservation cancelled successfully! Press any key...");
+                    Console.ReadKey();
+                    return;
+                }
+            }
+            else if (option == "6")
+            {
+                return;
+            }
+        }
+    }
 }

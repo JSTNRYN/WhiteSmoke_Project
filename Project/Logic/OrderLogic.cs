@@ -1,5 +1,10 @@
 public static class OrderLogic
 {
+    public static void Save(long reservationId, List<OrderLineModel> orderLines)
+    {
+        OrderAccess.Save(reservationId, orderLines);
+    }
+
     public static List<OrderLineModel>? AskForOrder()
     {
         List<MenuItemModel> menuItems = MenuLogic.GetMenuItemsForDisplay();
