@@ -1,20 +1,198 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
+// Menukeuzes als enum (Enum)
+public enum MenuChoice
+{
+    Back = 0,
+    Add = 1,
+    Move = 2,
+    Delete = 3
+}
 
-// Alles wat de admin ziet en intypt. Hier staat geen SQL en geen businessregel:
-// de UI vraagt invoer, laat TableLogic controleren en toont het resultaat.
-// De UI praat nooit rechtstreeks met TableAccess.
+public static class TextHelper
+{
+    // Geeft een string met n spaties
+    public static string Spaces(int n)
+    {
+        string result = "";
+        for (int i = 0; i < n; i++)
+        {
+            result += " ";
+        }
+        return result;
+    }
+
+    // Tekst links uitgelijnd rechts aangevuld met spaties
+    public static string FillRight(string text, int width)
+    {
+        if (text.Length >= width) return text.Substring(0, width);
+        return text + Spaces(width - text.Length);
+    }
+
+    // Tekst in het midden links en rechts aangevuld met spaties
+    public static string Middle(string text, int width)
+    {
+        if (text.Length >= width) return text.Substring(0, width);
+
+        int spacesLeft = (width - text.Length) / 2;
+        int spacesRight = width - text.Length - spacesLeft;
+        return Spaces(spacesLeft) + text + Spaces(spacesRight);
+    }
+}
+
+// Contract voor alles wat in de plattegrond getekend kan worden (Interface)
+public interface IFloorSection
+{
+    List<string> Draw();
+}
+
+// Gedeelde basis voor alle vakken (Abstract class + Inheritance)
+public abstract class FloorSection : IFloorSection
+{
+    public abstract List<string> Draw();
+}
+
+// Vaste vakken: bar, hot seats, toiletten (Concrete class)
+public class StaticSection : FloorSection
+{
+    private readonly string[] _lines;
+
+    public StaticSection(string[] lines)
+    {
+        _lines = lines;
+    }
+
+    public override List<string> Draw()
+    {
+        return new List<string>(_lines);
+    }
+}
+
+// Het vak TABLES & DINING, opgebouwd uit de database
+public class DiningSection : FloorSection
+{
+    private const int LabelWidth = 3;
+
+    // Property met private set (Properties)
+    public int InnerWidth { get; private set; }
+
+    public DiningSection(int innerWidth)
+    {
+        InnerWidth = innerWidth;
+    }
+
+    public override List<string> Draw()
+    {
+        int cols = TableLogic.MaxX + 1;
+        int rows = TableLogic.MaxY + 1;
+        int cellWidth = (InnerWidth - LabelWidth) / cols;
+
+        // 2D array: één keer vullen, daarna direct opzoeken via grid[x, y]
+        TableModel?[,] grid = new TableModel?[cols, rows];
+        foreach (var t in TableLogic.GetAllTables())
+        {
+            // Tafels zonder positie kunnen niet in het grid, die slaan we over
+            if (t.X == null || t.Y == null) continue;
+
+            int tx = t.X.Value;
+            int ty = t.Y.Value;
+
+            // Positie buiten het raster: overslaan in plaats van crashen
+            if (tx < 0 || tx >= cols || ty < 0 || ty >= rows) continue;
+
+            grid[tx, ty] = t;
+        }
+
+        string border = "+" + new string('-', InnerWidth) + "+";
+        string blank = "|" + TextHelper.Spaces(InnerWidth) + "|";
+
+        var box = new List<string>();
+        box.Add(border);
+        box.Add("|" + TextHelper.Middle("TABLES & DINING", InnerWidth) + "|");
+
+        string header = TextHelper.Spaces(LabelWidth);
+        for (int x = 0; x < cols; x++)
+            header += TextHelper.Middle($"X{x}", cellWidth);
+        box.Add("|" + TextHelper.FillRight(header, InnerWidth) + "|");
+
+        for (int y = 0; y < rows; y++)
+        {
+            string row = TextHelper.FillRight($"Y{y}", LabelWidth);
+
+            for (int x = 0; x < cols; x++)
+            {
+                TableModel? t = grid[x, y];
+                string text = t == null
+                    ? ""
+                    : $"[T{t.Id}: {t.Capacity}p{(t.IsOccupied == true ? "*" : "")}]";
+
+                row += TextHelper.Middle(text, cellWidth);
+            }
+
+            box.Add("|" + TextHelper.FillRight(row, InnerWidth) + "|");
+            if (y < rows - 1) box.Add(blank);
+        }
+
+        box.Add(border);
+        return box;
+    }
+}
+
+// Tekent het kader en zet twee vakken naast elkaar (non-static class)
+public class FloorPlanRenderer
+{
+    public int FrameWidth { get; }
+    public int LeftWidth { get; }
+    public int RightWidth { get; }
+
+    private readonly IFloorSection _left;
+    private readonly IFloorSection _right;
+
+    public FloorPlanRenderer(IFloorSection left, IFloorSection right,
+                             int frameWidth, int leftWidth, int rightWidth)
+    {
+        _left = left;
+        _right = right;
+        FrameWidth = frameWidth;
+        LeftWidth = leftWidth;
+        RightWidth = rightWidth;
+    }
+
+    public void Draw()
+    {
+        string frame = new string('=', FrameWidth);
+        string empty = "|" + TextHelper.Spaces(FrameWidth - 2) + "|";
+
+        Console.WriteLine(frame);
+        Console.WriteLine("|" + TextHelper.Middle("WHITE SMOKE", FrameWidth - 2) + "|");
+        Console.WriteLine("|" + TextHelper.Middle("Wijnhaven 107, 3011 WN Rotterdam", FrameWidth - 2) + "|");
+        Console.WriteLine(frame);
+        Console.WriteLine("|" + TextHelper.FillRight(" [ ENTRANCE / RECEPTION ]", FrameWidth - 2) + "|");
+        Console.WriteLine(empty);
+
+        List<string> left = _left.Draw();
+        List<string> right = _right.Draw();
+
+        int lines = Math.Max(left.Count, right.Count);
+        for (int i = 0; i < lines; i++)
+        {
+            string l = i < left.Count ? left[i] : "";
+            string r = i < right.Count ? right[i] : "";
+
+            Console.WriteLine("| " + TextHelper.FillRight(l, LeftWidth) + "    "
+                              + TextHelper.FillRight(r, RightWidth) + " |");
+        }
+
+        Console.WriteLine(frame);
+        Console.WriteLine("* = occupied");
+    }
+}
+
+// Alles wat de admin ziet en intypt
 public static class FloorPlanUI
 {
-    // Breedtes van de plattegrond (samen 74 tekens, net als je ontwerp)
-    private const int FrameWidth = 74;   // Hele kader, inclusief de buitenste "|"
-    private const int LeftWidth = 28;    // Breedte van de vakken links (bar, hot seats, toiletten)
-    private const int InnerWidth = 36;   // Binnenbreedte van het vak TABLES & DINING
-    private const int LabelWidth = 3;    // Ruimte voor het rijlabel (Y0, Y1, ...)
+    private const int FrameWidth = 74;
+    private const int LeftWidth = 28;
+    private const int InnerWidth = 36;
 
-    // De vaste linkerkant van de plattegrond: elke string is één regel.
-    // Een lege string is een lege regel tussen twee vakken.
     private static readonly string[] LeftColumn =
     {
         "+--------------------------+",
@@ -44,7 +222,9 @@ public static class FloorPlanUI
         "+--------------------------+"
     };
 
-    // Hoofdscherm van de plattegrond. Blijft herhalen tot de admin 0 kiest.
+    // Laatste acties, nieuwste bovenaan (Stack)
+    private static readonly Stack<string> ActionLog = new Stack<string>();
+
     public static void Show()
     {
         if (!UserLogic.IsLoggedIn() || !UserLogic.IsAdmin())
@@ -55,8 +235,8 @@ public static class FloorPlanUI
 
         while (true)
         {
-            Console.Clear();
             DrawFloorPlan();
+            PrintRecentActions();
             Console.WriteLine();
             Console.WriteLine("1. Add table");
             Console.WriteLine("2. Move table");
@@ -64,14 +244,15 @@ public static class FloorPlanUI
             Console.WriteLine("0. Back to main menu");
             Console.Write("Choice: ");
 
-            switch (Console.ReadLine())
+            MenuChoice? choice = ReadMenuChoice();
+
+            switch (choice)
             {
-                case "1": AddTableMenu(); break;
-                case "2": MoveTableMenu(); break;
-                case "3": DeleteTableMenu(); break;
-                case "0":
-                    Console.Clear();
-                    return;   // Terug naar het hoofdmenu
+                case MenuChoice.Add: AddTableMenu(); break;
+                case MenuChoice.Move: MoveTableMenu(); break;
+                case MenuChoice.Delete: DeleteTableMenu(); break;
+                case MenuChoice.Back:
+                    return;
                 default:
                     PrintError("Invalid choice.");
                     Pause();
@@ -80,106 +261,42 @@ public static class FloorPlanUI
         }
     }
 
-    // Tekent de hele plattegrond: kader, kop, linkerkant (vast) en rechterkant (uit de database)
     public static void DrawFloorPlan()
     {
-        string frame = new string('=', FrameWidth);
-        string empty = "|" + new string(' ', FrameWidth - 2) + "|";
+        var renderer = new FloorPlanRenderer(
+            new StaticSection(LeftColumn),
+            new DiningSection(InnerWidth),
+            FrameWidth, LeftWidth, InnerWidth + 2);
 
-        // Kop van het restaurant
-        Console.WriteLine(frame);
-        Console.WriteLine("|" + CenterText("WHITE SMOKE", FrameWidth - 2) + "|");
-        Console.WriteLine("|" + CenterText("Wijnhaven 107, 3011 WN Rotterdam", FrameWidth - 2) + "|");
-        Console.WriteLine(frame);
-        Console.WriteLine("|" + " [ ENTRANCE / RECEPTION ]".PadRight(FrameWidth - 2) + "|");
-        Console.WriteLine(empty);
-
-        // De rechterkant wordt opgebouwd uit de database
-        List<string> right = BuildDiningBox();
-
-        // Links en rechts naast elkaar zetten, regel voor regel.
-        // Is een kant korter, dan wordt de rest aangevuld met spaties.
-        int lines = Math.Max(LeftColumn.Length, right.Count);
-        for (int i = 0; i < lines; i++)
-        {
-            string left = i < LeftColumn.Length ? LeftColumn[i] : "";
-            string rightPart = i < right.Count ? right[i] : "";
-
-            // "| " + links (28) + 4 spaties + rechts (38) + " |" = 74 tekens
-            Console.WriteLine("| " + left.PadRight(LeftWidth) + "    "
-                              + rightPart.PadRight(InnerWidth + 2) + " |");
-        }
-
-        Console.WriteLine(frame);
-        Console.WriteLine("* = occupied");
+        renderer.Draw();
     }
 
-    // Bouwt het vak TABLES & DINING als lijst van regels, op basis van de tafels in de database
-    private static List<string> BuildDiningBox()
+
+    private static MenuChoice? ReadMenuChoice()
     {
-        int cols = TableLogic.MaxX + 1;
-        int rows = TableLogic.MaxY + 1;
+        string? input = Console.ReadLine()?.Trim();
 
-        // Breedte per kolom: de ruimte naast het rijlabel, eerlijk verdeeld over de kolommen
-        int cellWidth = (InnerWidth - LabelWidth) / cols;
+        if (Enum.TryParse(input, out MenuChoice choice) && Enum.IsDefined(typeof(MenuChoice), choice))
+            return choice;
 
-        // Tafels ophalen via de logica-laag (niet direct via TableAccess)
-        var tables = TableLogic.GetAllTables();
-
-        string border = "+" + new string('-', InnerWidth) + "+";
-        string blank = "|" + new string(' ', InnerWidth) + "|";
-
-        var box = new List<string>();
-        box.Add(border);
-        box.Add("|" + CenterText("TABLES & DINING", InnerWidth) + "|");
-
-        // Kopregel met de kolomnummers, zodat de admin weet welke X hij moet intypen
-        string header = new string(' ', LabelWidth);
-        for (int x = 0; x < cols; x++)
-            header += CenterText($"X{x}", cellWidth);
-        box.Add("|" + header.PadRight(InnerWidth) + "|");
-
-        for (int y = 0; y < rows; y++)
-        {
-            // Elke rij begint met het rijlabel (Y0, Y1, ...)
-            string row = $"Y{y}".PadRight(LabelWidth);
-
-            for (int x = 0; x < cols; x++)
-            {
-                // Zoek de tafel op deze plek (null als er geen is)
-                var t = tables.FirstOrDefault(t => t.X == x && t.Y == y);
-
-                // Lege plek = lege cel. Anders bijvoorbeeld [T3: 4p] of [T3: 4p*] als bezet.
-                string text = t == null
-                    ? ""
-                    : $"[T{t.Id}: {t.Capacity}p{(t.IsOccupied == true ? "*" : "")}]";
-
-                row += CenterText(text, cellWidth);
-            }
-
-            box.Add("|" + row.PadRight(InnerWidth) + "|");
-
-            // Lege regel tussen de rijen, behalve na de laatste
-            if (y < rows - 1) box.Add(blank);
-        }
-
-        box.Add(border);
-        return box;
+        return null;
     }
 
-    // ---------- Helpers ----------
-
-    // Zet tekst in het midden van een vaste breedte (aanvullen met spaties)
-    private static string CenterText(string text, int width)
+    private static void PrintRecentActions()
     {
-        if (text.Length >= width) return text.Substring(0, width);
+        if (ActionLog.Count == 0) return;
 
-        int left = (width - text.Length) / 2;
-        int right = width - text.Length - left;
-        return new string(' ', left) + text + new string(' ', right);
+        Console.WriteLine();
+        Console.WriteLine("Recent actions:");
+
+        int shown = 0;
+        foreach (string action in ActionLog)  
+        {
+            Console.WriteLine(" - " + action);
+            if (++shown == 3) break;
+        }
     }
 
-    // Print een foutmelding in het rood en zet de kleur daarna terug
     private static void PrintError(string message)
     {
         Console.ForegroundColor = ConsoleColor.Red;
@@ -187,9 +304,6 @@ public static class FloorPlanUI
         Console.ResetColor();
     }
 
-    // Vraagt een getal en blijft vragen tot het geldig is.
-    // "validate" is de controle die per vraag anders is.
-    // Geeft het getal terug, of null als de admin q typt om te annuleren.
     private static int? ReadValidated(string prompt, Action<int> validate)
     {
         while (true)
@@ -207,19 +321,16 @@ public static class FloorPlanUI
 
             try
             {
-                validate(value);   // Gooit een ArgumentException als de waarde niet mag
+                validate(value);
                 return value;
             }
             catch (ArgumentException ex)
             {
-                PrintError(ex.Message);   // Rode melding, daarna opnieuw vragen
+                PrintError(ex.Message);
             }
         }
     }
 
-    // Vraagt kolom en rij en controleert meteen of die plek vrij is.
-    // Bij een fout (bijvoorbeeld bezet) worden kolom en rij opnieuw gevraagd.
-    // ignoreTableId: bij verplaatsen telt de tafel zelf niet als bezette plek.
     private static (int X, int Y)? ReadFreePosition(int? ignoreTableId = null)
     {
         while (true)
@@ -242,16 +353,13 @@ public static class FloorPlanUI
         }
     }
 
-    // Wacht op een toets zodat meldingen leesbaar blijven voordat het scherm wordt gewist
     private static void Pause()
     {
         Console.WriteLine("Press any key to continue...");
         Console.ReadKey(true);
     }
 
-    // ---------- Menu's ----------
 
-    // Voegt een tafel toe: capaciteit, positie, opslaan
     private static void AddTableMenu()
     {
         Console.WriteLine("(type q to cancel)");
@@ -266,6 +374,7 @@ public static class FloorPlanUI
         {
             TableLogic.AddNewTable(capacity.Value, position.Value.X, position.Value.Y);
             Console.WriteLine("Table added.");
+            ActionLog.Push($"Added {capacity.Value}p table at X{position.Value.X}, Y{position.Value.Y}");
         }
         catch (ArgumentException ex)
         {
@@ -274,12 +383,10 @@ public static class FloorPlanUI
         Pause();
     }
 
-    // Verplaatst een tafel: welke tafel, nieuwe positie, opslaan
     private static void MoveTableMenu()
     {
         Console.WriteLine("(type q to cancel)");
 
-        // Het tafelnummer wordt direct gecontroleerd door de logica-laag
         int? id = ReadValidated("Table number to move: ", TableLogic.ValidateTableExists);
         if (id == null) return;
 
@@ -290,6 +397,7 @@ public static class FloorPlanUI
         {
             TableLogic.MoveTable(id.Value, position.Value.X, position.Value.Y);
             Console.WriteLine("Table moved.");
+            ActionLog.Push($"Moved T{id.Value} to X{position.Value.X}, Y{position.Value.Y}");
         }
         catch (Exception ex) when (ex is ArgumentException || ex is InvalidOperationException)
         {
@@ -298,7 +406,6 @@ public static class FloorPlanUI
         Pause();
     }
 
-    // Verwijdert een tafel, maar pas na bevestiging
     private static void DeleteTableMenu()
     {
         Console.WriteLine("(type q to cancel)");
@@ -306,7 +413,6 @@ public static class FloorPlanUI
         int? id = ReadValidated("Table number to delete: ", TableLogic.ValidateTableExists);
         if (id == null) return;
 
-        // Alleen y of j verwijdert, alles anders annuleert
         Console.Write($"Are you sure you want to delete table {id.Value}? (y/n): ");
         string? answer = Console.ReadLine()?.Trim().ToLower();
 
@@ -316,6 +422,7 @@ public static class FloorPlanUI
             {
                 TableLogic.DeleteTable(id.Value);
                 Console.WriteLine("Table deleted.");
+                ActionLog.Push($"Deleted T{id.Value}");
             }
             catch (InvalidOperationException ex)
             {
@@ -324,7 +431,6 @@ public static class FloorPlanUI
         }
         else
         {
-            // Niets verwijderen: de tafel blijft ongewijzigd
             Console.WriteLine("Deletion cancelled. The table remains unchanged.");
         }
         Pause();
