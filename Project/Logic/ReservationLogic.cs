@@ -25,10 +25,14 @@ public class ReservationLogic
         List<ReservationModel> reservations = ReservationAccess.GetAllByDate(date);
         List<TableModel> tables = TableAccess.GetWithMinimumCapacity(partySize);
 
-        HashSet<long> reservedTableIds = reservations
-            .Where(reservation => reservation.TimeSlot == time)
-            .Select(reservation => reservation.TableId)
-            .ToHashSet();
+        HashSet<long> reservedTableIds = new HashSet<long>();
+        foreach (ReservationModel reservation in reservations)
+        {
+            if (reservation.TimeSlot == time)
+            {
+                reservedTableIds.Add(reservation.TableId);
+            }
+        }
 
         List<TableModel> availableTables = new List<TableModel>();
         foreach (TableModel table in tables)
@@ -41,7 +45,6 @@ public class ReservationLogic
 
         return availableTables;
     }
-
 
     public static bool IsValidateDate(string date)
     {
@@ -56,8 +59,9 @@ public class ReservationLogic
         }
 
         DateTime currentDate = DateTime.Today;
+        DateTime OneYearAhead = currentDate.AddDays(365);
 
-        return parsedDate.Date >= currentDate;
+        return parsedDate.Date >= currentDate && parsedDate.Date <= OneYearAhead;
     }
 
     public static bool IsValidDateFormat(string date)
