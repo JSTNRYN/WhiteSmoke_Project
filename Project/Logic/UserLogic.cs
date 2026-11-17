@@ -66,7 +66,6 @@ public class UserLogic
 
         return digits.Length >= 8 && digits.Length <= 15;
     }
-    
     public static bool ValidateName(string? name)
     {
         return !string.IsNullOrWhiteSpace(name) && name.Trim().Length > 1;
@@ -81,7 +80,6 @@ public class UserLogic
     {
         CurrentAccount = null;
     }
-
     public static bool IsAdmin()
     {
         return CurrentAccount?.Role is "Admin";

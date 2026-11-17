@@ -2,7 +2,7 @@ using Project.Presentation;
 
 static class Menu
 {
-    private static string _homepageMessage = "Enter on of the option numbers";
+    private static string _homepageMessage = "Enter one of the option numbers";
     public static void ShowRestaurantName()
     {
         if (!Console.IsOutputRedirected) Console.Clear();
@@ -51,7 +51,8 @@ static class Menu
             Console.WriteLine(_homepageMessage);
             Console.WriteLine("1. Log in");
             Console.WriteLine("2. Sign up");
-            Console.WriteLine("3. About");
+            Console.WriteLine("3. View Menu");
+            Console.WriteLine("4. About");
             return;
         }
 
@@ -62,8 +63,9 @@ static class Menu
         Console.WriteLine(_homepageMessage);
         Console.WriteLine("1. Make a reservation");
         Console.WriteLine("2. View your reservations");
-        Console.WriteLine("3. About");
-        Console.WriteLine("4. Log out");
+        Console.WriteLine("3. View Menu");
+        Console.WriteLine("4. About");
+        Console.WriteLine("5. Log out");
 
         if (!isAdmin) return;
 
@@ -79,7 +81,15 @@ static class Menu
         {
             case "1": UserLogin.Start(); break;
             case "2": UserSignUp.Start(); break;
-            case "3": About(); break;
+            case "3":
+                List<MenuItemModel> list = MenuLogic.GetMenuItemsForDisplay();
+                MenuView.PrintItems(list);
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.WriteLine("Press Enter to return...");
+                Console.ResetColor();
+                Console.ReadLine();
+                break;
+            case "4": About(); break;
             default: ShowInvalidChoice(); break;
         }
     }

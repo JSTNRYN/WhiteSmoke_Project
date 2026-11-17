@@ -43,6 +43,83 @@ public class UserSignUp
         string password = InterceptPassword();
         _userLogic.CreateAccount(firstName, lastName, email, phoneNumber, password, dateOfBirth);
     }
+
+    public static string? AskEmail()
+    {
+        Console.Write("Please enter your e-mail (Or type q and enter to go back): ");
+        return Console.ReadLine();
+    }
+    
+    public static string? AskFirstName()
+    {
+        Console.Write("Please enter your first name (Or type q and enter to go back): ");
+        return Console.ReadLine();
+    }
+
+    public static string? AskLastName()
+    {
+        Console.Write("Please enter your last name (Or type q and enter to go back): ");
+        return Console.ReadLine();
+    }
+
+    public static DateTime AskDateOfBirth()
+    {
+        const string format = "dd-MM-yyyy";
+
+        while (true)
+        {
+            Console.Write($"Date of birth ({format}): ");
+            string? input = Console.ReadLine();
+
+            if (DateTime.TryParseExact(input, format, null, System.Globalization.DateTimeStyles.None, out DateTime date)
+                && date.Date <= DateTime.Today
+                && date.Date >= DateTime.Today.AddYears(-120))
+            {
+                return date.Date;
+            }
+
+            ShowError($"Please enter a valid date in {format} format.");
+        }
+    }
+
+    public static string? AskPassword()
+    {
+        string specialCharacters = "!@#$%&*";
+        while (true)
+        {
+            Console.Write("Please enter your password: ");
+            string? password = Console.ReadLine();
+            if (password is null)
+            {
+                return null;
+            }
+            bool hasSpecialChar = password.Any(ch => specialCharacters.Contains(ch));
+
+            if (password.Length < 6 || !hasSpecialChar)
+            {
+                ShowError("Password must be at least 6 characters and contain a special character!");
+            }
+            else
+            {
+                return password;
+            }
+        }
+    }
+
+    public static string AskPhoneNumber()
+    {
+        while (true)
+        {
+            Console.Write("Please enter your phone number: ");
+            string? phoneNumber = Console.ReadLine();
+            if (!string.IsNullOrWhiteSpace(phoneNumber) && phoneNumber.All(char.IsDigit))
+            {
+                return phoneNumber;
+            }
+
+            ShowError("Invalid phone number! Please enter numbers only.");
+        }
+    }
     
     public static void ShowError(string message)
     {
@@ -50,7 +127,6 @@ public class UserSignUp
         Console.WriteLine($"\n{message}");
         Console.ResetColor();
     }
-
     public static string? AskFirstName()
     {
         Console.Write("Please enter your first name (Or type q and enter to go back): ");
