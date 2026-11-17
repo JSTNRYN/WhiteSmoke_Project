@@ -86,7 +86,7 @@ public static class MakeReservation
             if (selectedTable == null) Console.WriteLine("Table number does not exist.");
         }
 
-        List<OrderLineModel>? orderLines = OrderLogic.AskForOrder();
+        List<OrderLineModel>? orderLines = OrderView.AskForOrder();
         if (orderLines == null) { Console.WriteLine("Reservation cancelled."); return; }
         Conformation(partySize, dateInput, timeInput, selectedTable.Id, orderLines);
     }

@@ -7,7 +7,14 @@ public class ReservationLogic
 
     public static List<ReservationModel> GetWithUserID(long User)
     {
-        return ReservationAccess.GetWithUserID(User);
+        List<ReservationModel> reservations = ReservationAccess.GetWithUserID(User);
+        reservations.Sort();
+        return reservations;
+    }
+
+    public static List<OrderLineModel> GetOrder(long reservationId)
+    {
+        return OrderAccess.GetLines(reservationId);
     }
 
     public static long Write(Int64 partySize, string dateInput, string timeInput, Int64 table)

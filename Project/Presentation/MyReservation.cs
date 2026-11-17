@@ -5,7 +5,7 @@ public static class MyReservation
         if (!Console.IsOutputRedirected)
             Console.Clear();
 
-        List<ReservationModel> reservations = MyReservationLogic.GetWithUserID(userId);
+        List<ReservationModel> reservations = ReservationLogic.GetWithUserID(userId);
         if (reservations.Count == 0)
         {
             Console.WriteLine("You have no reservations.");
@@ -24,7 +24,7 @@ public static class MyReservation
             Console.WriteLine($"Guests: {reservation.PartySize}");
             Console.WriteLine($"Table: #{reservation.TableId}");
 
-            List<OrderLineModel> order = MyReservationLogic.GetOrder(reservation.Id);
+            List<OrderLineModel> order = ReservationLogic.GetOrder(reservation.Id);
             if (order.Count == 0)
             {
                 Console.WriteLine("Order: none");

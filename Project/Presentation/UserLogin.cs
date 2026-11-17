@@ -6,7 +6,7 @@ static class UserLogin
     {
         Console.Write("Please enter your e-mail: ");
         string? email = Console.ReadLine();
-        string? password = UserLogic.InterceptPassword();
+        string? password = Project.Presentation.UserSignUp.InterceptPassword();
 
         UserModel? account = email != null && password != null
             ? UserLogic.CheckLogin(email, password)
