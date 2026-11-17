@@ -94,7 +94,7 @@ static class Menu
             case "4": UserLogic.Logout(); break;
             case "5" when isAdmin: break;
             case "6" when isAdmin: FloorPlanUI.Show(); break;
-            case "7" when isAdmin: AdminFunctions.ShowCustomers(); break;
+            case "7" when isAdmin: AdminFunctions.EditCustomers(); break;
             case "8" when isAdmin: AdminFunctions.DeleteCustomer(); break;
             default: ShowInvalidChoice(); break;
         }

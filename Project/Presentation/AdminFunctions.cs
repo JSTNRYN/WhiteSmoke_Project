@@ -1,6 +1,6 @@
 public static class AdminFunctions
 {
-    public static void ShowCustomers()
+    public static bool ShowCustomers()
     {
         List<UserModel> customers = new List<UserModel>();
         foreach (UserModel user in UserLogic.GetAllCustomers_ExceptPassword())
@@ -17,7 +17,7 @@ public static class AdminFunctions
             Console.WriteLine("No customers found.");
             Console.WriteLine("Press any key to return to the admin menu...");
             Console.ReadKey();
-            return;
+            return false;
         }
 
         Console.WriteLine($"List of Customers (Amount: {customers.Count}):");
@@ -29,12 +29,21 @@ public static class AdminFunctions
             Console.WriteLine($"Phone Number: {customer.PhoneNumber}");
             Console.WriteLine("-----------------------------");
         }
+        return true;
+    }
+
+    public static UserModel SelectCustomer()
+    {
+        if (!ShowCustomers())
+        {
+            return null;
+        }
 
         Console.WriteLine("Enter the ID of the customer you want to edit, or type 'q' to return to the main menu:");
         string input = Console.ReadLine();
         if (input.ToLower() == "q")
         {
-            return;
+            return null;
         }
 
         if (int.TryParse(input, out int customerId))
@@ -47,16 +56,25 @@ public static class AdminFunctions
                 Console.WriteLine("No customer found with the provided ID.");
                 Console.WriteLine("Press any key to return...");
                 Console.ReadKey();
+                return null;
             }
-            else
-            {
-                Console.Clear();
-                EditCustomer(customer);
-            }
+
+            Console.Clear();
+            return customer;
         }
-        else
+
+        Console.WriteLine("Invalid input.");
+        Console.WriteLine("Press any key to return...");
+        Console.ReadKey();
+        return null;
+    }
+
+    public static void EditCustomers()
+    {
+        UserModel customer = SelectCustomer();
+        if (customer != null)
         {
-            Console.WriteLine("Invalid input.");
+            EditCustomer(customer);
         }
     }
 
@@ -86,6 +104,7 @@ public static class AdminFunctions
                 }
                 UserLogic.UpdateFirstName(customer, newFirstName.Trim());
                 Console.WriteLine("First name updated successfully.");
+                Console.ReadKey();
                 Console.Clear();
                 return;
             }
@@ -102,6 +121,7 @@ public static class AdminFunctions
                 }
                 UserLogic.UpdateLastName(customer, newLastName.Trim());
                 Console.WriteLine("Last name updated successfully.");
+                Console.ReadKey();
                 Console.Clear();
                 return;
             }
@@ -118,6 +138,7 @@ public static class AdminFunctions
                 }
                 UserLogic.UpdateEmail(customer, newEmail.Trim());
                 Console.WriteLine("Email successfully updated.");
+                Console.ReadKey();
                 Console.Clear();
                 return;
             }
@@ -134,6 +155,7 @@ public static class AdminFunctions
                 }
                 UserLogic.UpdatePhoneNumber(customer, newPhoneNumber.Trim());
                 Console.WriteLine("Phone number updated successfully.");
+                Console.ReadKey();
                 Console.Clear();
                 return;
             }
@@ -144,6 +166,7 @@ public static class AdminFunctions
             else
             {
                 Console.WriteLine("Invalid option. Please choose 1 to 5.");
+                Console.ReadKey();
                 Console.Clear();
             }
         }
