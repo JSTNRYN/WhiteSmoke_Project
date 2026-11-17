@@ -148,4 +148,47 @@ public static class AdminFunctions
             }
         }
     }
+
+    public static void AdminMenu()
+    {
+        while (true)
+        {
+            Console.Clear();
+            Console.WriteLine("Admin Menu:");
+            Console.WriteLine("1. Manage Menu Items");
+            Console.WriteLine("2. View and edit the floor plan");
+            Console.WriteLine("3. View and manage customers");
+            Console.WriteLine("4. Back to main menu");
+            Console.Write("Choose an option: ");
+            string choice = Console.ReadLine();
+            if(int.TryParse(choice, out int option))
+            {
+                switch (option)
+                {
+                    case 1:
+                        Console.WriteLine("Manage Menu Items functionality is not implemented yet.");
+                        Console.ReadKey();
+                        break;
+                    case 2:
+                        FloorPlanUI.Show();
+                        break;
+                    case 3:
+                        ShowCustomers();
+                        break;
+                    case 4:
+                        return;
+                    default:
+                        Console.WriteLine("Invalid option. Please choose 1 to 4.");
+                        Console.ReadKey();
+                        break;
+                }
+            }
+            else
+            {
+                Console.WriteLine("Invalid input. Please enter a number.");
+                Console.ReadKey();
+            }
+            
+        }
+    }
 }
