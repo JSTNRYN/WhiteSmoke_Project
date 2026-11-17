@@ -67,9 +67,7 @@ static class Menu
 
         if (!isAdmin) return;
 
-        Console.WriteLine("5. Manage menu items");
-        Console.WriteLine("6. View and edit the floor plan");
-        Console.WriteLine("7. View and Manage customers");
+        Console.WriteLine("5. Admin Menu");
     }
 
     private static void HandleGuestChoice(string? choice)
@@ -91,9 +89,7 @@ static class Menu
             case "2": MyReservation.ShowReservations(UserLogic.CurrentAccount!.Id); break;
             case "3": About(); break;
             case "4": UserLogic.Logout(); break;
-            case "5" when isAdmin: break;
-            case "6" when isAdmin: FloorPlanUI.Show(); break;
-            case "7" when isAdmin: AdminFunctions.ShowCustomers(); break;
+            case "5" when isAdmin: AdminFunctions.AdminMenu(); break;
             default: ShowInvalidChoice(); break;
         }
     }
