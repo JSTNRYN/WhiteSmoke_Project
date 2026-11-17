@@ -148,4 +148,54 @@ public static class AdminFunctions
             }
         }
     }
+
+    public static void DeleteCustomer()
+    {
+        Console.Clear();
+        Console.WriteLine("Enter the ID of the customer you want to delete, or type 'q' to return to the main menu:");
+        string input = Console.ReadLine();
+        if (input.ToLower() == "q")
+        {
+            return;
+        }
+
+        if (int.TryParse(input, out int customerId))
+        {
+            UserModel customer = UserLogic.GetCustomerById(customerId);
+
+            if (customer == null || customerId == UserLogic.CurrentAccount.Id)
+            {
+                Console.Clear();
+                Console.WriteLine("No customer found with the provided ID.");
+                Console.WriteLine("Press any key to return...");
+                Console.ReadKey();
+            }
+            else
+            {
+                Console.Clear();
+                Console.WriteLine($"Are you sure you want to delete the customer: {customer.FirstName} {customer.LastName}? (y/n)");
+                string confirmation = Console.ReadLine();
+                if (confirmation.ToLower() == "y")
+                {
+                    bool success = UserLogic.DeleteCustomer(customer);
+                    if (success)
+                    {
+                        Console.WriteLine("Customer deleted successfully.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Failed to delete customer. There may be associated reservations or orders.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Deletion cancelled.");
+                }
+            }
+        }
+        else
+        {
+            Console.WriteLine("Invalid input.");
+        }
+    }
 }

@@ -128,5 +128,9 @@ public class UserLogic
         return UserAccess.GetById(id);
     }
 
+    public static bool DeleteCustomer(UserModel customer)
+    {
+        return UserAccess.DeleteCustomer(customer);
+    }
 
 }

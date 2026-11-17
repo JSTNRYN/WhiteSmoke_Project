@@ -70,6 +70,7 @@ static class Menu
         Console.WriteLine("5. Manage menu items");
         Console.WriteLine("6. View and edit the floor plan");
         Console.WriteLine("7. View and Manage customers");
+        Console.WriteLine("8. Delete a customer account");
     }
 
     private static void HandleGuestChoice(string? choice)
@@ -94,6 +95,7 @@ static class Menu
             case "5" when isAdmin: break;
             case "6" when isAdmin: FloorPlanUI.Show(); break;
             case "7" when isAdmin: AdminFunctions.ShowCustomers(); break;
+            case "8" when isAdmin: AdminFunctions.DeleteCustomer(); break;
             default: ShowInvalidChoice(); break;
         }
     }
