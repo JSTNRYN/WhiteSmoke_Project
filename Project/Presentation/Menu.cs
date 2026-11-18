@@ -2,7 +2,7 @@ using Project.Presentation;
 
 static class Menu
 {
-    private static string _homepageMessage = "Enter on of the option numbers";
+    private static string _homepageMessage = "Enter one of the option numbers";
     public static void ShowRestaurantName()
     {
         if (!Console.IsOutputRedirected) Console.Clear();
@@ -51,7 +51,8 @@ static class Menu
             Console.WriteLine(_homepageMessage);
             Console.WriteLine("1. Log in");
             Console.WriteLine("2. Sign up");
-            Console.WriteLine("3. About");
+            Console.WriteLine("3. View Menu");
+            Console.WriteLine("4. About");
             return;
         }
 
@@ -62,14 +63,13 @@ static class Menu
         Console.WriteLine(_homepageMessage);
         Console.WriteLine("1. Make a reservation");
         Console.WriteLine("2. View your reservations");
-        Console.WriteLine("3. About");
-        Console.WriteLine("4. Log out");
+        Console.WriteLine("3. View Menu");
+        Console.WriteLine("4. About");
+        Console.WriteLine("5. Log out");
 
         if (!isAdmin) return;
 
-        Console.WriteLine("5. Manage menu items");
-        Console.WriteLine("6. View and edit the floor plan");
-        Console.WriteLine("7. View and Manage customers");
+        Console.WriteLine("6. Admin Menu");
     }
 
     private static void HandleGuestChoice(string? choice)
@@ -78,7 +78,15 @@ static class Menu
         {
             case "1": UserLogin.Start(); break;
             case "2": UserSignUp.Start(); break;
-            case "3": About(); break;
+            case "3":
+                List<MenuItemModel> list = MenuLogic.GetMenuItemsForDisplay();
+                MenuView.PrintItems(list);
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.WriteLine("Press Enter to return...");
+                Console.ResetColor();
+                Console.ReadLine();
+                break;
+            case "4": About(); break;
             default: ShowInvalidChoice(); break;
         }
     }
@@ -89,11 +97,17 @@ static class Menu
         {
             case "1": MakeReservation.Start(); break;
             case "2": MyReservation.ShowReservations(UserLogic.CurrentAccount!.Id); break;
-            case "3": About(); break;
-            case "4": UserLogic.Logout(); break;
-            case "5" when isAdmin: break;
-            case "6" when isAdmin: FloorPlanUI.Show(); break;
-            case "7" when isAdmin: AdminFunctions.ShowCustomers(); break;
+            case "3":
+                List<MenuItemModel> list = MenuLogic.GetMenuItemsForDisplay();
+                MenuView.PrintItems(list);
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.WriteLine("Press Enter to return...");
+                Console.ResetColor();
+                Console.ReadLine();
+                break;
+            case "4": About(); break;
+            case "5": UserLogic.Logout(); break;
+            case "6" when isAdmin: AdminFunctions.AdminMenu(); break;
             default: ShowInvalidChoice(); break;
         }
     }
