@@ -87,18 +87,18 @@ public class DiningSection : FloorSection
 
         // 2D array: één keer vullen, daarna direct opzoeken via grid[x, y]
         TableModel?[,] grid = new TableModel?[cols, rows];
-        foreach (var t in TableLogic.GetAllTables())
+        foreach (var table in TableLogic.GetAllTables())
         {
             // Tafels zonder positie kunnen niet in het grid, die slaan we over
-            if (t.X == null || t.Y == null) continue;
+            if (table.X == null || table.Y == null) continue;
 
-            int tx = t.X.Value;
-            int ty = t.Y.Value;
+            int x = table.X.Value;
+            int y = table.Y.Value;
 
-            // Positie buiten het raster: overslaan in plaats van crashen
-            if (tx < 0 || tx >= cols || ty < 0 || ty >= rows) continue;
+            // Positie buiten het raster dus als die niet bestaat kan je hem niet aanmaken
+            if (x < 0 || x >= cols || y < 0 || y >= rows) continue;
 
-            grid[tx, ty] = t;
+            grid[x, y] = table;
         }
 
         string border = "+" + new string('-', InnerWidth) + "+";
