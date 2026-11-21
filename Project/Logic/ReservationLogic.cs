@@ -2,22 +2,43 @@ using System.Globalization;
 
 public class ReservationLogic
 {
-    public ReservationModel? currentReservation { get; private set; }
-
-
-    public static List<ReservationModel> GetWithUserID(long User)
+    public static long CreateReservation(ReservationModel reservation)
     {
-        return ReservationAccess.GetWithUserID(User);
-    }
-
-    public static long Write(Int64 partySize, string dateInput, string timeInput, Int64 table)
-    {
-        if (UserLogic.CurrentAccount is null)
+        if (UserLogic.CurrentAccount == null)
         {
             throw new InvalidOperationException("You must be logged in to make a reservation.");
         }
 
-        return ReservationAccess.Write(UserLogic.CurrentAccount, partySize, dateInput, timeInput, table);
+        if (!IsValidDateFormat(reservation.Date) || !IsValidateDate(reservation.Date))
+        {
+            throw new ArgumentException("Invalid reservation date.");
+        }
+
+        if (!SeatCount.WithinRange((int)reservation.PartySize))
+        {
+            throw new ArgumentException("Party size must be between 1 and 6.");
+        }
+
+        reservation.UserId = UserLogic.CurrentAccount.Id;
+        return ReservationAccess.Write(reservation);
+    }
+
+    public static long Write(long partySize, string dateInput, string timeInput, long table)
+    {
+        ReservationModel reservation = new ReservationModel(0, timeInput, dateInput, partySize, 0, table);
+        return CreateReservation(reservation);
+    }
+
+    public static List<ReservationModel> GetWithUserID(long userId)
+    {
+        List<ReservationModel> reservations = ReservationAccess.GetWithUserID(userId);
+        reservations.Sort();
+        return reservations;
+    }
+
+    public static List<OrderLineModel> GetOrder(long reservationId)
+    {
+        return OrderAccess.GetLines(reservationId);
     }
 
     public static List<TableModel> GetAvailableTables(string date, int partySize, string time)
@@ -25,7 +46,7 @@ public class ReservationLogic
         List<ReservationModel> reservations = ReservationAccess.GetAllByDate(date);
         List<TableModel> tables = TableAccess.GetWithMinimumCapacity(partySize);
 
-        HashSet<long> reservedTableIds = new HashSet<long>();
+        List<long> reservedTableIds = new List<long>();
         foreach (ReservationModel reservation in reservations)
         {
             if (reservation.TimeSlot == time)
@@ -48,7 +69,7 @@ public class ReservationLogic
 
     public static bool IsValidateDate(string date)
     {
-        if (date == null || date == "")
+        if (string.IsNullOrWhiteSpace(date))
         {
             return false;
         }
@@ -59,14 +80,14 @@ public class ReservationLogic
         }
 
         DateTime currentDate = DateTime.Today;
-        DateTime OneYearAhead = currentDate.AddDays(365);
+        DateTime oneYearAhead = currentDate.AddDays(365);
 
-        return parsedDate.Date >= currentDate && parsedDate.Date <= OneYearAhead;
+        return parsedDate.Date >= currentDate && parsedDate.Date <= oneYearAhead;
     }
 
     public static bool IsValidDateFormat(string date)
     {
-        if (date == null || date == "")
+        if (string.IsNullOrWhiteSpace(date))
         {
             return false;
         }

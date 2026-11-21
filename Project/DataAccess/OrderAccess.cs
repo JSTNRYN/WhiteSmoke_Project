@@ -18,40 +18,75 @@ public static class OrderAccess
 
         using var connection = Database.CreateConnection();
         connection.Open();
+
         List<dynamic> rows = connection.Query(query, new { ReservationId = reservationId }).ToList();
-        return rows.Select(row => new OrderLineModel(
-            new MenuItemModel(
+        List<OrderLineModel> lines = new List<OrderLineModel>();
+
+        foreach (var row in rows)
+        {
+            MenuItemModel item = new MenuItemModel(
                 Convert.ToInt32(row.Id),
                 Convert.ToString(row.Menu) ?? string.Empty,
                 Convert.ToString(row.Name) ?? string.Empty,
                 Convert.ToString(row.Category) ?? string.Empty,
                 Convert.ToDouble(row.UnitPrice),
-                Convert.ToString(row.Description) ?? string.Empty)
-            {
-                Adult = Convert.ToInt64(row.Adult) != 0
-            },
-            Convert.ToInt32(row.Quantity))).ToList();
+                Convert.ToString(row.Description) ?? string.Empty);
+
+            item.Adult = Convert.ToInt64(row.Adult) != 0;
+            lines.Add(new OrderLineModel(item, Convert.ToInt32(row.Quantity)));
+        }
+
+        return lines;
     }
 
-    public static void Save(long reservationId, List<OrderLineModel> orderLines)
+    public static OrderModel GetOrder(long reservationId)
+    {
+        List<OrderLineModel> lines = GetLines(reservationId);
+        return new OrderModel(reservationId, lines);
+    }
+
+    public static void Save(OrderModel order)
     {
         using var connection = Database.CreateConnection();
         connection.Open();
         using var transaction = connection.BeginTransaction();
-        long orderId = GetOrCreateOrder(connection, transaction, reservationId);
 
-        foreach (OrderLineModel line in orderLines)
-            connection.Execute("INSERT INTO OrderItem (OrderID, MenuItemID, Quantity) VALUES (@OrderID, @MenuItemID, @Quantity)", new { OrderID = orderId, MenuItemID = line.MenuItem.Id, Quantity = line.Quantity }, transaction);
+        long orderId = GetOrCreateOrder(connection, transaction, order.ReservationId);
+        order.Id = orderId;
+
+        foreach (OrderLineModel line in order.Lines)
+        {
+            connection.Execute(
+                "INSERT INTO OrderItem (OrderID, MenuItemID, Quantity) VALUES (@OrderID, @MenuItemID, @Quantity)",
+                new { OrderID = orderId, MenuItemID = line.MenuItem.Id, Quantity = line.Quantity },
+                transaction);
+        }
 
         UpdateTotal(connection, transaction, orderId);
         transaction.Commit();
     }
 
+    public static void Save(long reservationId, List<OrderLineModel> orderLines)
+    {
+        Save(new OrderModel(reservationId, orderLines));
+    }
+
     private static long GetOrCreateOrder(SqliteConnection connection, SqliteTransaction transaction, long reservationId)
     {
-        long? existing = connection.ExecuteScalar<long?>("SELECT ID FROM \"Order\" WHERE ReservationID = @ReservationId ORDER BY ID LIMIT 1", new { ReservationId = reservationId }, transaction);
-        if (existing.HasValue) return existing.Value;
-        return connection.ExecuteScalar<long>("INSERT INTO \"Order\" (ReservationID, TotalPrice) VALUES (@ReservationID, 0) RETURNING ID", new { ReservationID = reservationId }, transaction);
+        long? existing = connection.ExecuteScalar<long?>(
+            "SELECT ID FROM \"Order\" WHERE ReservationID = @ReservationId ORDER BY ID LIMIT 1",
+            new { ReservationId = reservationId },
+            transaction);
+
+        if (existing.HasValue)
+        {
+            return existing.Value;
+        }
+
+        return connection.ExecuteScalar<long>(
+            "INSERT INTO \"Order\" (ReservationID, TotalPrice) VALUES (@ReservationID, 0) RETURNING ID",
+            new { ReservationID = reservationId },
+            transaction);
     }
 
     private static void UpdateTotal(SqliteConnection connection, SqliteTransaction transaction, long orderId)
@@ -64,6 +99,8 @@ public static class OrderAccess
                 JOIN MenuItem ON MenuItem.ID = OrderItem.MenuItemID
                 WHERE OrderItem.OrderID = ""Order"".ID
             ), 0)
-            WHERE ID = @OrderID", new { OrderID = orderId }, transaction);
+            WHERE ID = @OrderID",
+            new { OrderID = orderId },
+            transaction);
     }
 }
