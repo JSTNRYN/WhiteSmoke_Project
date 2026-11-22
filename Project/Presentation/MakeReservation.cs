@@ -173,7 +173,7 @@ public static class MakeReservation
 
             if (input == "yes" || input == "y")
             {
-                long reservationId = ReservationLogic.CreateReservation(reservation);
+                long reservationId = ReservationLogic.Write(reservation);
                 reservation.Id = reservationId;
 
                 if (orderLines.Count > 0)

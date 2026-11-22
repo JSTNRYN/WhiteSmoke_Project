@@ -12,12 +12,6 @@ public static class ReservationAccess
         return connection.ExecuteScalar<long>(query, reservation);
     }
 
-    public static long Write(UserModel user, long partySize, string date, string timeslot, long table)
-    {
-        ReservationModel reservation = new ReservationModel(0, timeslot, date, partySize, user.Id, table);
-        return Write(reservation);
-    }
-
     public static List<ReservationModel> GetWithUserID(long userId)
     {
         string query = @"

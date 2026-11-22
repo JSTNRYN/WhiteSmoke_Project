@@ -2,7 +2,7 @@ using System.Globalization;
 
 public class ReservationLogic
 {
-    public static long CreateReservation(ReservationModel reservation)
+    public static long Write(ReservationModel reservation)
     {
         if (UserLogic.CurrentAccount == null)
         {
@@ -21,12 +21,6 @@ public class ReservationLogic
 
         reservation.UserId = UserLogic.CurrentAccount.Id;
         return ReservationAccess.Write(reservation);
-    }
-
-    public static long Write(long partySize, string dateInput, string timeInput, long table)
-    {
-        ReservationModel reservation = new ReservationModel(0, timeInput, dateInput, partySize, 0, table);
-        return CreateReservation(reservation);
     }
 
     public static List<ReservationModel> GetWithUserID(long userId)
