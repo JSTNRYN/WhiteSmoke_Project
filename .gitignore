@@ -430,6 +430,3 @@ FodyWeavers.xsd
 # Database files
 *.db
 !template.project.db
-
-# DS_Store files
-.DS_Store
