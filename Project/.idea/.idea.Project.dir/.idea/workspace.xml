@@ -15,8 +15,9 @@
   <component name="ChangeListManager">
     <list default="true" id="3be85243-6a67-4d44-8c62-2c66c5038dbe" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Project.dir/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Project.dir/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/UserAccess.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/UserAccess.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Logic/UserLogic.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Logic/UserLogic.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Presentation/UserLogin.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Presentation/UserLogin.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Presentation/Menu.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Presentation/Menu.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,13 +60,14 @@
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "cidr.known.project.marker": "true",
     "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "password-method",
+    "git-widget-placeholder": "54-user-updates-their-own-details",
     "last_opened_file_path": "/Users/hurbie48/Documents/GitHub/WhiteSmoke_Project/Project",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.lookFeel",
     "vue.rearranger.settings.migration": "true"
   },
   "keyToStringList": {
@@ -108,6 +110,7 @@
       <workItem from="1791966152419" duration="18000" />
       <workItem from="1791971078480" duration="893000" />
       <workItem from="1794398207170" duration="2514000" />
+      <workItem from="1795435527214" duration="2591000" />
     </task>
     <servers />
   </component>

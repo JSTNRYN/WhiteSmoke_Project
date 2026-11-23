@@ -230,7 +230,7 @@ public class UserLogic
         UserAccess.UpdatePhoneNumber(customer, newPhoneNumber);
     }
 
-    public static UserModel GetCustomerById(int id)
+    public static UserModel GetCustomerById(long id)
     {
         return UserAccess.GetById(id);
     }

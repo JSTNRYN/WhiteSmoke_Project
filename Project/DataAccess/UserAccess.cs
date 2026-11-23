@@ -11,7 +11,7 @@ public class UserAccess
 
     public long Write(UserModel account)
     {
-        string sql = $"INSERT INTO {Table} (email, password, firstName, lastName, phonenumber, role) VALUES (@EmailAddress, @Password, @FirstName, @LastName, @PhoneNumber, @Role) RETURNING id";
+        string sql = $"INSERT INTO {Table} (email, password, firstName, lastName, phonenumber, dateOfBirth, role) VALUES (@EmailAddress, @Password, @FirstName, @LastName, @PhoneNumber, @DateOfBirth, @Role) RETURNING id";
         _connection.Open();
         long id = _connection.ExecuteScalar<long>(sql, account);
         _connection.Close();
@@ -43,9 +43,9 @@ public class UserAccess
         _connection.Execute(sql, new { Id = account.Id });
         _connection.Close();
     }
-    public static UserModel? GetById(int id)
+    public static UserModel? GetById(long id)
     {
-        string sql = $"SELECT id, firstName, lastName, phonenumber, email AS EmailAddress, role FROM {Table} WHERE id = @id";
+        string sql = $"SELECT id, firstName, lastName, phonenumber, email, DATEOFBIRTH, role FROM {Table} WHERE id = @id";
         _connection.Open();
         var user = _connection.QueryFirstOrDefault<UserModel>(sql, new { id = id });
         _connection.Close();

@@ -64,12 +64,13 @@ static class Menu
         Console.WriteLine("2. View your reservations");
         Console.WriteLine("3. About");
         Console.WriteLine("4. Log out");
+        Console.WriteLine("5: Edit personal details");
 
         if (!isAdmin) return;
 
-        Console.WriteLine("5. Manage menu items");
-        Console.WriteLine("6. View and edit the floor plan");
-        Console.WriteLine("7. View and Manage customers");
+        Console.WriteLine("6. Manage menu items");
+        Console.WriteLine("7. View and edit the floor plan");
+        Console.WriteLine("8. View and Manage customers");
     }
 
     private static void HandleGuestChoice(string? choice)
@@ -91,19 +92,80 @@ static class Menu
             case "2": MyReservation.ShowReservations(UserLogic.CurrentAccount!.Id); break;
             case "3": About(); break;
             case "4": UserLogic.Logout(); break;
-            case "5" when isAdmin: break;
-            case "6" when isAdmin: FloorPlanUI.Show(); break;
-            case "7" when isAdmin: AdminFunctions.ShowCustomers(); break;
+            case "5": EditUserDetails(UserLogic.CurrentAccount); break;
+            case "6" when isAdmin: break;
+            case "7" when isAdmin: FloorPlanUI.Show(); break;
+            case "8" when isAdmin: AdminFunctions.ShowCustomers(); break;
             default: ShowInvalidChoice(); break;
         }
     }
 
+    private static void EditUserDetails(UserModel user)
+    {
+        Console.WriteLine("Current details:");
+        Console.WriteLine($"1: First name: {user.FirstName}");
+        Console.WriteLine($"2: Last name: {user.LastName}");
+        Console.WriteLine($"3: Email address: {UserLogic.GetCustomerById(UserLogic.CurrentAccount.Id).EmailAddress}");
+        Console.WriteLine($"4: Date of birth (DD-MM-YYYY): {user.DateOfBirth:dd-MM-yyyy}");
+        Console.WriteLine($"5: Phone number: {user.PhoneNumber}");
+        Console.WriteLine($"6: Change your password");
+        Console.WriteLine("7: Quit");
+        Console.WriteLine("-----------------");
+        Console.WriteLine("Please enter the number of the detail you would like to edit:");
+        string choice = Console.ReadLine();
+        switch (choice)
+        {
+            case "1": ChangeFirstName(); break;
+            case "2": ChangeLastName(); break;
+            case "3": ChangeEmail(); break;
+            case "4": ChangeDob(); break;
+            case "5": ChangePhoneNumber(); break;
+            case "6": ChangePhoneNumber(); break;
+            case "7" : break;
+            default: ShowInvalidChoiceForPersonalData(user); break;
+        }
+    }
+    
+    private static void ChangeFirstName()
+    {
+        
+    }
+    
+    private static void ChangeLastName()
+    {
+        
+    }
+    
+    private static void ChangeEmail()
+    {
+        
+    }
+    
+    private static void ChangeDob()
+    {
+        
+    }
+    
+    private static void ChangePhoneNumber()
+    {
+        
+    }
+    
     private static void ShowInvalidChoice()
     {
         Console.ForegroundColor = ConsoleColor.Red;
         Console.WriteLine("Invalid input.");
         Console.ResetColor();
         Thread.Sleep(1000);
+    }
+
+    private static void ShowInvalidChoiceForPersonalData(UserModel user)
+    {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine("Invalid input.");
+        Console.ResetColor();
+        Thread.Sleep(1000);
+        EditUserDetails(user);
     }
 
     public static void About()
