@@ -57,22 +57,39 @@ public static class MakeReservation
             int.TryParse(partySizeInput, out partySize);
         }
 
-        List<TableModel> availableTables = ReservationLogic.GetAvailableTables(dateInput, partySize, timeInput);
-        if (availableTables.Count == 0)
+        List<TableModel> tables = ReservationLogic.GetTablesForReservation(partySize);
+        if (tables.Count == 0)
         {
             Console.Clear();
-            Console.WriteLine("No tables are available for this date, time, and party size.");
+            Console.WriteLine("No tables have enough seats for this party size.");
             Console.WriteLine("Press any key to continue...");
             Console.ReadKey(true);
             return;
         }
 
+        HashSet<long> reservedTableIds = ReservationLogic.GetReservedTableIds(dateInput, timeInput);
+        List<TableModel> availableTables = tables.Where(table => !reservedTableIds.Contains(table.Id)).ToList();
+
         TableModel? selectedTable = null;
         while (selectedTable == null)
         {
             Console.Clear();
-            Console.WriteLine("Available tables:");
-            foreach (TableModel table in availableTables) Console.WriteLine($"Table #{table.Id}  |  Seats: {table.Capacity}");
+            Console.WriteLine($"Tables for {dateInput} at {timeInput} (party size: {partySize}):");
+            FloorPlanUI.DrawReservationFloorPlan(tables, reservedTableIds);
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.Write("Green = available");
+            Console.ResetColor();
+            Console.Write("; ");
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("red = already reserved.");
+            Console.ResetColor();
+            if (availableTables.Count == 0)
+            {
+                Console.WriteLine("No tables are available for this date and time.");
+                Console.WriteLine("Press any key to continue...");
+                Console.ReadKey(true);
+                return;
+            }
             Console.Write("Enter the table number: ");
             string tableInput = Console.ReadLine() ?? string.Empty;
             if (dateInput.Equals("cancel", StringComparison.OrdinalIgnoreCase)) { Console.WriteLine(_cancelled); return; }
@@ -83,7 +100,13 @@ public static class MakeReservation
                 continue;
             }
             selectedTable = availableTables.FirstOrDefault(table => table.Id == selectedId);
-            if (selectedTable == null) Console.WriteLine("Table number does not exist.");
+            if (selectedTable == null)
+            {
+                bool isReserved = reservedTableIds.Contains(selectedId);
+                Console.WriteLine(isReserved
+                    ? "That table is already reserved for this date and time. Choose a green table."
+                    : "Table number does not exist or is too small for your party.");
+            }
         }
 
         List<OrderLineModel>? orderLines = OrderLogic.AskForOrder();

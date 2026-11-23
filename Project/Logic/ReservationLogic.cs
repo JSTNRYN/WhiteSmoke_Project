@@ -22,20 +22,10 @@ public class ReservationLogic
 
     public static List<TableModel> GetAvailableTables(string date, int partySize, string time)
     {
-        List<ReservationModel> reservations = ReservationAccess.GetAllByDate(date);
-        List<TableModel> tables = TableAccess.GetWithMinimumCapacity(partySize);
-
-        HashSet<long> reservedTableIds = new HashSet<long>();
-        foreach (ReservationModel reservation in reservations)
-        {
-            if (reservation.TimeSlot == time)
-            {
-                reservedTableIds.Add(reservation.TableId);
-            }
-        }
-
+        List<long> reservedTableIds = GetReservedTableIds(date, time);
         List<TableModel> availableTables = new List<TableModel>();
-        foreach (TableModel table in tables)
+
+        foreach (TableModel table in TableAccess.GetWithMinimumCapacity(partySize))
         {
             if (!reservedTableIds.Contains(table.Id))
             {
@@ -44,6 +34,21 @@ public class ReservationLogic
         }
 
         return availableTables;
+    }
+
+    public static List<long> GetReservedTableIds(string date, string time)
+    {
+        List<long> reservedTableIds = new List<long>();
+
+        foreach (var reservation in ReservationAccess.GetAllByDate(date))
+        {
+            if (reservation.TimeSlot == time)
+            {
+                reservedTableIds.Add(reservation.TableId);
+            }
+        }
+
+        return reservedTableIds;
     }
 
     public static bool IsValidateDate(string date)
