@@ -11,6 +11,7 @@ public static class FloorPlanUI
         while (true)
         {
             DrawFloorPlan();
+            PrintRecentActions();
             Console.WriteLine();
             Console.WriteLine("1. Add table");
             Console.WriteLine("2. Move table");
@@ -18,7 +19,9 @@ public static class FloorPlanUI
             Console.WriteLine("0. Back to main menu");
             Console.Write("Choice: ");
 
-            switch (Console.ReadLine())
+            MenuChoice? choice = ReadMenuChoice();
+
+            switch (choice)
             {
                 case "1": AddTableMenu(); break;
                 case "2": MoveTableMenu(); break;
@@ -127,7 +130,6 @@ public static class FloorPlanUI
         }
     }
 
-    // Print een foutmelding in het rood en zet de kleur daarna terug
     private static void PrintError(string message)
     {
         Console.ForegroundColor = ConsoleColor.Red;
@@ -205,6 +207,7 @@ public static class FloorPlanUI
         {
             TableLogic.AddNewTable(capacity.Value, position.Value.X, position.Value.Y);
             Console.WriteLine("Table added.");
+            ActionLog.Push($"Added {capacity.Value}p table at X{position.Value.X}, Y{position.Value.Y}");
         }
         catch (ArgumentException ex)
         {
@@ -227,6 +230,7 @@ public static class FloorPlanUI
         {
             TableLogic.MoveTable(id.Value, position.Value.X, position.Value.Y);
             Console.WriteLine("Table moved.");
+            ActionLog.Push($"Moved T{id.Value} to X{position.Value.X}, Y{position.Value.Y}");
         }
         catch (Exception ex) when (ex is ArgumentException || ex is InvalidOperationException)
         {
@@ -242,7 +246,6 @@ public static class FloorPlanUI
         int? id = ReadValidated("Table number to delete: ", TableLogic.ValidateTableExists);
         if (id == null) return;
 
-        // Alleen y of j verwijdert, alles anders annuleert
         Console.Write($"Are you sure you want to delete table {id.Value}? (y/n): ");
         string? answer = Console.ReadLine()?.Trim().ToLower();
 
@@ -252,6 +255,7 @@ public static class FloorPlanUI
             {
                 TableLogic.DeleteTable(id.Value);
                 Console.WriteLine("Table deleted.");
+                ActionLog.Push($"Deleted T{id.Value}");
             }
             catch (InvalidOperationException ex)
             {

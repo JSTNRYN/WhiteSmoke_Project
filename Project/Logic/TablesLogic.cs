@@ -1,8 +1,10 @@
+using System.Collections.Generic;
+using System.Linq;
+
 public static class TableLogic
 {
-
- public const int MaxX = 2;  
-public const int MaxY = 5;  
+    public const int MaxX = 2;   
+    public const int MaxY = 5;   
 
     private static readonly int[] AllowedCapacities = { 2, 4, 6 };
 
@@ -14,26 +16,25 @@ public const int MaxY = 5;
     public static void ValidateTableExists(int id)
     {
         if (TableAccess.GetById(id) == null)
-            throw new ArgumentException($"Table {id} could not be found.");
+            throw new TableException(TableError.NotFound);
     }
 
     public static void ValidateCapacity(int capacity)
     {
         if (!AllowedCapacities.Contains(capacity))
-            throw new ArgumentException(
-                "Invalid table capacity. A table must have a capacity of 2, 4, or 6 persons.");
+            throw new TableException(TableError.InvalidCapacity);
     }
 
     public static void ValidateColumn(int x)
     {
         if (x < 0 || x > MaxX)
-            throw new ArgumentException($"Invalid column. X must be between 0 and {MaxX}.");
+            throw new TableException(TableError.InvalidColumn);
     }
 
     public static void ValidateRow(int y)
     {
         if (y < 0 || y > MaxY)
-            throw new ArgumentException($"Invalid row. Y must be between 0 and {MaxY}.");
+            throw new TableException(TableError.InvalidRow);
     }
 
     public static void ValidatePosition(int x, int y, int? ignoreTableId = null)
@@ -45,7 +46,7 @@ public const int MaxY = 5;
             .Any(t => t.X == x && t.Y == y && t.Id != ignoreTableId);
 
         if (taken)
-            throw new ArgumentException($"Position ({x}, {y}) is already occupied by another table.");
+            throw new TableException(TableError.PositionTaken);
     }
 
     public static void AddNewTable(int capacity, int x, int y)
@@ -57,20 +58,16 @@ public const int MaxY = 5;
 
     public static void MoveTable(int id, int x, int y)
     {
-        var table = TableAccess.GetById(id)
-            ?? throw new InvalidOperationException($"Table {id} could not be found.");
-
-        ValidatePosition(x, y, ignoreTableId: table.Id);
+        ValidateTableExists(id);
+        ValidatePosition(x, y, ignoreTableId: id);
         TableAccess.UpdateLocation(id, x, y);
     }
 
     public static void DeleteTable(int id)
     {
-        var table = TableAccess.GetById(id)
-            ?? throw new InvalidOperationException($"Table {id} could not be found.");
+        ValidateTableExists(id);
 
         if (!TableAccess.Delete(id))
-            throw new InvalidOperationException(
-                $"Table {id} can't be deleted because it still has reservations.");
+            throw new TableException(TableError.HasReservations);
     }
 }

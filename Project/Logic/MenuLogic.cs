@@ -14,12 +14,13 @@ public class MenuLogic
     {
         if (string.IsNullOrWhiteSpace(input)) return false;
 
-        return input.Trim() switch
+        string choice = input.Trim();
+        if (isLoggedIn)
         {
-            "1" or "2" or "3" or "4" when isLoggedIn => true,
-            "1" or "2" or "3" when !isLoggedIn => true,
-            _ => false
-        };
+            return choice == "1" || choice == "2" || choice == "3" || choice == "4";
+        }
+
+        return choice == "1" || choice == "2" || choice == "3";
     }
 
     public Dictionary<string, List<MenuItemModel>> GetMenuGroupedByCategory()
@@ -31,7 +32,7 @@ public class MenuLogic
             return new Dictionary<string, List<MenuItemModel>>();
         }
 
-        Dictionary<string, List<MenuItemModel>> groupedMenu = new();
+        Dictionary<string, List<MenuItemModel>> groupedMenu = new Dictionary<string, List<MenuItemModel>>();
 
         foreach (var item in allItems)
         {
@@ -52,7 +53,9 @@ public class MenuLogic
     {
         List<MenuItemModel> items = MenuItemAccess.GetAll();
         foreach (MenuItemModel item in items)
+        {
             item.Category = NormalizeCategory(item.Category);
+        }
 
         return items
             .OrderBy(item => item.Category, StringComparer.OrdinalIgnoreCase)
@@ -62,10 +65,14 @@ public class MenuLogic
 
     private static string NormalizeCategory(string category)
     {
-        return category.Trim().ToLowerInvariant() switch
+        string trimmed = category.Trim();
+        string lower = trimmed.ToLowerInvariant();
+
+        if (lower == "dessert" || lower == "desserts" || lower == "sweets")
         {
-            "dessert" or "desserts" or "sweets" => "Desserts",
-            _ => category.Trim()
-        };
+            return "Desserts";
+        }
+
+        return trimmed;
     }
 }
