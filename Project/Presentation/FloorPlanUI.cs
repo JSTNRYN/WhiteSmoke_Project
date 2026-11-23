@@ -40,7 +40,7 @@ public static class FloorPlanUI
         DrawTableRows(TableLogic.GetAllTables());
     }
 
-    public static void DrawReservationFloorPlan(List<TableModel> reservationTables, HashSet<long> reservedTableIds)
+    public static void DrawReservationFloorPlan(List<TableModel> reservationTables, List<long> reservedTableIds)
     {
         DrawRoomLayout();
         Console.WriteLine("TABLES & DINING - choose by table number");
@@ -56,7 +56,7 @@ public static class FloorPlanUI
         Console.WriteLine("                 ENTRANCE / RECEPTION                       ");
     }
 
-    private static void DrawTableRows(List<TableModel> tables, HashSet<long>? reservedTableIds = null)
+    private static void DrawTableRows(List<TableModel> tables, List<long>? reservedTableIds = null)
     {
         var leftSide = new List<string>
         {
@@ -91,43 +91,62 @@ public static class FloorPlanUI
             tableSide.Add("+-----------------------------------------------------------------+");
         }
 
-        int lineCount = Math.Max(leftSide.Count, tableSide.Count);
-        for (int i = 0; i < lineCount; i++)
+    // Aantal regels = de langste van de twee kanten
+    int lineCount = Math.Max(leftSide.Count, tableSide.Count);
+
+    for (int i = 0; i < lineCount; i++)
+    {
+        // Tekst links en rechts voor deze regel (leeg als er niets meer is)
+        string left = i < leftSide.Count ? leftSide[i] : "                        ";
+        string right = i < tableSide.Count ? tableSide[i] : "";
+
+        // Print de linkerkant
+        Console.Write(left);
+        Console.Write("    ");
+
+        // Is dit een rij met tafels
+        if (i >= 5 && i < 5 + TableLogic.MaxY * 2 + 1 && (i - 5) % 2 == 0)
         {
-            string left = i < leftSide.Count ? leftSide[i] : "                        ";
-            string right = i < tableSide.Count ? tableSide[i] : "";
-            Console.Write(left);
-            Console.Write("    ");
+            // Welke rij (Y) is dit?
+            int y = (i - 5) / 2;
+            Console.Write("|    Y" + y + "    |");
 
-            if (i >= 5 && i < 5 + TableLogic.MaxY * 2 + 1 && (i - 5) % 2 == 0)
+            // Loop door alle kolommen (X)
+            for (int x = 0; x <= TableLogic.MaxX; x++)
             {
-                int y = (i - 5) / 2;
-                Console.Write("|    Y" + y + "    |");
-                for (int x = 0; x <= TableLogic.MaxX; x++)
+                // Zoek de tafel op deze plek
+                TableModel? table = tables.FirstOrDefault(t => t.X == x && t.Y == y);
+
+                // Geen tafel: print "empty"
+                if (table == null)
                 {
-                    TableModel? table = tables.FirstOrDefault(t => t.X == x && t.Y == y);
-                    if (table == null)
-                    {
-                        Console.Write("    [ empty ]    |");
-                        continue;
-                    }
-
-                    bool isReserved = reservedTableIds?.Contains(table.Id) == true;
-                    if (reservedTableIds != null)
-                        Console.ForegroundColor = isReserved ? ConsoleColor.Red : ConsoleColor.Green;
-                    Console.Write("    [T" + table.Id + ": " + table.Capacity + "p]    |");
-                    if (reservedTableIds != null) Console.ResetColor();
+                    Console.Write("    [ empty ]    |");
+                    continue;
                 }
-                Console.WriteLine();
+
+                // Is de tafel gereserveerd?
+                bool isReserved = reservedTableIds?.Contains(table.Id) == true;
+
+                // Rood = gereserveerd, groen = vrij
+                if (reservedTableIds != null)
+                    Console.ForegroundColor = isReserved ? ConsoleColor.Red : ConsoleColor.Green;
+
+                // Print de tafel
+                Console.Write("    [T" + table.Id + ": " + table.Capacity + "p]    |");
+
+                // Kleur weer normaal
+                if (reservedTableIds != null) Console.ResetColor();
             }
-            else
-            {
-                Console.WriteLine(right);
-            }
+
+        }
+        else
+        {
+            Console.WriteLine(right);
+        }
         }
     }
+    
 
-    // Print een foutmelding in het rood en zet de kleur daarna terug
     private static void PrintError(string message)
     {
         Console.ForegroundColor = ConsoleColor.Red;

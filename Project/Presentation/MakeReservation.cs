@@ -67,7 +67,7 @@ public static class MakeReservation
             return;
         }
 
-        HashSet<long> reservedTableIds = ReservationLogic.GetReservedTableIds(dateInput, timeInput);
+        List<long> reservedTableIds = ReservationLogic.GetReservedTableIds(dateInput, timeInput);
         List<TableModel> availableTables = tables.Where(table => !reservedTableIds.Contains(table.Id)).ToList();
 
         TableModel? selectedTable = null;

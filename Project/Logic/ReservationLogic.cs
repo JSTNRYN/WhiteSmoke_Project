@@ -20,6 +20,20 @@ public class ReservationLogic
         return ReservationAccess.Write(UserLogic.CurrentAccount, partySize, dateInput, timeInput, table);
     }
 
+    public static List<TableModel> GetTablesForReservation(int partySize)
+    {
+        ReservationModel reservation = new ReservationModel
+        {
+            PartySize = partySize
+        };
+        return GetTablesForReservation(reservation);
+    }
+
+    public static List<TableModel> GetTablesForReservation(ReservationModel reservation)
+    {
+        return TableAccess.GetWithMinimumCapacity((int)reservation.PartySize);
+    }
+
     public static List<TableModel> GetAvailableTables(string date, int partySize, string time)
     {
         List<long> reservedTableIds = GetReservedTableIds(date, time);
