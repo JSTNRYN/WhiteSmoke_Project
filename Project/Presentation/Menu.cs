@@ -54,7 +54,7 @@ static class Menu
             case 0: UserLogin.Start(); break;
             case 1: UserSignUp.Start(); break;
             case 2:
-                List<MenuItemModel> list = MenuLogic.GetMenuItemsForDisplay();
+                List<MenuItemModel> list = MenuLogic.GetNonAdminMenuItems();
                 MenuView.PrintItems(list);
                 Console.ForegroundColor = ConsoleColor.DarkYellow;
                 Console.WriteLine("Press Enter to return...");
@@ -73,7 +73,7 @@ static class Menu
             case 0: MakeReservation.Start(); break;
             case 1: MyReservation.ShowReservations(UserLogic.CurrentAccount!.Id); break;
             case 2:
-                List<MenuItemModel> list = MenuLogic.GetMenuItemsForDisplay();
+                List<MenuItemModel> list = MenuLogic.GetNonAdminMenuItems();
                 MenuView.PrintItems(list);
                 Console.ForegroundColor = ConsoleColor.DarkYellow;
                 Console.WriteLine("Press Enter to return...");
