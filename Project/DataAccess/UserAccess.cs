@@ -18,6 +18,7 @@ public class UserAccess
 
         return id;
     }
+    
 
     public static UserModel GetByEmail(string email)
     {
@@ -45,7 +46,7 @@ public class UserAccess
     }
     public static UserModel? GetById(long id)
     {
-        string sql = $"SELECT id, firstName, lastName, phonenumber, email, DATEOFBIRTH, role FROM {Table} WHERE id = @id";
+        string sql = $"SELECT id, firstName, lastName, phonenumber, email AS EmailAddress, DATEOFBIRTH, role FROM {Table} WHERE id = @id";
         _connection.Open();
         var user = _connection.QueryFirstOrDefault<UserModel>(sql, new { id = id });
         _connection.Close();
@@ -59,6 +60,15 @@ public class UserAccess
         List<UserModel> customers = _connection.Query<UserModel>(sql).ToList();
         _connection.Close();
         return customers;
+    }
+    
+    public static List<UserModel> GetAllAdmins_ExceptPassword()
+    {
+        string sql = $"SELECT id, firstName, lastName, phonenumber, email AS EmailAddress, role FROM {Table} WHERE role = 'Admin'";
+        _connection.Open();
+        List<UserModel> admins = _connection.Query<UserModel>(sql).ToList();
+        _connection.Close();
+        return admins;
     }
 
     public static void UpdateFirstName(UserModel customer, string newFirstName)
@@ -84,12 +94,28 @@ public class UserAccess
         _connection.Execute(sql, new { NewPhoneNumber = newPhoneNumber, Id = customer.Id });
         _connection.Close();
     }
+    
+    public static void UpdatePassword(UserModel customer, string newPassword)
+    {
+        string sql = $"UPDATE {Table} SET password = @NewPassword WHERE id = @Id";
+        _connection.Open();
+        _connection.Execute(sql, new { NewPassword = newPassword, Id = customer.Id });
+        _connection.Close();
+    }
 
     public static void UpdateEmail(UserModel customer, string newEmail)
     {
         string sql = $"UPDATE {Table} SET email = @NewEmail WHERE id = @Id";
         _connection.Open();
         _connection.Execute(sql, new { NewEmail = newEmail, Id = customer.Id });
+        _connection.Close();
+    }
+
+    public static void UpdateDob(UserModel customer, string newDob)
+    {
+        string sql = $"UPDATE {Table} SET DATEOFBIRTH = @NewDob WHERE id = @Id";
+        _connection.Open();
+        _connection.Execute(sql, new { NewDob = newDob, Id = customer.Id });
         _connection.Close();
     }
 

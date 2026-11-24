@@ -1,4 +1,4 @@
-﻿using System.Text;
+﻿using System.Globalization;
 using Project.Presentation;
 
 public class UserLogic
@@ -8,6 +8,19 @@ public class UserLogic
 
     public UserLogic()
     {
+    }
+
+
+    public static bool CheckIfPasswordsMatch(string oldPassword)
+    {
+        try
+        {
+            return BCrypt.Net.BCrypt.Verify(oldPassword, CurrentAccount!.Password);
+        }
+        catch (BCrypt.Net.SaltParseException)
+        {
+            return false;
+        }
     }
 
     public UserModel? CheckLogin(string email, string password)
@@ -31,7 +44,7 @@ public class UserLogic
         CurrentAccount = acc;
     }
 
-    private string HashPassword(string password)
+    private static string HashPassword(string password)
     {
         return BCrypt.Net.BCrypt.HashPassword(password);
     }
@@ -41,14 +54,19 @@ public class UserLogic
         return IsValidEmailFormat(email) && !EmailExists(email);
     }
 
+    public static bool ValidateDob(string DateOfBirth)
+    {
+        return true;
+    }
+
     public static bool EmailExists(string email)
     {
         return UserAccess.GetByEmail(email) != null;
     }
 
-    public static bool IsValidEmailFormat(string? email)
+    private static bool IsValidEmailFormat(string? email)
     {
-        return !string.IsNullOrWhiteSpace(email) && email.Contains("@") && email.Contains(".");
+        return !string.IsNullOrWhiteSpace(email) && email.Contains('@') && email.Contains('.');
     }
 
     public static bool ValidatePhoneNumber(string phoneNumber)
@@ -68,9 +86,9 @@ public class UserLogic
         return digits.Length >= 8 && digits.Length <= 15;
     }
     
-    public static string InterceptPassword()
+    public static string InterceptPassword(string msg)
     {
-        Console.Write("Please enter your password: ");
+        Console.Write(msg);
         string password = "";
         while (true)
         {
@@ -209,25 +227,48 @@ public class UserLogic
     {
         return UserAccess.GetAllCustomers_ExceptPassword();
     }
+    
+    public static List<UserModel> GetAllAdmins_ExceptPassword()
+    {
+        return UserAccess.GetAllAdmins_ExceptPassword();
+    }
 
     public static void UpdateFirstName(UserModel customer, string newFirstName)
     {
         UserAccess.UpdateFirstName(customer, newFirstName);
+        customer.FirstName = newFirstName;
     }
 
     public static void UpdateLastName(UserModel customer, string newLastName)
     {
         UserAccess.UpdateLastName(customer, newLastName);
+        customer.LastName = newLastName;
     }
 
     public static void UpdateEmail(UserModel customer, string newEmail)
     {
         UserAccess.UpdateEmail(customer, newEmail);
+        customer.EmailAddress = newEmail;
+    }
+
+    public static void UpdateDob(UserModel customer, string newDob)
+    {
+        UserAccess.UpdateDob(customer, newDob);
+        // Hier wordt de string newDob ge-convert naar een DateTime via Parse
+        customer.DateOfBirth = DateTime.ParseExact(newDob, "dd-MM-yyyy", CultureInfo.InvariantCulture);
     }
 
     public static void UpdatePhoneNumber(UserModel customer, string newPhoneNumber)
     {
         UserAccess.UpdatePhoneNumber(customer, newPhoneNumber);
+        customer.PhoneNumber = newPhoneNumber;
+    }
+
+    public static void UpdatePassword(UserModel customer, string newPassword)
+    {
+        string hashedPassword = HashPassword(newPassword);
+        UserAccess.UpdatePassword(customer, hashedPassword);
+        customer.Password = hashedPassword;
     }
 
     public static UserModel GetCustomerById(long id)
