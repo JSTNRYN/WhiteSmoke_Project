@@ -193,7 +193,8 @@ public static class AdminFunctions
 
                 if(ReservationLogic.GetWithUserID(customer.Id).Count > 0)
                 {
-                    ReservationLogic.DeleteReservationsByUserId(customer.Id);
+                    
+                    bool reservationSuccess = ReservationLogic.DeleteReservationsByUserId(customer.Id);
                 }
                 if (success)
                 {

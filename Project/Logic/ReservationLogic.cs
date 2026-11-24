@@ -88,4 +88,9 @@ public class ReservationLogic
 
         return DateTime.TryParseExact(date, "dd-MM-yyyy", new CultureInfo("nl-NL"), DateTimeStyles.None, out _);
     }
+
+    public static bool DeleteReservationsByUserId(long userId)
+    {
+        return ReservationAccess.DeleteReservationsByUserId(userId);
+    }
 }
