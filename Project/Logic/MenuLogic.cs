@@ -1,5 +1,18 @@
 public class MenuLogic
 {
+    public static void Update(MenuItemModel item)
+    {
+        MenuItemAccess.Update(item);
+    }
+
+    public static MenuItemModel? FindById(int id)
+    {
+        MenuItemModel? item = MenuItemAccess.FindById(id);
+        if (item == null) { return null; }
+
+        return item;
+    }
+
     public static bool IsAdultItem(MenuItemModel item)
     {
         return item.Adult
@@ -58,6 +71,21 @@ public class MenuLogic
         }
 
         return items
+            .OrderBy(item => item.Category, StringComparer.OrdinalIgnoreCase)
+            .ThenBy(item => item.Name, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+    }
+
+    public static List<MenuItemModel> GetNonAdminMenuItems()
+    {
+        List<MenuItemModel> items = MenuItemAccess.GetAll();
+        foreach (MenuItemModel item in items)
+        {
+            item.Category = NormalizeCategory(item.Category);
+        }
+
+        return items
+            .Where(item => item.IsViewable is true)
             .OrderBy(item => item.Category, StringComparer.OrdinalIgnoreCase)
             .ThenBy(item => item.Name, StringComparer.OrdinalIgnoreCase)
             .ToList();

@@ -1,5 +1,7 @@
 public static class AdminFunctions
 {
+    private static readonly string[] _adminMenuOptions = ["Manage Menu Items", "View and edit the floor plan", "View and manage customers", "View and edit reservations", "Back to main menu"];
+    
     public static void ShowCustomers()
     {
         List<UserModel> customers = new List<UserModel>();
@@ -299,23 +301,16 @@ public static class AdminFunctions
 
     public static void AdminMenu()
     {
-        List<string> options = new List<string>
-        {
-            "Manage Menu Items",
-            "View and edit the floor plan",
-            "View and manage customers",
-            "View and edit reservations",
-            "Back to main menu"
-        };
-
         while (true)
         {
-            int choice = MenuHelper.Run(options, "=== ADMIN MENU ===");
+            Console.Clear();
+            Console.WriteLine("ADMIN MENU\n");
+
+            int choice = Menu.InteractiveMenu(_adminMenuOptions);
             switch (choice)
             {
                 case 0:
-                    Console.WriteLine("Manage Menu Items functionality is not implemented yet.");
-                    Console.ReadKey();
+                    MenuView.ShowMenu();
                     break;
                 case 1:
                     FloorPlanUI.Show();
