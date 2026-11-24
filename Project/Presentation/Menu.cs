@@ -139,6 +139,7 @@ static class Menu
         {
             ShowInvalidChoice();
             ChangeFirstName(user);
+            return;
         }
         EditUserDetails(user);
     }
@@ -156,6 +157,7 @@ static class Menu
         {
             ShowInvalidChoice();
             ChangeLastName(user);
+            return;
         }
         EditUserDetails(user);
     }
@@ -173,6 +175,7 @@ static class Menu
         {
             ShowInvalidChoice();
             ChangeEmail(user);
+            return;
         }
         EditUserDetails(user);
     }
@@ -190,6 +193,7 @@ static class Menu
         {
             ShowInvalidChoice();
             ChangeDob(user);
+            return;
         }
         EditUserDetails(user);
     }
@@ -207,6 +211,7 @@ static class Menu
         {
             ShowInvalidChoice();
             ChangePhoneNumber(user);
+            return;
         }
         EditUserDetails(user);
     }
@@ -223,6 +228,7 @@ static class Menu
         {
             ShowInvalidChoiceWithMsg("Your old password was wrong, please try again.");
             ChangePassword(user);
+            return;
         }
     }
     

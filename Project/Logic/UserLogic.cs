@@ -54,9 +54,17 @@ public class UserLogic
         return IsValidEmailFormat(email) && !EmailExists(email);
     }
 
-    public static bool ValidateDob(string DateOfBirth)
+    public static bool ValidateDob(string dateOfBirth)
     {
-        return true;
+        try
+        {
+            DateTime.ParseExact(dateOfBirth, "dd-MM-yyyy", CultureInfo.InvariantCulture);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     public static bool EmailExists(string email)
