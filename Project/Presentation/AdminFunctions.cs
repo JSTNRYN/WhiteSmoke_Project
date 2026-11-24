@@ -148,47 +148,187 @@ public static class AdminFunctions
             }
         }
     }
-
-    public static void AdminMenu()
+        public static void ShowReservations()
     {
-        while (true)
+        Console.Clear();
+        List<ReservationModel> reservations = ReservationLogic.GetAll();
+
+        if (reservations.Count == 0)
         {
-            Console.Clear();
-            Console.WriteLine("Admin Menu:");
-            Console.WriteLine("1. Manage Menu Items");
-            Console.WriteLine("2. View and edit the floor plan");
-            Console.WriteLine("3. View and manage customers");
-            Console.WriteLine("4. Back to main menu");
-            Console.Write("Choose an option: ");
-            string choice = Console.ReadLine();
-            if(int.TryParse(choice, out int option))
+            Console.WriteLine("No reservations found.");
+            Console.WriteLine("Press any key to return...");
+            Console.ReadKey();
+            return;
+        }
+
+        Console.WriteLine($"=== RESERVATION LIST (Total: {reservations.Count}) ===");
+        Console.WriteLine(new string('-', 70));
+        foreach (ReservationModel res in reservations)
+        {
+            Console.WriteLine($"ID: #{res.Id,-4} | Date: {res.Date,-10} | Time: {res.TimeSlot,-8} | Guests: {res.PartySize,-2} | Table: #{res.TableId}");
+        }
+        Console.WriteLine(new string('-', 70));
+
+        Console.WriteLine("Enter the ID of the reservation you want to edit, or type 'q' to return:");
+        string? input = Console.ReadLine()?.Trim();
+        if (string.Equals(input, "q", StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        if (long.TryParse(input, out long reservationId))
+        {
+            ReservationModel? reservation = ReservationLogic.GetById(reservationId);
+            if (reservation == null)
             {
-                switch (option)
-                {
-                    case 1:
-                        Console.WriteLine("Manage Menu Items functionality is not implemented yet.");
-                        Console.ReadKey();
-                        break;
-                    case 2:
-                        FloorPlanUI.Show();
-                        break;
-                    case 3:
-                        ShowCustomers();
-                        break;
-                    case 4:
-                        return;
-                    default:
-                        Console.WriteLine("Invalid option. Please choose 1 to 4.");
-                        Console.ReadKey();
-                        break;
-                }
+                Console.WriteLine($"\nError: No reservation found with ID {reservationId}.");
+                Console.WriteLine("Press any key to continue...");
+                Console.ReadKey();
             }
             else
             {
-                Console.WriteLine("Invalid input. Please enter a number.");
-                Console.ReadKey();
+                EditReservation(reservation);
             }
-            
+        }
+        else
+        {
+            Console.WriteLine("\nError: Invalid ID entered.");
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey();
+        }
+    }
+
+    private static void EditReservation(ReservationModel reservation)
+    {
+        while (true)
+        {
+            List<string> options = new List<string>
+            {
+                $"Date:       {reservation.Date}",
+                $"Time:       {reservation.TimeSlot}",
+                $"Guests:     {reservation.PartySize}",
+                $"Table:      #{reservation.TableId}",
+                "Cancel this reservation (Delete)",
+                "Return to reservation list"
+            };
+
+            int choice = MenuHelper.Run(options, $"=== EDITING RESERVATION #{reservation.Id} ===");
+
+            switch (choice)
+            {
+                case 0: 
+                    Console.Clear();
+                    Console.WriteLine($"Current date: {reservation.Date}");
+                    Console.Write("Enter new date (dd-MM-yyyy): ");
+                    string newDate = Console.ReadLine() ?? string.Empty;
+                    if (!ReservationLogic.IsValidDateFormat(newDate) || !ReservationLogic.IsValidateDate(newDate))
+                    {
+                        Console.WriteLine("\nValidation error: Invalid date or date is in the past! Changes not saved.");
+                        Console.WriteLine("Press any key to continue...");
+                        Console.ReadKey(true);
+                        continue;
+                    }
+                    reservation.Date = newDate;
+                    ReservationLogic.Update(reservation);
+                    Console.WriteLine("\nDate updated successfully! Press any key...");
+                    Console.ReadKey(true);
+                    break;
+
+                case 1:
+                    List<string> timeSlots = new List<string> { "5:00 PM", "9:30 PM" };
+                    int timeChoice = MenuHelper.Run(timeSlots, $"Current time: {reservation.TimeSlot}\nChoose new time slot:");
+                    reservation.TimeSlot = timeSlots[timeChoice];
+                    ReservationLogic.Update(reservation);
+                    Console.WriteLine("\nTime updated successfully! Press any key...");
+                    Console.ReadKey(true);
+                    break;
+
+                case 2: 
+                    Console.Clear();
+                    Console.WriteLine($"Current guests: {reservation.PartySize}");
+                    Console.Write("Enter new number of guests (1-6): ");
+                    if (!int.TryParse(Console.ReadLine(), out int guests) || !SeatCount.WithinRange(guests))
+                    {
+                        Console.WriteLine("\nValidation error: Invalid number of guests! Must be between 1 and 6.");
+                        Console.WriteLine("Press any key to continue...");
+                        Console.ReadKey(true);
+                        continue;
+                    }
+                    reservation.PartySize = guests;
+                    ReservationLogic.Update(reservation);
+                    Console.WriteLine("\nGuests updated successfully! Press any key...");
+                    Console.ReadKey(true);
+                    break;
+
+                case 3: 
+                    Console.Clear();
+                    Console.WriteLine($"Current table: #{reservation.TableId}");
+                    Console.Write("Enter new table number: ");
+                    if (!long.TryParse(Console.ReadLine(), out long tableId))
+                    {
+                        Console.WriteLine("\nError: Invalid table number! Press any key...");
+                        Console.ReadKey(true);
+                        continue;
+                    }
+                    reservation.TableId = tableId;
+                    ReservationLogic.Update(reservation);
+                    Console.WriteLine("\nTable updated successfully! Press any key...");
+                    Console.ReadKey(true);
+                    break;
+
+                case 4: 
+                    Console.Clear();
+                    Console.WriteLine($"Reservation details to cancel:");
+                    Console.WriteLine($"Date: {reservation.Date} | Time: {reservation.TimeSlot} | Guests: {reservation.PartySize} | Table: #{reservation.TableId}");
+                    Console.Write("\nAre you sure you want to cancel/delete this reservation? (yes/no): ");
+                    string? confirm = Console.ReadLine()?.Trim().ToLower();
+                    if (confirm == "yes" || confirm == "y")
+                    {
+                        ReservationLogic.Delete(reservation.Id);
+                        Console.WriteLine("\nReservation cancelled successfully! Press any key...");
+                        Console.ReadKey(true);
+                        return;
+                    }
+                    break;
+
+                case 5: // Return
+                    return;
+            }
+        }
+    }
+
+    public static void AdminMenu()
+    {
+        List<string> options = new List<string>
+        {
+            "Manage Menu Items",
+            "View and edit the floor plan",
+            "View and manage customers",
+            "View and edit reservations",
+            "Back to main menu"
+        };
+
+        while (true)
+        {
+            int choice = MenuHelper.Run(options, "=== ADMIN MENU ===");
+            switch (choice)
+            {
+                case 0:
+                    Console.WriteLine("Manage Menu Items functionality is not implemented yet.");
+                    Console.ReadKey();
+                    break;
+                case 1:
+                    FloorPlanUI.Show();
+                    break;
+                case 2:
+                    ShowCustomers();
+                    break;
+                case 3:
+                    ShowReservations();
+                    break;
+                case 4:
+                    return;
+            }
         }
     }
 }
