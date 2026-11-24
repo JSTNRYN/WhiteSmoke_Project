@@ -183,7 +183,7 @@ public static class AdminFunctions
             ReservationModel? reservation = ReservationLogic.GetById(reservationId);
             if (reservation == null)
             {
-                Console.WriteLine($"\nError: No reservation found with ID {reservationId}.");
+                Console.WriteLine($"\nNo reservation found with ID {reservationId}.");
                 Console.WriteLine("Press any key to continue...");
                 Console.ReadKey();
             }
@@ -194,7 +194,7 @@ public static class AdminFunctions
         }
         else
         {
-            Console.WriteLine("\nError: Invalid ID entered.");
+            Console.WriteLine("\nInvalid ID entered.");
             Console.WriteLine("Press any key to continue...");
             Console.ReadKey();
         }
