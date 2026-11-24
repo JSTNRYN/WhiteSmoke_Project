@@ -6,6 +6,13 @@ public static class CustomerFunctions
         if (currentUser == null)
         {
             Console.WriteLine("No user is currently logged in.");
+            Console.ReadKey();
+            return;
+        }
+        if (currentUser.Role == "Admin")
+        {
+            Console.WriteLine("Admin accounts cannot be deleted through this function.");
+            Console.ReadKey();
             return;
         }
 
@@ -41,10 +48,14 @@ public static class CustomerFunctions
         else if (confirmation == "n")
         {
             Console.WriteLine("Account deletion canceled.");
+            Console.WriteLine("Press any key to return to the menu...");
+            Console.ReadKey();
         }
         else
         {
             Console.WriteLine("Invalid input. Please enter 'y' or 'n'.");
+            Console.WriteLine("Press any key to return to the menu...");
+            Console.ReadKey();
         }
     }
 }
