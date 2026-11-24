@@ -177,7 +177,9 @@ public static class AdminFunctions
         UserModel customer = SelectCustomer();
         if (customer != null)
         {
-            if(ReservationLogic.GetWithUserID(customer.Id).Count > 0)
+            bool hasReservations = ReservationLogic.GetWithUserID(customer.Id).Count > 0;
+
+            if (hasReservations)
             {
                 Console.WriteLine("This customer has existing reservations. Deleting this customer will also delete their reservations.");
                 Console.WriteLine($"Are you sure you want to delete the customer: {customer.FirstName} {customer.LastName}? (y/n): ");
@@ -189,18 +191,32 @@ public static class AdminFunctions
             string confirmation = Console.ReadLine();
             if (confirmation.ToLower() == "y")
             {
+                if (hasReservations)
+                {
+                    bool reservationsDeleted = ReservationLogic.DeleteReservationsByUserId(customer.Id);
+                    if (!reservationsDeleted)
+                    {
+                        Console.WriteLine("Failed to delete the reservations of this customer. Customer was not deleted.");
+                        Console.ReadKey();
+                        Console.Clear();
+                        return;
+                    }
+                }
+
                 bool success = UserLogic.DeleteCustomer(customer);
 
-                if(ReservationLogic.GetWithUserID(customer.Id).Count > 0)
+                if (success && hasReservations)
                 {
-                    
-                    bool reservationSuccess = ReservationLogic.DeleteReservationsByUserId(customer.Id);
+                    Console.WriteLine("Customer and their reservations deleted successfully.");
                 }
-                if (success)
+                else if (success)
                 {
                     Console.WriteLine("Customer deleted successfully.");
                 }
-
+                else
+                {
+                    Console.WriteLine("Failed to delete customer.");
+                }
             }
             else if (confirmation.ToLower() == "n")
             {
@@ -213,8 +229,6 @@ public static class AdminFunctions
             Console.ReadKey();
             Console.Clear();
         }
-
- 
     }
 
     public static void AdminMenu()
