@@ -177,27 +177,43 @@ public static class AdminFunctions
         UserModel customer = SelectCustomer();
         if (customer != null)
         {
-            Console.WriteLine($"Are you sure you want to delete the customer: {customer.FirstName} {customer.LastName}? (y/n)");
+            if(ReservationLogic.GetWithUserID(customer.Id).Count > 0)
+            {
+                Console.WriteLine("This customer has existing reservations. Deleting this customer will also delete their reservations.");
+                Console.WriteLine($"Are you sure you want to delete the customer: {customer.FirstName} {customer.LastName}? (y/n): ");
+            }
+            else
+            {
+                Console.WriteLine($"Are you sure you want to delete the customer: {customer.FirstName} {customer.LastName}? (y/n): ");
+            }
             string confirmation = Console.ReadLine();
             if (confirmation.ToLower() == "y")
             {
                 bool success = UserLogic.DeleteCustomer(customer);
+
+                if(ReservationLogic.GetWithUserID(customer.Id).Count > 0)
+                {
+                    ReservationLogic.DeleteReservationsByUserId(customer.Id);
+                }
                 if (success)
                 {
                     Console.WriteLine("Customer deleted successfully.");
                 }
-                else
-                {
-                    Console.WriteLine("Failed to delete customer. They may have existing reservations or orders.");
-                }
+
+            }
+            else if (confirmation.ToLower() == "n")
+            {
+                Console.WriteLine("Deletion cancelled.");
             }
             else
             {
-                Console.WriteLine("Deletion cancelled.");
+                Console.WriteLine("Invalid input. Deletion cancelled.");
             }
             Console.ReadKey();
             Console.Clear();
         }
+
+ 
     }
 
     public static void AdminMenu()
@@ -225,7 +241,7 @@ public static class AdminFunctions
                         FloorPlanUI.Show();
                         break;
                     case 3:
-                        ShowCustomers();
+                        SelectCustomer();
                         break;
                     case 4:
                         DeleteCustomer();
