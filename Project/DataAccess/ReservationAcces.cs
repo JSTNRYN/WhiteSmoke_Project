@@ -1,39 +1,28 @@
-using Microsoft.Data.Sqlite;
 using Dapper;
 
 public static class ReservationAccess
 {
     private static string _table = "Reservation";
 
-
-    public static long Write(UserModel user, Int64 partySize, string date, string timeslot, Int64 table)
+    public static long Write(ReservationModel reservation)
     {
-        string query = $"INSERT INTO {_table} (Timeslot, Date, PartySize, UserID, TableID) VALUES (@Timeslot, @Date, @PartySize, @UserID, @TableID) RETURNING ID";
+        string query = $"INSERT INTO {_table} (Timeslot, Date, PartySize, UserID, TableID) VALUES (@TimeSlot, @Date, @PartySize, @UserId, @TableId) RETURNING ID";
         using var connection = Database.CreateConnection();
         connection.Open();
-        return connection.ExecuteScalar<long>(query, new
-        {
-            Timeslot = timeslot,
-            Date = date,
-            PartySize = partySize,
-            UserID = user.Id,
-            TableID = table
-        });
+        return connection.ExecuteScalar<long>(query, reservation);
     }
 
-    public static List<ReservationModel> GetWithUserID(long User)
+    public static List<ReservationModel> GetWithUserID(long userId)
     {
         string query = @"
-        SELECT Reservation.*, User.FirstName, User.LastName
-        FROM Reservation
-        JOIN User ON Reservation.UserID = User.ID
-        WHERE Reservation.UserID = @User";
+            SELECT Reservation.*, User.FirstName, User.LastName
+            FROM Reservation
+            JOIN User ON Reservation.UserID = User.ID
+            WHERE Reservation.UserID = @UserId";
+
         using var connection = Database.CreateConnection();
         connection.Open();
-        List<ReservationModel> MyReservation =
-            connection.Query<ReservationModel>(query, new { User = User }).ToList();
-
-        return MyReservation;
+        return connection.Query<ReservationModel>(query, new { UserId = userId }).ToList();
     }
 
     public static List<ReservationModel> GetAllByDate(string date)
@@ -41,9 +30,6 @@ public static class ReservationAccess
         string query = $"SELECT * FROM {_table} WHERE Date = @Date";
         using var connection = Database.CreateConnection();
         connection.Open();
-        List<ReservationModel> reservations = connection.Query<ReservationModel>(query, new { Date = date }).ToList();
-
-        return reservations;
+        return connection.Query<ReservationModel>(query, new { Date = date }).ToList();
     }
-
 }
