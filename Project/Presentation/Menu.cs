@@ -2,7 +2,10 @@ using Project.Presentation;
 
 static class Menu
 {
-    private static string _homepageMessage = "Enter on of the option numbers";
+    private static readonly string[] _guestOptions = ["Log in", "Sign up", "View Menu", "About us"];
+    private static readonly string[] _UserOptions = ["Make a reservation", "View your reservations", "View Menu", "About us", "Log out"];
+    private static readonly string[] _adminOptions = ["Make a reservation", "View your reservations", "View Menu", "About us", "Log out", "View admin menu"];
+
     public static void ShowRestaurantName()
     {
         if (!Console.IsOutputRedirected) Console.Clear();
@@ -20,40 +23,14 @@ static class Menu
 
     public static void Start()
     {
-        ShowRestaurantName();
-        bool firstMenu = true;
-
         while (true)
         {
-            if (!firstMenu)
-                ShowRestaurantName();
-            firstMenu = false;
+            ShowRestaurantName();
 
             bool loggedIn = UserLogic.IsLoggedIn();
             bool isAdmin = loggedIn && UserLogic.IsAdmin();
-            ShowMainOptions(loggedIn, isAdmin);
 
-            string? choice = Console.ReadLine()?.Trim();
-            if (loggedIn)
-                HandleLoggedInChoice(choice, isAdmin);
-            else
-                HandleGuestChoice(choice);
-        }
-    }
 
-    private static void ShowMainOptions(bool loggedIn, bool isAdmin)
-    {
-        if (!loggedIn)
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("You are currently not logged in.");
-            Console.ResetColor();
-            Console.WriteLine(_homepageMessage);
-            Console.WriteLine("1. Log in");
-            Console.WriteLine("2. Sign up");
-            Console.WriteLine("3. About");
-            return;
-        }
 
         var account = UserLogic.CurrentAccount!;
         Console.ForegroundColor = ConsoleColor.Green;
@@ -71,20 +48,41 @@ static class Menu
         Console.WriteLine("6. Manage menu items");
         Console.WriteLine("7. View and edit the floor plan");
         Console.WriteLine("8. View and Manage customers");
-    }
-
-    private static void HandleGuestChoice(string? choice)
-    {
-        switch (choice)
-        {
-            case "1": UserLogin.Start(); break;
-            case "2": UserSignUp.Start(); break;
-            case "3": About(); break;
-            default: ShowInvalidChoice(); break;
+            if (isAdmin)
+            {
+                HandleLoggedInChoice(InteractiveMenu(_adminOptions), isAdmin);
+            }
+            else if (loggedIn)
+            {
+                HandleLoggedInChoice(InteractiveMenu(_UserOptions), isAdmin);
+            }
+            else
+            {
+                HandleGuestChoice(InteractiveMenu(_guestOptions));
+            }
         }
     }
 
-    private static void HandleLoggedInChoice(string? choice, bool isAdmin)
+    private static void HandleGuestChoice(int choice)
+    {
+        switch (choice)
+        {
+            case 0: UserLogin.Start(); break;
+            case 1: UserSignUp.Start(); break;
+            case 2:
+                List<MenuItemModel> list = MenuLogic.GetNonAdminMenuItems();
+                MenuView.PrintItems(list);
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.WriteLine("Press Enter to return...");
+                Console.ResetColor();
+                Console.ReadLine();
+                Console.Clear();
+                break;
+            case 3: About(); break;
+        }
+    }
+
+    private static void HandleLoggedInChoice(int? choice, bool isAdmin)
     {
         switch (choice)
         {
@@ -256,6 +254,23 @@ static class Menu
         EditUserDetails(user);
     }
 
+            case 0: MakeReservation.Start(); break;
+            case 1: MyReservation.ShowReservations(UserLogic.CurrentAccount!.Id); break;
+            case 2:
+                List<MenuItemModel> list = MenuLogic.GetNonAdminMenuItems();
+                MenuView.PrintItems(list);
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.WriteLine("Press Enter to return...");
+                Console.ResetColor();
+                Console.ReadLine();
+                Console.Clear();
+                break;
+            case 3: About(); break;
+            case 4: UserLogic.Logout(); break;
+            case 5 when isAdmin: AdminFunctions.AdminMenu(); break;
+        }
+    }
+
     public static void About()
     {
         Console.Clear();
@@ -302,20 +317,48 @@ Opening hours
   Sunday        12:00 PM - 10:00 PM
 ");
 
-            Console.WriteLine("enter 1 to back");
-            string? input = Console.ReadLine();
-            if (input == "1")
+            Console.WriteLine("Press enter to go back");
+            Console.ReadLine();
+            Console.Clear();
+            return;
+        }
+    }
+
+    public static int InteractiveMenu(string[] menuOptions)
+    {
+        ConsoleKeyInfo key;
+        int option = 0;
+        int maxMenuOptionNumber = menuOptions.Length - 1;
+        bool notSelected = true;
+        (int left, int top) = Console.GetCursorPosition();
+
+        while (notSelected)
+        {
+            Console.SetCursorPosition(left, top);
+
+            Console.WriteLine("Press up/down arrows to go over the options");
+            Console.WriteLine("Press enter to confirm option");
+            for (int i = 0; i < menuOptions.Length; i++)
             {
-                return;
+                Console.WriteLine($"{(option == i ? $"* {menuOptions[i]}" : $"  {menuOptions[i]}")}");
             }
-            else
+
+            key = Console.ReadKey(true);
+
+            switch (key.Key)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Wrong input!");
-                Console.ResetColor();
-                Thread.Sleep(1000);
-                Console.Clear();
+                case ConsoleKey.DownArrow:
+                    option = (option == maxMenuOptionNumber) ? maxMenuOptionNumber : option + 1;
+                    break;
+                case ConsoleKey.UpArrow:
+                    option = (option == 0) ? 0 : option - 1;
+                    break;
+                case ConsoleKey.Enter:
+                    notSelected = false;
+                    break;
             }
         }
+
+        return option;
     }
 }
