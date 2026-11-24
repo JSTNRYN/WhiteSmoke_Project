@@ -3,11 +3,9 @@ public static class MyReservation
     public static void ShowReservations(long userId)
     {
         if (!Console.IsOutputRedirected)
-        {
             Console.Clear();
-        }
 
-        List<ReservationModel> reservations = ReservationLogic.GetWithUserID(userId);
+        List<ReservationModel> reservations = MyReservationLogic.GetWithUserID(userId);
         if (reservations.Count == 0)
         {
             Console.WriteLine("You have no reservations.");
@@ -18,7 +16,6 @@ public static class MyReservation
 
         Console.WriteLine("MY RESERVATIONS");
         Console.WriteLine("===============");
-
         foreach (ReservationModel reservation in reservations)
         {
             Console.WriteLine($"Reservation #{reservation.Id}");
@@ -27,7 +24,7 @@ public static class MyReservation
             Console.WriteLine($"Guests: {reservation.PartySize}");
             Console.WriteLine($"Table: #{reservation.TableId}");
 
-            List<OrderLineModel> order = ReservationLogic.GetOrder(reservation.Id);
+            List<OrderLineModel> order = MyReservationLogic.GetOrder(reservation.Id);
             if (order.Count == 0)
             {
                 Console.WriteLine("Order: none");
@@ -36,13 +33,8 @@ public static class MyReservation
             {
                 Console.WriteLine("Order:");
                 foreach (OrderLineModel line in order)
-                {
-                    double lineTotal = line.MenuItem.UnitPrice * line.Quantity;
-                    Console.WriteLine($"  {line.Quantity}x {line.MenuItem.Name} - EUR {lineTotal:F2}");
-                }
-
-                double total = OrderLogic.GetTotal(order);
-                Console.WriteLine($"Order total: EUR {total:F2}");
+                    Console.WriteLine($"  {line.Quantity}x {line.MenuItem.Name} - EUR {line.MenuItem.UnitPrice * line.Quantity:F2}");
+                Console.WriteLine($"Order total: EUR {OrderLogic.GetTotal(order):F2}");
             }
 
             Console.WriteLine(new string('-', 50));

@@ -1,2 +1,2 @@
-Database.Initialize();
+﻿Database.Initialize();
 Menu.Start();
