@@ -200,21 +200,24 @@ public static class AdminFunctions
         }
     }
 
-    private static void EditReservation(ReservationModel reservation)
+    public static void EditReservation(ReservationModel reservation)
     {
         while (true)
         {
-            List<string> options = new List<string>
-            {
+            Console.Clear();
+            Console.WriteLine($"=== EDITING RESERVATION #{reservation.Id} ===\n");
+            Console.WriteLine("Select an option you want to change:\n");
+
+            string[] options = [
                 $"Date:       {reservation.Date}",
                 $"Time:       {reservation.TimeSlot}",
                 $"Guests:     {reservation.PartySize}",
                 $"Table:      #{reservation.TableId}",
                 "Cancel this reservation (Delete)",
                 "Return to reservation list"
-            };
+            ];
 
-            int choice = MenuHelper.Run(options, $"=== EDITING RESERVATION #{reservation.Id} ===");
+            int choice = Menu.InteractiveMenu(options);
 
             switch (choice)
             {
@@ -225,7 +228,7 @@ public static class AdminFunctions
                     string newDate = Console.ReadLine() ?? string.Empty;
                     if (!ReservationLogic.IsValidDateFormat(newDate) || !ReservationLogic.IsValidateDate(newDate))
                     {
-                        Console.WriteLine("\nValidation error: Invalid date or date is in the past! Changes not saved.");
+                        Console.WriteLine("\nInvalid date! Changes not saved.");
                         Console.WriteLine("Press any key to continue...");
                         Console.ReadKey(true);
                         continue;
@@ -237,8 +240,10 @@ public static class AdminFunctions
                     break;
 
                 case 1:
-                    List<string> timeSlots = new List<string> { "5:00 PM", "9:30 PM" };
-                    int timeChoice = MenuHelper.Run(timeSlots, $"Current time: {reservation.TimeSlot}\nChoose new time slot:");
+                    Console.Clear();
+                    Console.WriteLine($"Current time: {reservation.TimeSlot}\nChoose new time slot:\n");
+                    string[] timeSlots = ["5:00 PM", "9:30 PM"];
+                    int timeChoice = Menu.InteractiveMenu(timeSlots);
                     reservation.TimeSlot = timeSlots[timeChoice];
                     ReservationLogic.Update(reservation);
                     Console.WriteLine("\nTime updated successfully! Press any key...");
@@ -251,7 +256,7 @@ public static class AdminFunctions
                     Console.Write("Enter new number of guests (1-6): ");
                     if (!int.TryParse(Console.ReadLine(), out int guests) || !SeatCount.WithinRange(guests))
                     {
-                        Console.WriteLine("\nValidation error: Invalid number of guests! Must be between 1 and 6.");
+                        Console.WriteLine("\nInvalid number of guests! Must be between 1 and 6.");
                         Console.WriteLine("Press any key to continue...");
                         Console.ReadKey(true);
                         continue;
@@ -268,7 +273,7 @@ public static class AdminFunctions
                     Console.Write("Enter new table number: ");
                     if (!long.TryParse(Console.ReadLine(), out long tableId))
                     {
-                        Console.WriteLine("\nError: Invalid table number! Press any key...");
+                        Console.WriteLine("\nInvalid table number! Press any key...");
                         Console.ReadKey(true);
                         continue;
                     }
