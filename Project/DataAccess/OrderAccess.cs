@@ -103,4 +103,20 @@ public static class OrderAccess
             new { OrderID = orderId },
             transaction);
     }
+
+    public static void DeleteOrdersByReservationId(long reservationId)
+    {
+        using var connection = Database.CreateConnection();
+        connection.Open();
+        connection.Execute("DELETE FROM \"Order\" WHERE ReservationId = @ReservationId", new { ReservationId = reservationId });
+    }
+
+    public static void DeleteOrderItemsByReservationId(long reservationId)
+{
+    using var connection = Database.CreateConnection();
+    connection.Open();
+    {
+        connection.Execute("DELETE FROM \"OrderItem\" WHERE OrderId IN (SELECT Id FROM \"Order\" WHERE ReservationId = @ReservationId)", new { ReservationId = reservationId });
+    }
+}
 }

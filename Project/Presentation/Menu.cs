@@ -3,8 +3,8 @@ using Project.Presentation;
 static class Menu
 {
     private static readonly string[] _guestOptions = ["Log in", "Sign up", "View Menu", "About us"];
-    private static readonly string[] _UserOptions = ["Make a reservation", "View your reservations", "View Menu", "About us", "Log out"];
-    private static readonly string[] _adminOptions = ["Make a reservation", "View your reservations", "View Menu", "About us", "Log out", "View admin menu"];
+    private static readonly string[] _UserOptions = ["Make a reservation", "View your reservations", "View Menu", "About us", "Log out", "Delete account"];
+    private static readonly string[] _adminOptions = ["Make a reservation", "View your reservations", "View Menu", "About us", "Log out", "Delete account", "View admin menu"];
 
     public static void ShowRestaurantName()
     {
@@ -83,7 +83,8 @@ static class Menu
                 break;
             case 3: About(); break;
             case 4: UserLogic.Logout(); break;
-            case 5 when isAdmin: AdminFunctions.AdminMenu(); break;
+            case 5: CustomerFunctions.DeleteAccount(); break;
+            case 6 when isAdmin: AdminFunctions.AdminMenu(); break;
         }
     }
 

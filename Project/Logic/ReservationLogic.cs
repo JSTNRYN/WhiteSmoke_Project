@@ -91,6 +91,14 @@ public class ReservationLogic
 
     public static bool DeleteReservationsByUserId(long userId)
     {
+        List<ReservationModel> reservations = GetWithUserID(userId);
+
+        foreach (ReservationModel reservation in reservations)
+        {
+            OrderAccess.DeleteOrderItemsByReservationId(reservation.Id);
+            OrderAccess.DeleteOrdersByReservationId(reservation.Id);
+        }
+
         return ReservationAccess.DeleteReservationsByUserId(userId);
     }
 }

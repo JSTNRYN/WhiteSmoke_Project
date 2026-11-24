@@ -9,7 +9,17 @@ public static class CustomerFunctions
             return;
         }
 
-        Console.WriteLine("Are you sure you want to delete your account? This action cannot be undone. (y/n)");
+        bool hasReservations = ReservationLogic.GetWithUserID(currentUser.Id).Count > 0;
+
+        if (hasReservations)
+        {
+            Console.WriteLine("Your current account has existing reservations. Deleting this account will also delete the reservations.");
+            Console.WriteLine($"Are you sure you want to delete the account: {currentUser.FirstName} {currentUser.LastName}? (y/n): ");
+        }
+        else
+        {
+            Console.WriteLine($"Are you sure you want to delete the account: {currentUser.FirstName} {currentUser.LastName}? (y/n): ");
+        }
         string confirmation = Console.ReadLine()?.Trim().ToLower();
 
         if (confirmation == "y")
