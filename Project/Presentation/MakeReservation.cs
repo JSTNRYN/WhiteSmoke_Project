@@ -67,7 +67,13 @@ public static class MakeReservation
             return;
         }
 
-        List<long> reservedTableIds = ReservationLogic.GetReservedTableIds(dateInput, timeInput);
+        ReservationModel reservation = new ReservationModel
+        {
+            Date = dateInput,
+            TimeSlot = timeInput
+        };
+
+        List<long> reservedTableIds = ReservationLogic.GetReservedTableIds(reservation);
         List<TableModel> availableTables = tables.Where(table => !reservedTableIds.Contains(table.Id)).ToList();
 
         TableModel? selectedTable = null;
@@ -132,8 +138,16 @@ public static class MakeReservation
     }
 
     private static void SaveReservation(long partySize, string dateInput, string timeInput, long table, List<OrderLineModel> orderLines)
-    {
-        long reservationId = ReservationLogic.Write(partySize, dateInput, timeInput, table);
-        if (orderLines.Count > 0) OrderAccess.Save(reservationId, orderLines);
-    }
-}
+        {
+            ReservationModel reservation = new ReservationModel
+            {
+                PartySize = partySize,
+                Date = dateInput,
+                TimeSlot = timeInput,
+                TableId = table
+            };
+
+            long reservationId = ReservationLogic.Write(reservation);
+            if (orderLines.Count > 0) OrderAccess.Save(reservationId, orderLines);
+        }}
+    

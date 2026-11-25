@@ -4,20 +4,24 @@ public class ReservationLogic
 {
     public ReservationModel? currentReservation { get; private set; }
 
-
     public static List<ReservationModel> GetWithUserID(long User)
     {
         return ReservationAccess.GetWithUserID(User);
     }
 
-    public static long Write(Int64 partySize, string dateInput, string timeInput, Int64 table)
+    public static long Write(ReservationModel reservation)
     {
         if (UserLogic.CurrentAccount is null)
         {
             throw new InvalidOperationException("You must be logged in to make a reservation.");
         }
 
-        return ReservationAccess.Write(UserLogic.CurrentAccount, partySize, dateInput, timeInput, table);
+        return ReservationAccess.Write(
+            UserLogic.CurrentAccount,
+            reservation.PartySize,
+            reservation.Date,
+            reservation.TimeSlot,
+            reservation.TableId);
     }
 
     public static List<TableModel> GetTablesForReservation(int partySize)
@@ -34,12 +38,12 @@ public class ReservationLogic
         return TableAccess.GetWithMinimumCapacity((int)reservation.PartySize);
     }
 
-    public static List<TableModel> GetAvailableTables(string date, int partySize, string time)
+    public static List<TableModel> GetAvailableTables(ReservationModel reservation)
     {
-        List<long> reservedTableIds = GetReservedTableIds(date, time);
+        List<long> reservedTableIds = GetReservedTableIds(reservation);
         List<TableModel> availableTables = new List<TableModel>();
 
-        foreach (TableModel table in TableAccess.GetWithMinimumCapacity(partySize))
+        foreach (TableModel table in TableAccess.GetWithMinimumCapacity((int)reservation.PartySize))
         {
             if (!reservedTableIds.Contains(table.Id))
             {
@@ -50,15 +54,15 @@ public class ReservationLogic
         return availableTables;
     }
 
-    public static List<long> GetReservedTableIds(string date, string time)
+    public static List<long> GetReservedTableIds(ReservationModel reservation)
     {
         List<long> reservedTableIds = new List<long>();
 
-        foreach (var reservation in ReservationAccess.GetAllByDate(date))
+        foreach (var existing in ReservationAccess.GetAllByDate(reservation.Date))
         {
-            if (reservation.TimeSlot == time)
+            if (existing.TimeSlot == reservation.TimeSlot)
             {
-                reservedTableIds.Add(reservation.TableId);
+                reservedTableIds.Add(existing.TableId);
             }
         }
 

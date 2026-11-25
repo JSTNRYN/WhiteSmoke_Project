@@ -91,50 +91,47 @@ public static class FloorPlanUI
             tableSide.Add("+-----------------------------------------------------------------+");
         }
 
-    // Aantal regels = de langste van de twee kanten
+    // De linkerkant (bar, toiletten) en rechterkant (tafels) zijn twee lijsten met regels.
     int lineCount = Math.Max(leftSide.Count, tableSide.Count);
 
     for (int i = 0; i < lineCount; i++)
     {
-        // Tekst links en rechts voor deze regel (leeg als er niets meer is)
+        // Is een lijst korter dan de andere, dan vullen we aan zodat niets crasht.
+        // Links: spaties, zodat de rechterkant op dezelfde plek blijft staan.
         string left = i < leftSide.Count ? leftSide[i] : "                        ";
         string right = i < tableSide.Count ? tableSide[i] : "";
 
-        // Print de linkerkant
+        // Linkerkant altijd eerst, zonder nieuwe regel (Write), zodat rechts erachter komt
         Console.Write(left);
         Console.Write("    ");
 
-        // Is dit een rij met tafels
+        // Tafelrijen staan op regel 5, 7, 9, ... (de regels ertussen zijn scheidingslijnen)
         if (i >= 5 && i < 5 + TableLogic.MaxY * 2 + 1 && (i - 5) % 2 == 0)
         {
-            // Welke rij (Y) is dit?
+            // Regelnummer omrekenen naar rijnummer: 5 -> Y0, 7 -> Y1, 9 -> Y2
             int y = (i - 5) / 2;
             Console.Write("|    Y" + y + "    |");
 
-            // Loop door alle kolommen (X)
             for (int x = 0; x <= TableLogic.MaxX; x++)
             {
-                // Zoek de tafel op deze plek
+                // Staat er een tafel op (x, y)? Zo niet, dan is table null
                 TableModel? table = tables.FirstOrDefault(t => t.X == x && t.Y == y);
 
-                // Geen tafel: print "empty"
                 if (table == null)
                 {
                     Console.Write("    [ empty ]    |");
                     continue;
                 }
 
-                // Is de tafel gereserveerd?
+                // Alleen true als de lijst bestaat én de tafel erin staat
                 bool isReserved = reservedTableIds?.Contains(table.Id) == true;
 
-                // Rood = gereserveerd, groen = vrij
                 if (reservedTableIds != null)
                     Console.ForegroundColor = isReserved ? ConsoleColor.Red : ConsoleColor.Green;
 
-                // Print de tafel
                 Console.Write("    [T" + table.Id + ": " + table.Capacity + "p]    |");
 
-                // Kleur weer normaal
+                // Kleur terugzetten, anders wordt alle volgende tekst ook rood of groen
                 if (reservedTableIds != null) Console.ResetColor();
             }
 
@@ -143,9 +140,8 @@ public static class FloorPlanUI
         {
             Console.WriteLine(right);
         }
-        }
     }
-    
+    }
 
     private static void PrintError(string message)
     {
