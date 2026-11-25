@@ -77,21 +77,32 @@ public class UserLogic
         return !string.IsNullOrWhiteSpace(email) && email.Contains('@') && email.Contains('.');
     }
 
-    public static bool ValidatePhoneNumber(string phoneNumber)
+    public static bool ValidatePhoneNumber(string? phoneNumber)
     {
         if (string.IsNullOrWhiteSpace(phoneNumber))
         {
             return false;
         }
 
-        string digits = phoneNumber.StartsWith("+") ? phoneNumber.Substring(1) : phoneNumber;
+        bool isInternational = phoneNumber.StartsWith("+");
 
-        if (digits.Length == 0 || !digits.All(char.IsDigit))
+        string digits = phoneNumber;
+        if (isInternational)
+        {
+            digits = phoneNumber.Substring(1);
+        }
+
+        if (!digits.All(char.IsDigit))
         {
             return false;
         }
 
-        return digits.Length >= 8 && digits.Length <= 15;
+        if (isInternational)
+        {
+            return digits.Length == 11;
+        }
+
+        return digits.Length == 10 && digits.StartsWith("0");
     }
     
     public static string InterceptPassword(string msg)

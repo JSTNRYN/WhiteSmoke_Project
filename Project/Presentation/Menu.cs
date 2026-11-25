@@ -97,137 +97,152 @@ static class Menu
 
     private static void EditUserDetails(UserModel user)
     {
+        string newFirstName = user.FirstName;
+        string newLastName = user.LastName;
+        string newEmail = user.EmailAddress;
+        string newDob = $"{user.DateOfBirth:dd-MM-yyyy}";
+        string newPhone = user.PhoneNumber;
+        string newPassword = "";
+
+        while (true)
+        {
+            ShowRestaurantName();
+            Console.WriteLine("Choose what you want to change. Pick 'Save changes' when you are done.");
+
+            string passwordText = "Change your password";
+            if (newPassword != "")
+            {
+                passwordText = "Change your password (changed)";
+            }
+            string[] options =
+            [
+                $"First name: {newFirstName}",
+                $"Last name: {newLastName}",
+                $"Email address: {newEmail}",
+                $"Date of birth (DD-MM-YYYY): {newDob}",
+                $"Phone number: {newPhone}",
+                passwordText,
+                "Save changes",
+                "Back without saving"
+            ];
+
+            switch (InteractiveMenu(options))
+            {
+                case 0: newFirstName = AskNewName("first name"); break;
+                case 1: newLastName = AskNewName("last name"); break;
+                case 2: newEmail = AskNewEmail(user.EmailAddress); break;
+                case 3: newDob = AskNewDob(); break;
+                case 4: newPhone = AskNewPhoneNumber(); break;
+                case 5:
+                    string password = AskNewPassword();
+                    if (password != "") newPassword = password;
+                    break;
+                case 6:
+                    if (ConfirmChanges(user, newFirstName, newLastName, newEmail, newDob, newPhone, newPassword != ""))
+                    {
+                        SaveChanges(user, newFirstName, newLastName, newEmail, newDob, newPhone, newPassword);
+                        return;
+                    }
+                    break;
+                case 7: return;
+            }
+        }
+    }
+
+    private static bool ConfirmChanges(UserModel user, string newFirstName, string newLastName, string newEmail, string newDob, string newPhone, bool passwordChanged)
+    {
         ShowRestaurantName();
-        Console.WriteLine("Choose the detail you would like to edit:");
 
-        string[] options =
-        [
-            $"First name: {user.FirstName}",
-            $"Last name: {user.LastName}",
-            $"Email address: {user.EmailAddress}",
-            $"Date of birth (DD-MM-YYYY): {user.DateOfBirth:dd-MM-yyyy}",
-            $"Phone number: {user.PhoneNumber}",
-            "Change your password",
-            "Back"
-        ];
+        Console.WriteLine("Current details:");
+        Console.WriteLine($"First name:    {user.FirstName}");
+        Console.WriteLine($"Last name:     {user.LastName}");
+        Console.WriteLine($"Email address: {user.EmailAddress}");
+        Console.WriteLine($"Date of birth: {user.DateOfBirth:dd-MM-yyyy}");
+        Console.WriteLine($"Phone number:  {user.PhoneNumber}");
+        Console.WriteLine();
 
-        switch (InteractiveMenu(options))
+        Console.WriteLine("New details:");
+        Console.WriteLine($"First name:    {newFirstName}");
+        Console.WriteLine($"Last name:     {newLastName}");
+        Console.WriteLine($"Email address: {newEmail}");
+        Console.WriteLine($"Date of birth: {newDob}");
+        Console.WriteLine($"Phone number:  {newPhone}");
+        if (passwordChanged)
         {
-            case 0: ChangeFirstName(user); break;
-            case 1: ChangeLastName(user); break;
-            case 2: ChangeEmail(user); break;
-            case 3: ChangeDob(user); break;
-            case 4: ChangePhoneNumber(user); break;
-            case 5: ChangePassword(user); break;
-            case 6: break;
-        }
-    }
-
-    private static void ChangeFirstName(UserModel user)
-    {
-        Console.WriteLine($"Current: {user.FirstName}");
-        Console.Write("New name: ");
-        string newName = Console.ReadLine();
-        if (UserLogic.ValidateName(newName))
-        {
-            UserLogic.UpdateFirstName(user, newName);
+            Console.WriteLine("Password:      changed");
         }
         else
         {
-            ShowInvalidChoice();
-            ChangeFirstName(user);
-            return;
+            Console.WriteLine("Password:      not changed");
         }
-        EditUserDetails(user);
+        int choice = InteractiveMenu(["Confirm", "Go back"]);
+        return choice == 0;
     }
 
-    private static void ChangeLastName(UserModel user)
+    private static void SaveChanges(UserModel user, string newFirstName, string newLastName, string newEmail, string newDob, string newPhone, string newPassword)
     {
-        Console.WriteLine($"Current: {user.LastName}");
-        Console.Write("New name: ");
-        string newName = Console.ReadLine();
-        if (UserLogic.ValidateName(newName))
-        {
-            UserLogic.UpdateLastName(user, newName);
-        }
-        else
-        {
-            ShowInvalidChoice();
-            ChangeLastName(user);
-            return;
-        }
-        EditUserDetails(user);
+        if (newFirstName != user.FirstName) UserLogic.UpdateFirstName(user, newFirstName);
+        if (newLastName != user.LastName) UserLogic.UpdateLastName(user, newLastName);
+        if (newEmail != user.EmailAddress) UserLogic.UpdateEmail(user, newEmail);
+        if (newDob != $"{user.DateOfBirth:dd-MM-yyyy}") UserLogic.UpdateDob(user, newDob);
+        if (newPhone != user.PhoneNumber) UserLogic.UpdatePhoneNumber(user, newPhone);
+        if (newPassword != "") UserLogic.UpdatePassword(user, newPassword);
     }
 
-    private static void ChangeEmail(UserModel user)
+
+    private static string AskNewName(string label)
     {
-        Console.WriteLine($"Current: {user.EmailAddress}");
-        Console.Write("New email: ");
-        string newEmail = Console.ReadLine().Trim();
-        if (UserLogic.ValidateEmail(newEmail))
+        while (true)
         {
-            UserLogic.UpdateEmail(user, newEmail);
-        }
-        else
-        {
+            Console.Write($"New {label}: ");
+            string input = Console.ReadLine()?.Trim() ?? "";
+            if (UserLogic.ValidateName(input)) return input;
             ShowInvalidChoice();
-            ChangeEmail(user);
-            return;
         }
-        EditUserDetails(user);
     }
 
-    private static void ChangeDob(UserModel user)
+    private static string AskNewEmail(string currentEmail)
     {
-        Console.WriteLine($"Current: {user.DateOfBirth:dd-MM-yyyy}");
-        Console.Write("New date of birth (dd-mm-yyyy): ");
-        string newDob = Console.ReadLine();
-        if (UserLogic.ValidateDob(newDob))
+        while (true)
         {
-            UserLogic.UpdateDob(user, newDob);
-        }
-        else
-        {
+            Console.Write("New email: ");
+            string input = Console.ReadLine()?.Trim() ?? "";
+            if (input == currentEmail || UserLogic.ValidateEmail(input)) return input;
             ShowInvalidChoice();
-            ChangeDob(user);
-            return;
         }
-        EditUserDetails(user);
     }
 
-    private static void ChangePhoneNumber(UserModel user)
+    private static string AskNewDob()
     {
-        Console.WriteLine($"Current: {user.PhoneNumber}");
-        Console.Write("New phone number: ");
-        string newPhone = Console.ReadLine().Trim();
-        if (UserLogic.ValidatePhoneNumber(newPhone))
+        while (true)
         {
-            UserLogic.UpdatePhoneNumber(user, newPhone);
-        }
-        else
-        {
+            Console.Write("New date of birth (dd-mm-yyyy): ");
+            string input = Console.ReadLine()?.Trim() ?? "";
+            if (UserLogic.ValidateDob(input)) return input;
             ShowInvalidChoice();
-            ChangePhoneNumber(user);
-            return;
         }
-        EditUserDetails(user);
     }
 
-    private static void ChangePassword(UserModel user)
+    private static string AskNewPhoneNumber()
+    {
+        while (true)
+        {
+            Console.Write("New phone number: ");
+            string input = Console.ReadLine()?.Trim() ?? "";
+            if (UserLogic.ValidatePhoneNumber(input)) return input;
+            ShowInvalidChoice();
+        }
+    }
+
+    private static string AskNewPassword()
     {
         string oldPassword = UserLogic.InterceptPassword("Please enter your old password: ");
-        string newPassword = UserLogic.InterceptPassword("Please enter your new password: ");
-        if (UserLogic.CheckIfPasswordsMatch(oldPassword))
+        if (!UserLogic.CheckIfPasswordsMatch(oldPassword))
         {
-            UserLogic.UpdatePassword(user, newPassword);
+            ShowInvalidChoiceWithMsg("Your old password was wrong.");
+            return "";
         }
-        else
-        {
-            ShowInvalidChoiceWithMsg("Your old password was wrong, please try again.");
-            ChangePassword(user);
-            return;
-        }
-        EditUserDetails(user);
+        return UserLogic.InterceptPassword("Please enter your new password: ");
     }
 
     private static void ShowInvalidChoiceWithMsg(string msg)
