@@ -395,7 +395,7 @@ public static class AdminFunctions
                     FloorPlanUI.Show();
                     break;
                 case 2:
-                    ShowCustomers();
+                    EditCustomers();
                     break;
                 case 3:
                     ShowReservations();
