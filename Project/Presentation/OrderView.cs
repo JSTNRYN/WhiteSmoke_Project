@@ -2,7 +2,7 @@ public static class OrderView
 {
     public static List<OrderLineModel>? AskForOrder()
     {
-        List<MenuItemModel> menuItems = MenuLogic.GetMenuItemsForDisplay();
+        List<MenuItemModel> menuItems = MenuLogic.GetNonAdminMenuItems();
         List<OrderLineModel> orderLines = new List<OrderLineModel>();
 
         if (menuItems.Count == 0)
@@ -26,9 +26,13 @@ public static class OrderView
             switch (choice)
             {
                 case "1":
-                    MenuView.ShowMenu(UserLogic.CurrentAccount!);
+                    menuItems = MenuLogic.GetNonAdminMenuItems();
+                    MenuView.PrintItems(menuItems);
+                    Console.WriteLine("Press Enter to return...");
+                    Console.ReadLine();
                     break;
                 case "2":
+                    menuItems = MenuLogic.GetNonAdminMenuItems();
                     MakeOrder(menuItems, orderLines);
                     break;
                 case "3":
@@ -52,7 +56,7 @@ public static class OrderView
 
         while (true)
         {
-            Console.Write("Enter dish number (or 0 to stop adding): ");
+            Console.Write("Enter item ID (or 0 to stop adding): ");
             if (!int.TryParse(Console.ReadLine(), out int itemNumber))
             {
                 Console.WriteLine("Please enter a valid number.");
@@ -64,13 +68,12 @@ public static class OrderView
                 return;
             }
 
-            if (itemNumber < 1 || itemNumber > menuItems.Count)
+            MenuItemModel? selectedItem = menuItems.FirstOrDefault(item => item.Id == itemNumber);
+            if (selectedItem == null)
             {
-                Console.WriteLine($"Dish number must be between 1 and {menuItems.Count}.");
+                Console.WriteLine("Please enter an item ID shown in the menu.");
                 continue;
             }
-
-            MenuItemModel selectedItem = menuItems[itemNumber - 1];
 
             if (!OrderLogic.CanOrder(UserLogic.CurrentAccount, selectedItem))
             {

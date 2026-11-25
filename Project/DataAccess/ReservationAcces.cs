@@ -33,6 +33,38 @@ public static class ReservationAccess
         return connection.Query<ReservationModel>(query, new { Date = date }).ToList();
     }
 
+        public static List<ReservationModel> GetAll()
+    {
+        string query = $"SELECT * FROM {_table} ORDER BY Date, Timeslot";
+        using var connection = Database.CreateConnection();
+        connection.Open();
+        return connection.Query<ReservationModel>(query).ToList();
+    }
+
+    public static ReservationModel? GetById(long id)
+    {
+        string query = $"SELECT * FROM {_table} WHERE ID = @Id";
+        using var connection = Database.CreateConnection();
+        connection.Open();
+        return connection.QueryFirstOrDefault<ReservationModel>(query, new { Id = id });
+    }
+
+    public static void Update(ReservationModel reservation)
+    {
+        string query = $"UPDATE {_table} SET Timeslot = @TimeSlot, Date = @Date, PartySize = @PartySize, TableID = @TableId WHERE ID = @Id";
+        using var connection = Database.CreateConnection();
+        connection.Open();
+        connection.Execute(query, reservation);
+    }
+
+    public static void Delete(long id)
+    {
+        string query = $"DELETE FROM {_table} WHERE ID = @Id";
+        using var connection = Database.CreateConnection();
+        connection.Open();
+        connection.Execute(query, new { Id = id });
+    }
+
     public static bool DeleteReservationsByUserId(long userId)
     {
         string query = $"DELETE FROM {_table} WHERE UserID = @UserId";
