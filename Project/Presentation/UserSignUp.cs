@@ -131,12 +131,39 @@ public class UserSignUp
             string? phoneNumber = Console.ReadLine();
             if (IsQuit(phoneNumber)) return null;
 
-            if (!string.IsNullOrWhiteSpace(phoneNumber) && phoneNumber.All(char.IsDigit))
+            if (string.IsNullOrWhiteSpace(phoneNumber))
             {
-                return phoneNumber;
+                ShowError("Invalid phone number!");
+                continue;
             }
 
-            ShowError("Invalid phone number! Please enter numbers only.");
+            bool isInternational = phoneNumber.StartsWith("+");
+            string digits = isInternational ? phoneNumber.Substring(1) : phoneNumber;
+
+            if (!digits.All(char.IsDigit))
+            {
+                ShowError("Invalid phone number!");
+                continue;
+            }
+
+            if (isInternational)
+            {
+                if (digits.Length != 11)
+                {
+                    ShowError("Invalid phone number!");
+                    continue;
+                }
+            }
+            else
+            {
+                if (digits.Length != 10 || !digits.StartsWith("0"))
+                {
+                    ShowError("Invalid phone number!");
+                    continue;
+                }
+            }
+
+            return phoneNumber;
         }
     }
 
