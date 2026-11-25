@@ -150,53 +150,45 @@ public static class AdminFunctions
             }
         }
     }
-        public static void ShowReservations()
+    public static void ShowReservations()
     {
-        Console.Clear();
-        List<ReservationModel> reservations = ReservationLogic.GetAll();
-
-        if (reservations.Count == 0)
+        while (true)
         {
-            Console.WriteLine("No reservations found.");
-            Console.WriteLine("Press any key to return...");
-            Console.ReadKey();
-            return;
-        }
-
-        Console.WriteLine($"=== RESERVATION LIST (Total: {reservations.Count}) ===");
-        Console.WriteLine(new string('-', 70));
-        foreach (ReservationModel res in reservations)
-        {
-            Console.WriteLine($"ID: #{res.Id,-4} | Date: {res.Date,-10} | Time: {res.TimeSlot,-8} | Guests: {res.PartySize,-2} | Table: #{res.TableId}");
-        }
-        Console.WriteLine(new string('-', 70));
-
-        Console.WriteLine("Enter the ID of the reservation you want to edit, or type 'q' to return:");
-        string? input = Console.ReadLine()?.Trim();
-        if (string.Equals(input, "q", StringComparison.OrdinalIgnoreCase))
-        {
-            return;
-        }
-
-        if (long.TryParse(input, out long reservationId))
-        {
-            ReservationModel? reservation = ReservationLogic.GetById(reservationId);
-            if (reservation == null)
+            if (!Console.IsOutputRedirected)
             {
-                Console.WriteLine($"\nNo reservation found with ID {reservationId}.");
-                Console.WriteLine("Press any key to continue...");
-                Console.ReadKey();
+                Console.Clear();
             }
-            else
+
+            List<ReservationModel> reservations = ReservationLogic.GetAll();
+
+            if (reservations.Count == 0)
             {
-                EditReservation(reservation);
+                Console.WriteLine("No reservations found.");
+                Console.WriteLine("Press Enter to return...");
+                Console.ReadLine();
+                return;
             }
-        }
-        else
-        {
-            Console.WriteLine("\nInvalid ID entered.");
-            Console.WriteLine("Press any key to continue...");
-            Console.ReadKey();
+
+            Console.WriteLine("=== ALL RESERVATIONS ===");
+            Console.WriteLine("========================\n");
+            Console.WriteLine("Select a reservation you want to view/edit:\n");
+
+            List<string> options = new List<string>();
+            foreach (ReservationModel res in reservations)
+            {
+                options.Add($"Reservation #{res.Id} - {res.Date} ({res.TimeSlot}) - {res.PartySize}p - Table #{res.TableId}");
+            }
+            options.Add("Back to admin menu");
+
+            int selectedIndex = Menu.InteractiveMenu(options.ToArray());
+
+            if (selectedIndex == options.Count - 1)
+            {
+                return;
+            }
+
+            ReservationModel selectedReservation = reservations[selectedIndex];
+            EditReservation(selectedReservation);
         }
     }
 
