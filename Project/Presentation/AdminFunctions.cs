@@ -262,13 +262,37 @@ public static class AdminFunctions
                 case 3: 
                     Console.Clear();
                     Console.WriteLine($"Current table: #{reservation.TableId}");
-                    Console.Write("Enter new table number: ");
-                    if (!long.TryParse(Console.ReadLine(), out long tableId))
+
+                    List<TableModel> availableTables = ReservationLogic.GetAvailableTables(reservation.Date, (int)reservation.PartySize, reservation.TimeSlot);
+                    TableModel? currentTable = TableAccess.GetById((int)reservation.TableId);
+                    if (currentTable != null && !availableTables.Any(t => t.Id == currentTable.Id))
                     {
-                        Console.WriteLine("\nInvalid table number! Press any key...");
+                        availableTables.Add(currentTable);
+                    }
+
+                    if (availableTables.Count == 0)
+                    {
+                        Console.WriteLine("\nNo tables available for this date, time and party size.");
+                        Console.WriteLine("Press any key to continue...");
                         Console.ReadKey(true);
                         continue;
                     }
+
+                    Console.WriteLine("\nAvailable tables:");
+                    foreach (TableModel table in availableTables.OrderBy(t => t.Id))
+                    {
+                        Console.WriteLine($"Table #{table.Id} (Seats: {table.Capacity})");
+                    }
+
+                    Console.Write("\nEnter new table number: ");
+                    if (!long.TryParse(Console.ReadLine(), out long tableId) || !availableTables.Any(t => t.Id == tableId))
+                    {
+                        Console.WriteLine("\nInvalid table selection! Table must exist, have enough seats and be free.");
+                        Console.WriteLine("Press any key to continue...");
+                        Console.ReadKey(true);
+                        continue;
+                    }
+
                     reservation.TableId = tableId;
                     ReservationLogic.Update(reservation);
                     Console.WriteLine("\nTable updated successfully! Press any key...");

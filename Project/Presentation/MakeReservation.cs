@@ -157,7 +157,16 @@ public static class MakeReservation
         Console.WriteLine($"Time:     {reservation.TimeSlot}");
         Console.WriteLine($"Guests:   {reservation.PartySize}");
         Console.WriteLine($"Table:    #{reservation.TableId}");
-        Console.WriteLine($"Order:    EUR {OrderLogic.GetTotal(orderLines):F2}");
+        if (orderLines.Count > 0)
+        {
+            Console.WriteLine("Order items:");
+            foreach (OrderLineModel line in orderLines)
+            {
+                double lineTotal = line.MenuItem.UnitPrice * line.Quantity;
+                Console.WriteLine($"  {line.Quantity}x {line.MenuItem.Name,-30} EUR {lineTotal,6:F2}");
+            }
+        }
+        Console.WriteLine($"Order total: EUR {OrderLogic.GetTotal(orderLines):F2}");
         Console.WriteLine("---------------------------");
 
         while (true)

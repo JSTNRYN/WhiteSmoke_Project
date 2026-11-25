@@ -56,7 +56,7 @@ public static class OrderView
 
         while (true)
         {
-            Console.Write("Enter item ID (or 0 to stop adding): ");
+            Console.Write("Enter dish number (or 0 to stop adding): ");
             if (!int.TryParse(Console.ReadLine(), out int itemNumber))
             {
                 Console.WriteLine("Please enter a valid number.");
@@ -71,7 +71,7 @@ public static class OrderView
             MenuItemModel? selectedItem = menuItems.FirstOrDefault(item => item.Id == itemNumber);
             if (selectedItem == null)
             {
-                Console.WriteLine("Please enter an item ID shown in the menu.");
+                Console.WriteLine("Please enter a dish number shown in the menu.");
                 continue;
             }
 
