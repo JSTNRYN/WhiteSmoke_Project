@@ -62,11 +62,10 @@ public static class MenuView
                 Console.WriteLine(new string('-', 74));
                 Console.ResetColor();
             }
-
             Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine($"[{item.Id}] {item.Name}");
+            Console.Write($"[{item.Id}] {item.Name,-45}");
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine($"  EUR {item.UnitPrice,6:F2}");
+            Console.WriteLine($" EUR {item.UnitPrice,6:F2}");
             if (MenuLogic.IsAdultItem(item))
             {
                 Console.ForegroundColor = ConsoleColor.Red;

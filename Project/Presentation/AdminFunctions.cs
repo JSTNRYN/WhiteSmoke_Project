@@ -1,6 +1,6 @@
 public static class AdminFunctions
 {
-    private static readonly string[] _adminMenuOptions = ["Manage Menu Items", "View and edit the floor plan", "View and manage customers", "Back to main menu"];
+    private static readonly string[] _adminMenuOptions = ["Manage Menu Items", "View and edit the floor plan", "View and manage customers", "View and edit reservations", "Back to main menu"];
     
     public static void ShowCustomers()
     {
@@ -150,6 +150,151 @@ public static class AdminFunctions
             }
         }
     }
+    public static void ShowReservations()
+    {
+        while (true)
+        {
+            if (!Console.IsOutputRedirected)
+            {
+                Console.Clear();
+            }
+
+            List<ReservationModel> reservations = ReservationLogic.GetAll();
+
+            if (reservations.Count == 0)
+            {
+                Console.WriteLine("No reservations found.");
+                Console.WriteLine("Press Enter to return...");
+                Console.ReadLine();
+                return;
+            }
+
+            Console.WriteLine("=== ALL RESERVATIONS ===");
+            Console.WriteLine("========================\n");
+            Console.WriteLine("Select a reservation you want to view/edit:\n");
+
+            List<string> options = new List<string>();
+            foreach (ReservationModel res in reservations)
+            {
+                options.Add($"Reservation #{res.Id} - {res.Date} ({res.TimeSlot}) - {res.PartySize}p - Table #{res.TableId}");
+            }
+            options.Add("Back to admin menu");
+
+            int selectedIndex = Menu.InteractiveMenu(options.ToArray());
+
+            if (selectedIndex == options.Count - 1)
+            {
+                return;
+            }
+
+            ReservationModel selectedReservation = reservations[selectedIndex];
+            EditReservation(selectedReservation);
+        }
+    }
+
+    public static void EditReservation(ReservationModel reservation)
+    {
+        while (true)
+        {
+            Console.Clear();
+            Console.WriteLine($"=== EDITING RESERVATION #{reservation.Id} ===\n");
+            Console.WriteLine("Select an option you want to change:\n");
+
+            string[] options = [
+                $"Date:       {reservation.Date}",
+                $"Time:       {reservation.TimeSlot}",
+                $"Guests:     {reservation.PartySize}",
+                $"Table:      #{reservation.TableId}",
+                "Cancel this reservation (Delete)",
+                "Return to reservation list"
+            ];
+
+            int choice = Menu.InteractiveMenu(options);
+
+            switch (choice)
+            {
+                case 0: 
+                    Console.Clear();
+                    Console.WriteLine($"Current date: {reservation.Date}");
+                    Console.Write("Enter new date (dd-MM-yyyy): ");
+                    string newDate = Console.ReadLine() ?? string.Empty;
+                    if (!ReservationLogic.IsValidDateFormat(newDate) || !ReservationLogic.IsValidateDate(newDate))
+                    {
+                        Console.WriteLine("\nInvalid date! Changes not saved.");
+                        Console.WriteLine("Press any key to continue...");
+                        Console.ReadKey(true);
+                        continue;
+                    }
+                    reservation.Date = newDate;
+                    ReservationLogic.Update(reservation);
+                    Console.WriteLine("\nDate updated successfully! Press any key...");
+                    Console.ReadKey(true);
+                    break;
+
+                case 1:
+                    Console.Clear();
+                    Console.WriteLine($"Current time: {reservation.TimeSlot}\nChoose new time slot:\n");
+                    string[] timeSlots = ["5:00 PM", "9:30 PM"];
+                    int timeChoice = Menu.InteractiveMenu(timeSlots);
+                    reservation.TimeSlot = timeSlots[timeChoice];
+                    ReservationLogic.Update(reservation);
+                    Console.WriteLine("\nTime updated successfully! Press any key...");
+                    Console.ReadKey(true);
+                    break;
+
+                case 2: 
+                    Console.Clear();
+                    Console.WriteLine($"Current guests: {reservation.PartySize}");
+                    Console.Write("Enter new number of guests (1-6): ");
+                    if (!int.TryParse(Console.ReadLine(), out int guests) || !SeatCount.WithinRange(guests))
+                    {
+                        Console.WriteLine("\nInvalid number of guests! Must be between 1 and 6.");
+                        Console.WriteLine("Press any key to continue...");
+                        Console.ReadKey(true);
+                        continue;
+                    }
+                    reservation.PartySize = guests;
+                    ReservationLogic.Update(reservation);
+                    Console.WriteLine("\nGuests updated successfully! Press any key...");
+                    Console.ReadKey(true);
+                    break;
+
+                case 3: 
+                    Console.Clear();
+                    Console.WriteLine($"Current table: #{reservation.TableId}");
+                    Console.Write("Enter new table number: ");
+                    if (!long.TryParse(Console.ReadLine(), out long tableId))
+                    {
+                        Console.WriteLine("\nInvalid table number! Press any key...");
+                        Console.ReadKey(true);
+                        continue;
+                    }
+                    reservation.TableId = tableId;
+                    ReservationLogic.Update(reservation);
+                    Console.WriteLine("\nTable updated successfully! Press any key...");
+                    Console.ReadKey(true);
+                    break;
+
+                case 4: 
+                    Console.Clear();
+                    Console.WriteLine($"Reservation details to cancel:");
+                    Console.WriteLine($"Date: {reservation.Date} | Time: {reservation.TimeSlot} | Guests: {reservation.PartySize} | Table: #{reservation.TableId}");
+                    Console.Write("\nAre you sure you want to cancel/delete this reservation? (yes/no): ");
+                    string? confirm = Console.ReadLine()?.Trim().ToLower();
+                    if (confirm == "yes" || confirm == "y")
+                    {
+                        ReservationLogic.Delete(reservation.Id);
+                        Console.WriteLine("\nReservation cancelled successfully! Press any key...");
+                        Console.ReadKey(true);
+                        return;
+                    }
+                    break;
+
+                case 5: // Return
+                    return;
+            }
+        }
+    }
 
     public static void AdminMenu()
     {
@@ -157,11 +302,11 @@ public static class AdminFunctions
         {
             Console.Clear();
             Console.WriteLine("ADMIN MENU\n");
-            
+
             int choice = Menu.InteractiveMenu(_adminMenuOptions);
-            switch(choice)
+            switch (choice)
             {
-                case 0: 
+                case 0:
                     MenuView.ShowMenu();
                     break;
                 case 1:
@@ -171,6 +316,9 @@ public static class AdminFunctions
                     ShowCustomers();
                     break;
                 case 3:
+                    ShowReservations();
+                    break;
+                case 4:
                     return;
             }
         }
