@@ -112,6 +112,14 @@ static class Menu
         }
     }
 
+    private static void ShowInvalidChoice()
+    {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine("Invalid input.");
+        Console.ResetColor();
+        Thread.Sleep(1000);
+    }
+
     public static void About()
     {
         Console.Clear();

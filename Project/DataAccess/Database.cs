@@ -55,7 +55,6 @@ public static class Database
         AddColumnIfMissing(connection, "MenuItem", "UNITPRICE", "REAL NOT NULL DEFAULT 0");
         AddColumnIfMissing(connection, "MenuItem", "DESCRIPTION", "TEXT NOT NULL DEFAULT ''");
         AddColumnIfMissing(connection, "MenuItem", "ADULT", "INTEGER NOT NULL DEFAULT 0");
-        AddColumnIfMissing(connection, "MenuItem", "IsViewable", "INTEGER NOT NULL DEFAULT 1");
         EnsureAdmin(connection);
 
         if (connection.ExecuteScalar<long>("SELECT COUNT(*) FROM MenuItem") == 0)

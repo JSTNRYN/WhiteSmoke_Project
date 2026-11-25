@@ -1,9 +1,13 @@
 public static class MenuView
 {
-    private static readonly string[] _editOptions = ["Hide/Show", "Update", "Go back"];
-
-    public static void ShowMenu()
+    public static void ShowMenu(UserModel currentUser)
     {
+        if (currentUser == null)
+        {
+            Console.WriteLine("You must log in before viewing the menu.");
+            return;
+        }
+
         List<MenuItemModel> menuItems = MenuLogic.GetMenuItemsForDisplay();
         if (menuItems.Count == 0)
         {
@@ -11,38 +15,16 @@ public static class MenuView
             return;
         }
 
-        while (true)
-        {
-            menuItems = MenuLogic.GetMenuItemsForDisplay();
-            Console.Clear();
+        if (!Console.IsOutputRedirected) Console.Clear();
+        PrintItems(menuItems);
 
-            if (!Console.IsOutputRedirected) Console.Clear();
-            PrintItems(menuItems, true);
-
-            Console.WriteLine("Enter in id to select the item.");
-            Console.WriteLine("Type 'back' to go back to admin panel.");
-
-            string input = Console.ReadLine() ?? string.Empty;
-            if (input.Equals("back", StringComparison.OrdinalIgnoreCase)) { return; }
-
-            if (!int.TryParse(input, out int id))
-            {
-                Console.WriteLine("Invalid input, Enter a item id.");
-                continue;
-            }
-
-            MenuItemModel? selectedItem = MenuLogic.FindById(id);
-            if (selectedItem == null)
-            {
-                Console.WriteLine("No menu item was found with that id.");
-                continue;
-            }
-
-            Edit(selectedItem);
-        }
+        Console.ForegroundColor = ConsoleColor.DarkYellow;
+        Console.WriteLine("Press Enter to return...");
+        Console.ResetColor();
+        Console.ReadLine();
     }
 
-    public static void PrintItems(IReadOnlyList<MenuItemModel> menuItems, bool isAdmin = false)
+    public static void PrintItems(IReadOnlyList<MenuItemModel> menuItems)
     {
         Console.ForegroundColor = ConsoleColor.DarkYellow;
         Console.WriteLine("==========================================================================");
@@ -51,6 +33,7 @@ public static class MenuView
         Console.ResetColor();
 
         string? category = null;
+        int menuNumber = 1;
         foreach (MenuItemModel item in menuItems)
         {
             if (!string.Equals(category, item.Category, StringComparison.OrdinalIgnoreCase))
@@ -73,43 +56,8 @@ public static class MenuView
             }
             Console.ForegroundColor = ConsoleColor.Gray;
             Console.WriteLine($"  {item.Description}");
-            if(isAdmin)
-            {
-                Console.WriteLine($"  {(item.IsViewable ? "Visible" : "Hidden")}");
-            }
             Console.WriteLine();
             Console.ResetColor();
-        }
-    }
-
-    public static void Edit(MenuItemModel menu)
-    {
-        while (true)
-        {
-            MenuItemModel? menuCopy = MenuItemAccess.FindById(menu.Id);
-
-            Console.Clear();
-            Console.WriteLine($"ID:          {menu.Id}");
-            Console.WriteLine($"Name:        {menu.Name}");
-            Console.WriteLine($"Description: {menu.Description}");
-            Console.WriteLine($"Menu type:   {menu.Menu}");
-            Console.WriteLine($"Category:    {menu.Category}");
-            Console.WriteLine($"Price:       {menu.UnitPrice}");
-            Console.WriteLine($"For adults:  {(menu.Adult ? "Yes" : "No")}");
-            Console.WriteLine($"Viewable:    {(menu.IsViewable ? "Yes" : "No")} {(menuCopy?.IsViewable == menu.IsViewable ? "" : "(New)")}");
-            Console.WriteLine();
-
-            switch (Menu.InteractiveMenu(_editOptions))
-            {
-                case 0:
-                    menu.IsViewable = menu.IsViewable ? false : true;
-                    break;
-                case 1:
-                    MenuLogic.Update(menu);
-                    break;
-                case 2:
-                    return;
-            }
         }
     }
 }

@@ -7,23 +7,11 @@ public class MenuItemModel
     public double UnitPrice { get; set; }
     public string Description { get; set; } = string.Empty;
     public bool Adult { get; set; }
-    public bool IsViewable { get; set; }
 
     public MenuItemModel()
     {
     }
 
-    public MenuItemModel(int id, string menu, string name, string category, double unitPrice, string description, bool forAdult, bool viewable)
-    {
-        Id = id;
-        Menu = menu;
-        Name = name;
-        Category = category;
-        UnitPrice = unitPrice;
-        Description = description;
-        Adult = forAdult;
-        IsViewable = viewable;
-    }
     public MenuItemModel(int id, string menu, string name, string category, double unitPrice, string description)
     {
         Id = id;
