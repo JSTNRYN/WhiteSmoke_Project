@@ -1,4 +1,4 @@
-﻿using System.Text;
+﻿using System.Globalization;
 using Project.Presentation;
 
 public class UserLogic
@@ -8,6 +8,19 @@ public class UserLogic
 
     public UserLogic()
     {
+    }
+
+
+    public static bool CheckIfPasswordsMatch(string oldPassword)
+    {
+        try
+        {
+            return BCrypt.Net.BCrypt.Verify(oldPassword, CurrentAccount!.Password);
+        }
+        catch (BCrypt.Net.SaltParseException)
+        {
+            return false;
+        }
     }
 
     public UserModel? CheckLogin(string email, string password)
@@ -31,7 +44,7 @@ public class UserLogic
         CurrentAccount = acc;
     }
 
-    private string HashPassword(string password)
+    private static string HashPassword(string password)
     {
         return BCrypt.Net.BCrypt.HashPassword(password);
     }
@@ -41,31 +54,85 @@ public class UserLogic
         return IsValidEmailFormat(email) && !EmailExists(email);
     }
 
+    public static bool ValidateDob(string dateOfBirth)
+    {
+        try
+        {
+            DateTime.ParseExact(dateOfBirth, "dd-MM-yyyy", CultureInfo.InvariantCulture);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
     public static bool EmailExists(string email)
     {
         return UserAccess.GetByEmail(email) != null;
     }
 
-    public static bool IsValidEmailFormat(string? email)
+    private static bool IsValidEmailFormat(string? email)
     {
-        return !string.IsNullOrWhiteSpace(email) && email.Contains("@") && email.Contains(".");
+        return !string.IsNullOrWhiteSpace(email) && email.Contains('@') && email.Contains('.');
     }
 
-    public static bool ValidatePhoneNumber(string phoneNumber)
+    public static bool ValidatePhoneNumber(string? phoneNumber)
     {
         if (string.IsNullOrWhiteSpace(phoneNumber))
         {
             return false;
         }
 
-        string digits = phoneNumber.StartsWith("+") ? phoneNumber.Substring(1) : phoneNumber;
+        bool isInternational = phoneNumber.StartsWith("+");
 
-        if (digits.Length == 0 || !digits.All(char.IsDigit))
+        string digits = phoneNumber;
+        if (isInternational)
+        {
+            digits = phoneNumber.Substring(1);
+        }
+
+        if (!digits.All(char.IsDigit))
         {
             return false;
         }
 
-        return digits.Length >= 8 && digits.Length <= 15;
+        if (isInternational)
+        {
+            return digits.Length == 11;
+        }
+
+        return digits.Length == 10 && digits.StartsWith("0");
+    }
+    
+    public static string InterceptPassword(string msg)
+    {
+        Console.Write(msg);
+        string password = "";
+        while (true)
+        {
+            ConsoleKeyInfo key = Console.ReadKey(intercept: true);
+            if (key.Key == ConsoleKey.Enter)
+            {
+                Console.WriteLine();
+                break;
+            }
+            if (key.Key == ConsoleKey.Backspace)
+            {
+                if (password.Length > 0)
+                {
+                    password = password.Substring(0, password.Length - 1);
+                    Console.Write("\b \b");
+                }
+                continue;
+            }
+            if (!char.IsControl(key.KeyChar))
+            {
+                password += key.KeyChar;
+                Console.Write('*');
+            }
+        }
+        return password;
     }
 
     public static bool ValidateName(string? name)
@@ -102,28 +169,51 @@ public class UserLogic
     {
         return UserAccess.GetAllCustomers_ExceptPassword();
     }
+    
+    public static List<UserModel> GetAllAdmins_ExceptPassword()
+    {
+        return UserAccess.GetAllAdmins_ExceptPassword();
+    }
 
     public static void UpdateFirstName(UserModel customer, string newFirstName)
     {
         UserAccess.UpdateFirstName(customer, newFirstName);
+        customer.FirstName = newFirstName;
     }
 
     public static void UpdateLastName(UserModel customer, string newLastName)
     {
         UserAccess.UpdateLastName(customer, newLastName);
+        customer.LastName = newLastName;
     }
 
     public static void UpdateEmail(UserModel customer, string newEmail)
     {
         UserAccess.UpdateEmail(customer, newEmail);
+        customer.EmailAddress = newEmail;
+    }
+
+    public static void UpdateDob(UserModel customer, string newDob)
+    {
+        UserAccess.UpdateDob(customer, newDob);
+        // Hier wordt de string newDob ge-convert naar een DateTime via Parse
+        customer.DateOfBirth = DateTime.ParseExact(newDob, "dd-MM-yyyy", CultureInfo.InvariantCulture);
     }
 
     public static void UpdatePhoneNumber(UserModel customer, string newPhoneNumber)
     {
         UserAccess.UpdatePhoneNumber(customer, newPhoneNumber);
+        customer.PhoneNumber = newPhoneNumber;
     }
 
-    public static UserModel GetCustomerById(int id)
+    public static void UpdatePassword(UserModel customer, string newPassword)
+    {
+        string hashedPassword = HashPassword(newPassword);
+        UserAccess.UpdatePassword(customer, hashedPassword);
+        customer.Password = hashedPassword;
+    }
+
+    public static UserModel GetCustomerById(long id)
     {
         return UserAccess.GetById(id);
     }

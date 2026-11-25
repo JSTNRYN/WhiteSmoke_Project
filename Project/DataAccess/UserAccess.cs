@@ -11,17 +11,18 @@ public class UserAccess
 
     public long Write(UserModel account)
     {
-        string sql = $"INSERT INTO {Table} (email, password, firstName, lastName, phonenumber, role) VALUES (@EmailAddress, @Password, @FirstName, @LastName, @PhoneNumber, @Role) RETURNING id";
+        string sql = $"INSERT INTO {Table} (email, password, firstName, lastName, phonenumber, dateOfBirth, role) VALUES (@EmailAddress, @Password, @FirstName, @LastName, @PhoneNumber, @DateOfBirth, @Role) RETURNING id";
         _connection.Open();
         long id = _connection.ExecuteScalar<long>(sql, account);
         _connection.Close();
 
         return id;
     }
+    
 
     public static UserModel GetByEmail(string email)
     {
-        string sql = $"SELECT * FROM {Table} WHERE email = @Email";
+        string sql = $"SELECT id, email AS EmailAddress, password, firstName, lastName, phonenumber, dateOfBirth, role FROM {Table} WHERE email = @Email";
         _connection.Open();
         var user = _connection.QueryFirstOrDefault<UserModel>(sql, new { Email = email });
         _connection.Close();
@@ -43,9 +44,9 @@ public class UserAccess
         _connection.Execute(sql, new { Id = account.Id });
         _connection.Close();
     }
-    public static UserModel? GetById(int id)
+    public static UserModel? GetById(long id)
     {
-        string sql = $"SELECT id, firstName, lastName, phonenumber, email AS EmailAddress, role FROM {Table} WHERE id = @id";
+        string sql = $"SELECT id, firstName, lastName, phonenumber, email AS EmailAddress, DATEOFBIRTH, role FROM {Table} WHERE id = @id";
         _connection.Open();
         var user = _connection.QueryFirstOrDefault<UserModel>(sql, new { id = id });
         _connection.Close();
@@ -59,6 +60,15 @@ public class UserAccess
         List<UserModel> customers = _connection.Query<UserModel>(sql).ToList();
         _connection.Close();
         return customers;
+    }
+    
+    public static List<UserModel> GetAllAdmins_ExceptPassword()
+    {
+        string sql = $"SELECT id, firstName, lastName, phonenumber, email AS EmailAddress, role FROM {Table} WHERE role = 'Admin'";
+        _connection.Open();
+        List<UserModel> admins = _connection.Query<UserModel>(sql).ToList();
+        _connection.Close();
+        return admins;
     }
 
     public static void UpdateFirstName(UserModel customer, string newFirstName)
@@ -84,12 +94,28 @@ public class UserAccess
         _connection.Execute(sql, new { NewPhoneNumber = newPhoneNumber, Id = customer.Id });
         _connection.Close();
     }
+    
+    public static void UpdatePassword(UserModel customer, string newPassword)
+    {
+        string sql = $"UPDATE {Table} SET password = @NewPassword WHERE id = @Id";
+        _connection.Open();
+        _connection.Execute(sql, new { NewPassword = newPassword, Id = customer.Id });
+        _connection.Close();
+    }
 
     public static void UpdateEmail(UserModel customer, string newEmail)
     {
         string sql = $"UPDATE {Table} SET email = @NewEmail WHERE id = @Id";
         _connection.Open();
         _connection.Execute(sql, new { NewEmail = newEmail, Id = customer.Id });
+        _connection.Close();
+    }
+
+    public static void UpdateDob(UserModel customer, string newDob)
+    {
+        string sql = $"UPDATE {Table} SET DATEOFBIRTH = @NewDob WHERE id = @Id";
+        _connection.Open();
+        _connection.Execute(sql, new { NewDob = newDob, Id = customer.Id });
         _connection.Close();
     }
 
