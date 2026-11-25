@@ -38,11 +38,13 @@ public static class CustomerFunctions
             if (success)
             {
                 Console.WriteLine("Your account has been deleted successfully.");
+                Console.ReadKey();
                 UserLogic.Logout();
             }
             else
             {
                 Console.WriteLine("An error occurred while trying to delete your account.");
+                Console.ReadKey();
             }
         }
         else if (confirmation == "n")
