@@ -22,7 +22,7 @@ public class UserAccess
 
     public static UserModel GetByEmail(string email)
     {
-        string sql = $"SELECT * FROM {Table} WHERE email = @Email";
+        string sql = $"SELECT id, email AS EmailAddress, password, firstName, lastName, phonenumber, dateOfBirth, role FROM {Table} WHERE email = @Email";
         _connection.Open();
         var user = _connection.QueryFirstOrDefault<UserModel>(sql, new { Email = email });
         _connection.Close();

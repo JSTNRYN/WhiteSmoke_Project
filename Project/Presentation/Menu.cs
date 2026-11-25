@@ -3,20 +3,20 @@ using Project.Presentation;
 static class Menu
 {
     private static readonly string[] _guestOptions = ["Log in", "Sign up", "View Menu", "About us"];
-    private static readonly string[] _UserOptions = ["Make a reservation", "View your reservations", "View Menu", "About us", "Log out"];
-    private static readonly string[] _adminOptions = ["Make a reservation", "View your reservations", "View Menu", "About us", "Log out", "View admin menu"];
+    private static readonly string[] _userOptions = ["Make a reservation", "View your reservations", "View Menu", "About us", "Edit personal details", "Log out"];
+    private static readonly string[] _adminOptions = ["Make a reservation", "View your reservations", "View Menu", "About us", "Edit personal details", "Log out", "View admin menu"];
 
     public static void ShowRestaurantName()
     {
         if (!Console.IsOutputRedirected) Console.Clear();
         Console.WriteLine(@"
-        (                             
-        (  (         )        )        )\ )                 )        
-        )\))(   ' ( /( (   ( /(   (   (()/(    )         ( /(    (   
-        ((_)()\ )  )\()))\  )\()) ))\   /(_))  (      (   )\())  ))\  
-        _(())\_)()((_)(_))/ /((_) (_))    )\  '  )\ ((_\  /((_) 
-        \ \((_)/ /| |(_)(_) | |_ (_))   / __| _((_))  ((_)| |(_)(_))   
-         \ \/\/ / | ' \ | | |  _|/ -_)  \__ \| '  \()/ _ \| / / / -_)  
+        (
+        (  (         )        )        )\ )                 )
+        )\))(   ' ( /( (   ( /(   (   (()/(    )         ( /(    (
+        ((_)()\ )  )\()))\  )\()) ))\   /(_))  (      (   )\())  ))\
+        _(())\_)()((_)(_))/ /((_) (_))    )\  '  )\ ((_\  /((_)
+        \ \((_)/ /| |(_)(_) | |_ (_))   / __| _((_))  ((_)| |(_)(_))
+         \ \/\/ / | ' \ | | |  _|/ -_)  \__ \| '  \()/ _ \| / / / -_)
           \_/\_/  |_||_||_| \\__|\___|  |___/|_|_|_| \___/|_\_\ \___|
 ");
     }
@@ -30,31 +30,27 @@ static class Menu
             bool loggedIn = UserLogic.IsLoggedIn();
             bool isAdmin = loggedIn && UserLogic.IsAdmin();
 
+            if (loggedIn)
+            {
+                var account = UserLogic.CurrentAccount!;
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine($"Logged in as: {account.FirstName} {account.LastName}");
+                Console.ResetColor();
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("You are currently not logged in.");
+                Console.ResetColor();
+            }
 
-
-        var account = UserLogic.CurrentAccount!;
-        Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine($"Logged in as: {account.FirstName} {account.LastName}");
-        Console.ResetColor();
-        Console.WriteLine(_homepageMessage);
-        Console.WriteLine("1. Make a reservation");
-        Console.WriteLine("2. View your reservations");
-        Console.WriteLine("3. About");
-        Console.WriteLine("4. Log out");
-        Console.WriteLine("5: Edit personal details");
-
-        if (!isAdmin) return;
-
-        Console.WriteLine("6. Manage menu items");
-        Console.WriteLine("7. View and edit the floor plan");
-        Console.WriteLine("8. View and Manage customers");
             if (isAdmin)
             {
                 HandleLoggedInChoice(InteractiveMenu(_adminOptions), isAdmin);
             }
             else if (loggedIn)
             {
-                HandleLoggedInChoice(InteractiveMenu(_UserOptions), isAdmin);
+                HandleLoggedInChoice(InteractiveMenu(_userOptions), isAdmin);
             }
             else
             {
@@ -69,61 +65,64 @@ static class Menu
         {
             case 0: UserLogin.Start(); break;
             case 1: UserSignUp.Start(); break;
-            case 2:
-                List<MenuItemModel> list = MenuLogic.GetNonAdminMenuItems();
-                MenuView.PrintItems(list);
-                Console.ForegroundColor = ConsoleColor.DarkYellow;
-                Console.WriteLine("Press Enter to return...");
-                Console.ResetColor();
-                Console.ReadLine();
-                Console.Clear();
-                break;
+            case 2: ShowFoodMenu(); break;
             case 3: About(); break;
         }
     }
 
-    private static void HandleLoggedInChoice(int? choice, bool isAdmin)
+    private static void HandleLoggedInChoice(int choice, bool isAdmin)
     {
         switch (choice)
         {
-            case "1": MakeReservation.Start(); break;
-            case "2": MyReservation.ShowReservations(UserLogic.CurrentAccount!.Id); break;
-            case "3": About(); break;
-            case "4": UserLogic.Logout(); break;
-            case "5": EditUserDetails(UserLogic.CurrentAccount); break;
-            case "6" when isAdmin: break;
-            case "7" when isAdmin: FloorPlanUI.Show(); break;
-            case "8" when isAdmin: AdminFunctions.ShowCustomers(); break;
-            default: ShowInvalidChoice(); break;
+            case 0: MakeReservation.Start(); break;
+            case 1: MyReservation.ShowReservations(UserLogic.CurrentAccount!.Id); break;
+            case 2: ShowFoodMenu(); break;
+            case 3: About(); break;
+            case 4: EditUserDetails(UserLogic.CurrentAccount!); break;
+            case 5: UserLogic.Logout(); break;
+            case 6 when isAdmin: AdminFunctions.AdminMenu(); break;
         }
+    }
+
+    private static void ShowFoodMenu()
+    {
+        List<MenuItemModel> list = MenuLogic.GetNonAdminMenuItems();
+        MenuView.PrintItems(list);
+        Console.ForegroundColor = ConsoleColor.DarkYellow;
+        Console.WriteLine("Press Enter to return...");
+        Console.ResetColor();
+        Console.ReadLine();
+        Console.Clear();
     }
 
     private static void EditUserDetails(UserModel user)
     {
-        Console.WriteLine("Current details:");
-        Console.WriteLine($"1: First name: {user.FirstName}");
-        Console.WriteLine($"2: Last name: {user.LastName}");
-        Console.WriteLine($"3: Email address: {UserLogic.GetAllAdmins_ExceptPassword()[^1].EmailAddress}");
-        Console.WriteLine($"4: Date of birth (DD-MM-YYYY): {user.DateOfBirth:dd-MM-yyyy}");
-        Console.WriteLine($"5: Phone number: {user.PhoneNumber}");
-        Console.WriteLine($"6: Change your password");
-        Console.WriteLine("7: Quit");
-        Console.WriteLine("-----------------");
-        Console.WriteLine("Please enter the number of the detail you would like to edit:");
-        string choice = Console.ReadLine();
-        switch (choice)
+        ShowRestaurantName();
+        Console.WriteLine("Choose the detail you would like to edit:");
+
+        string[] options =
+        [
+            $"First name: {user.FirstName}",
+            $"Last name: {user.LastName}",
+            $"Email address: {user.EmailAddress}",
+            $"Date of birth (DD-MM-YYYY): {user.DateOfBirth:dd-MM-yyyy}",
+            $"Phone number: {user.PhoneNumber}",
+            "Change your password",
+            "Back"
+        ];
+
+        switch (InteractiveMenu(options))
         {
-            case "1": ChangeFirstName(user); break;
-            case "2": ChangeLastName(user); break;
-            case "3": ChangeEmail(user); break;
-            case "4": ChangeDob(user); break;
-            case "5": ChangePhoneNumber(user); break;
-            case "6": ChangePassword(user); break;
-            case "7" : break;
-            default: ShowInvalidChoiceForPersonalData(user); break;
+            case 0: ChangeFirstName(user); break;
+            case 1: ChangeLastName(user); break;
+            case 2: ChangeEmail(user); break;
+            case 3: ChangeDob(user); break;
+            case 4: ChangePhoneNumber(user); break;
+            case 5: ChangePassword(user); break;
+            case 6: break;
         }
     }
-    
+
     private static void ChangeFirstName(UserModel user)
     {
         Console.WriteLine($"Current: {user.FirstName}");
@@ -141,7 +140,7 @@ static class Menu
         }
         EditUserDetails(user);
     }
-    
+
     private static void ChangeLastName(UserModel user)
     {
         Console.WriteLine($"Current: {user.LastName}");
@@ -159,10 +158,10 @@ static class Menu
         }
         EditUserDetails(user);
     }
-    
+
     private static void ChangeEmail(UserModel user)
     {
-        Console.WriteLine($"Current: {UserLogic.GetAllCustomers_ExceptPassword()[0].EmailAddress}");
+        Console.WriteLine($"Current: {user.EmailAddress}");
         Console.Write("New email: ");
         string newEmail = Console.ReadLine().Trim();
         if (UserLogic.ValidateEmail(newEmail))
@@ -177,7 +176,7 @@ static class Menu
         }
         EditUserDetails(user);
     }
-    
+
     private static void ChangeDob(UserModel user)
     {
         Console.WriteLine($"Current: {user.DateOfBirth:dd-MM-yyyy}");
@@ -195,7 +194,7 @@ static class Menu
         }
         EditUserDetails(user);
     }
-    
+
     private static void ChangePhoneNumber(UserModel user)
     {
         Console.WriteLine($"Current: {user.PhoneNumber}");
@@ -228,8 +227,9 @@ static class Menu
             ChangePassword(user);
             return;
         }
+        EditUserDetails(user);
     }
-    
+
     private static void ShowInvalidChoiceWithMsg(string msg)
     {
         Console.ForegroundColor = ConsoleColor.Red;
@@ -237,6 +237,7 @@ static class Menu
         Console.ResetColor();
         Thread.Sleep(1000);
     }
+
     private static void ShowInvalidChoice()
     {
         Console.ForegroundColor = ConsoleColor.Red;
@@ -245,41 +246,11 @@ static class Menu
         Thread.Sleep(1000);
     }
 
-    private static void ShowInvalidChoiceForPersonalData(UserModel user)
-    {
-        Console.ForegroundColor = ConsoleColor.Red;
-        Console.WriteLine("Invalid input.");
-        Console.ResetColor();
-        Thread.Sleep(1000);
-        EditUserDetails(user);
-    }
-
-            case 0: MakeReservation.Start(); break;
-            case 1: MyReservation.ShowReservations(UserLogic.CurrentAccount!.Id); break;
-            case 2:
-                List<MenuItemModel> list = MenuLogic.GetNonAdminMenuItems();
-                MenuView.PrintItems(list);
-                Console.ForegroundColor = ConsoleColor.DarkYellow;
-                Console.WriteLine("Press Enter to return...");
-                Console.ResetColor();
-                Console.ReadLine();
-                Console.Clear();
-                break;
-            case 3: About(); break;
-            case 4: UserLogic.Logout(); break;
-            case 5 when isAdmin: AdminFunctions.AdminMenu(); break;
-        }
-    }
-
     public static void About()
     {
-        Console.Clear();
-        bool repeat = true;
-        while (repeat)
-        {
-            ShowRestaurantName();
-            Console.WriteLine("About\n");
-            Console.WriteLine(@"
+        ShowRestaurantName();
+        Console.WriteLine("About\n");
+        Console.WriteLine(@"
 White Smoke is built around one idea: cook with fire, and let the ingredients do the talking.
 Our Pitmasters tend an open fire daily, slowly cooking meat, fish, and vegetables until they develop deep, smoky flavour without losing their freshness.
 Every dish is finished light and bright, so the smoke adds depth instead of weight.
@@ -295,7 +266,7 @@ The crew:
 
             ");
 
-            Console.WriteLine(@"
+        Console.WriteLine(@"
 Welcome to White Smoke, where fire and smoke bring every dish to life.
 Our pitmasters slowly cook meat, fish and vegetables over an open fire,
 for deep flavour with a light, fresh finish.
@@ -317,11 +288,9 @@ Opening hours
   Sunday        12:00 PM - 10:00 PM
 ");
 
-            Console.WriteLine("Press enter to go back");
-            Console.ReadLine();
-            Console.Clear();
-            return;
-        }
+        Console.WriteLine("Press enter to go back");
+        Console.ReadLine();
+        Console.Clear();
     }
 
     public static int InteractiveMenu(string[] menuOptions)
