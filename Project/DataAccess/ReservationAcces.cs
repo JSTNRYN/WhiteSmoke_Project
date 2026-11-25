@@ -59,9 +59,29 @@ public static class ReservationAccess
 
     public static void Delete(long id)
     {
-        string query = $"DELETE FROM {_table} WHERE ID = @Id";
+        string orderItemQuery = @"
+            DELETE FROM OrderItem
+            WHERE OrderID IN (
+                SELECT ID FROM ""Order"" WHERE ReservationID = @Id
+            )";
+        string orderQuery = @"DELETE FROM ""Order"" WHERE ReservationID = @Id";
+        string reservationQuery = $"DELETE FROM {_table} WHERE ID = @Id";
         using var connection = Database.CreateConnection();
         connection.Open();
-        connection.Execute(query, new { Id = id });
+        using var transaction = connection.BeginTransaction();
+
+        try
+        {
+            connection.Execute(orderItemQuery, new { Id = id }, transaction);
+            connection.Execute(orderQuery, new { Id = id }, transaction);
+            connection.Execute(reservationQuery, new { Id = id }, transaction);
+            transaction.Commit();
+        }
+        catch
+        {
+            transaction.Rollback();
+            throw;
+        }
     }
+
 }
