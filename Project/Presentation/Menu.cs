@@ -76,18 +76,10 @@ static class Menu
     {
         switch (choice)
         {
-            case 0: UserLogin.Start(); break;
-            case 1: UserSignUp.Start(); break;
-            case 2:
-                List<MenuItemModel> list = MenuLogic.GetNonAdminMenuItems();
-                MenuView.PrintItems(list);
-                Console.ForegroundColor = ConsoleColor.DarkYellow;
-                Console.WriteLine("Press Enter to return...");
-                Console.ResetColor();
-                Console.ReadLine();
-                Console.Clear();
-                break;
-            case 3: About(); break;
+            case "1": UserLogin.Start(); break;
+            case "2": UserSignUp.Start(); break;
+            case "3": About(); break;
+            default: ShowInvalidChoice(); break;
         }
     }
 
@@ -95,20 +87,14 @@ static class Menu
     {
         switch (choice)
         {
-            case 0: MakeReservation.Start(); break;
-            case 1: MyReservation.ShowReservations(UserLogic.CurrentAccount!.Id); break;
-            case 2:
-                List<MenuItemModel> list = MenuLogic.GetNonAdminMenuItems();
-                MenuView.PrintItems(list);
-                Console.ForegroundColor = ConsoleColor.DarkYellow;
-                Console.WriteLine("Press Enter to return...");
-                Console.ResetColor();
-                Console.ReadLine();
-                Console.Clear();
-                break;
-            case 3: About(); break;
-            case 4: UserLogic.Logout(); break;
-            case 5 when isAdmin: AdminFunctions.AdminMenu(); break;
+            case "1": MakeReservation.Start(); break;
+            case "2": MyReservation.ShowReservations(UserLogic.CurrentAccount!.Id); break;
+            case "3": About(); break;
+            case "4": UserLogic.Logout(); break;
+            case "5" when isAdmin: break;
+            case "6" when isAdmin: FloorPlanUI.Show(); break;
+            case "7" when isAdmin: AdminFunctions.ShowCustomers(); break;
+            default: ShowInvalidChoice(); break;
         }
     }
 

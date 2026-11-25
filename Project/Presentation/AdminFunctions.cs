@@ -1,7 +1,5 @@
 public static class AdminFunctions
 {
-    private static readonly string[] _adminMenuOptions = ["Manage Menu Items", "View and edit the floor plan", "View and manage customers", "Back to main menu"];
-    
     public static void ShowCustomers()
     {
         List<UserModel> customers = new List<UserModel>();
@@ -147,31 +145,6 @@ public static class AdminFunctions
             {
                 Console.WriteLine("Invalid option. Please choose 1 to 5.");
                 Console.Clear();
-            }
-        }
-    }
-
-    public static void AdminMenu()
-    {
-        while (true)
-        {
-            Console.Clear();
-            Console.WriteLine("ADMIN MENU\n");
-            
-            int choice = Menu.InteractiveMenu(_adminMenuOptions);
-            switch(choice)
-            {
-                case 0: 
-                    MenuView.ShowMenu();
-                    break;
-                case 1:
-                    FloorPlanUI.Show();
-                    break;
-                case 2:
-                    ShowCustomers();
-                    break;
-                case 3:
-                    return;
             }
         }
     }
