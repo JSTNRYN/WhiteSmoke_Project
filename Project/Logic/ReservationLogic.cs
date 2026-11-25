@@ -96,4 +96,48 @@ public class ReservationLogic
 
         return DateTime.TryParseExact(date, "dd-MM-yyyy", new CultureInfo("nl-NL"), DateTimeStyles.None, out _);
     }
+
+        public static List<ReservationModel> GetAll()
+    {
+        return ReservationAccess.GetAll();
+    }
+
+    public static ReservationModel? GetById(long id)
+    {
+        return ReservationAccess.GetById(id);
+    }
+
+    public static bool Update(ReservationModel reservation)
+    {
+        ReservationModel? existing = ReservationAccess.GetById(reservation.Id);
+        if (existing == null)
+        {
+            return false;
+        }
+
+        if (!IsValidDateFormat(reservation.Date) || !IsValidateDate(reservation.Date))
+        {
+            return false;
+        }
+
+        if (!SeatCount.WithinRange((int)reservation.PartySize))
+        {
+            return false;
+        }
+
+        ReservationAccess.Update(reservation);
+        return true;
+    }
+
+    public static bool Delete(long id)
+    {
+        ReservationModel? existing = ReservationAccess.GetById(id);
+        if (existing == null)
+        {
+            return false;
+        }
+
+        ReservationAccess.Delete(id);
+        return true;
+    }
 }
