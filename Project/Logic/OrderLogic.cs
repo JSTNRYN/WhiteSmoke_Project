@@ -23,8 +23,8 @@ public static class OrderLogic
 
             switch (Console.ReadLine()?.Trim())
             {
-                case "1": MenuView.ShowMenu(UserLogic.CurrentAccount!); break;
-                case "2": MakeOrder(menuItems, orderLines); break;
+                case "1": MenuView.ShowMenu(); break;
+                  case "2": MakeOrder(menuItems, orderLines); break;
                 case "3": ShowOrder(orderLines); break;
                 case "4": return orderLines;
                 case "5": return null;
