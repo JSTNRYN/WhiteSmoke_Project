@@ -1,18 +1,5 @@
 public class MenuLogic
 {
-    public static void Update(MenuItemModel item)
-    {
-        MenuItemAccess.Update(item);
-    }
-
-    public static MenuItemModel? FindById(int id)
-    {
-        MenuItemModel? item = MenuItemAccess.FindById(id);
-        if (item == null) { return null; }
-
-        return item;
-    }
-
     public static bool IsAdultItem(MenuItemModel item)
     {
         return item.Adult
@@ -23,13 +10,49 @@ public class MenuLogic
             || item.Category.Contains("after dinner", StringComparison.OrdinalIgnoreCase);
     }
 
+    public static bool IsKnownChoice(string? input, bool isLoggedIn, bool isAdmin)
+    {
+        if (string.IsNullOrWhiteSpace(input)) return false;
+
+        return input.Trim() switch
+        {
+            "1" or "2" or "3" or "4" when isLoggedIn => true,
+            "1" or "2" or "3" when !isLoggedIn => true,
+            _ => false
+        };
+    }
+
+    public Dictionary<string, List<MenuItemModel>> GetMenuGroupedByCategory()
+    {
+        List<MenuItemModel> allItems = GetMenuItemsForDisplay();
+
+        if (allItems == null)
+        {
+            return new Dictionary<string, List<MenuItemModel>>();
+        }
+
+        Dictionary<string, List<MenuItemModel>> groupedMenu = new();
+
+        foreach (var item in allItems)
+        {
+            string category = NormalizeCategory(item.Category);
+            if (!groupedMenu.ContainsKey(category))
+            {
+                groupedMenu[category] = new List<MenuItemModel>();
+            }
+
+            item.Category = category;
+            groupedMenu[category].Add(item);
+        }
+
+        return groupedMenu;
+    }
+
     public static List<MenuItemModel> GetMenuItemsForDisplay()
     {
         List<MenuItemModel> items = MenuItemAccess.GetAll();
         foreach (MenuItemModel item in items)
-        {
             item.Category = NormalizeCategory(item.Category);
-        }
 
         return items
             .OrderBy(item => item.Category, StringComparer.OrdinalIgnoreCase)
@@ -52,16 +75,13 @@ public class MenuLogic
             .ToList();
     }
 
+
     private static string NormalizeCategory(string category)
     {
-        string trimmed = category.Trim();
-        string lower = trimmed.ToLowerInvariant();
-
-        if (lower == "dessert" || lower == "desserts" || lower == "sweets")
+        return category.Trim().ToLowerInvariant() switch
         {
-            return "Desserts";
-        }
-
-        return trimmed;
+            "dessert" or "desserts" or "sweets" => "Desserts",
+            _ => category.Trim()
+        };
     }
 }

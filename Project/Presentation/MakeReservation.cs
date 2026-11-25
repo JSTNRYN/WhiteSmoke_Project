@@ -1,204 +1,153 @@
 public static class MakeReservation
 {
-    private const string DateFormat = "dd-MM-yyyy";
+    private static readonly string _dateFormat = "dd-MM-yyyy";
+    private static readonly string _toCancel = "You can cancel by entering 'cancel'.";
+    private static readonly string _cancelled = "Process canceled, you can try again.";
 
     public static void Start()
     {
         Console.Clear();
-        Console.WriteLine("=== MAKE A RESERVATION ===");
-        Console.WriteLine("(You can cancel anytime by typing 'cancel')\n");
-
-        string? date = AskDate();
-        if (date == null) return;
-
-        string? time = AskTime();
-        if (time == null) return;
-
-        int? partySize = AskPartySize();
-        if (partySize == null) return;
-
-        TableModel? selectedTable = ChooseTable(date, partySize.Value, time);
-        if (selectedTable == null) return;
-
-        List<OrderLineModel>? orderLines = OrderView.AskForOrder();
-        if (orderLines == null)
+        Console.WriteLine($"Enter the date for your reservation ({_dateFormat}):");
+        Console.WriteLine(_toCancel);
+        string dateInput = Console.ReadLine() ?? string.Empty;
+        if (dateInput.Equals("cancel", StringComparison.OrdinalIgnoreCase)) { Console.WriteLine(_cancelled); return; }
+        while (!ReservationLogic.IsValidDateFormat(dateInput))
         {
-            Console.WriteLine("Reservation cancelled.");
+            Console.Clear();
+            Console.WriteLine($"Invalid date format. Please enter the date in {_dateFormat} format:");
+            dateInput = Console.ReadLine() ?? string.Empty;
+            if (dateInput.Equals("cancel", StringComparison.OrdinalIgnoreCase)) { Console.WriteLine(_cancelled); return; }
+        }
+
+        while (!ReservationLogic.IsValidateDate(dateInput))
+        {
+            Console.Clear();
+            Console.WriteLine("You cannot make a reservation that is in the past or more than a year!");
+            Console.WriteLine($"Enter the date for your reservation ({_dateFormat}):");
+            dateInput = Console.ReadLine() ?? string.Empty;
+            if (dateInput.Equals("cancel", StringComparison.OrdinalIgnoreCase)) { Console.WriteLine(_cancelled); return; }
+        }
+
+        Console.Clear();
+        Console.WriteLine("Enter the time for your reservation");
+        Console.WriteLine("1) 5:00 PM");
+        Console.WriteLine("2) 9:30 PM");
+        Console.WriteLine(_toCancel);
+        string timeInput = Console.ReadLine() ?? string.Empty;
+        if (timeInput.Equals("cancel", StringComparison.OrdinalIgnoreCase)) { Console.WriteLine(_cancelled); return; }
+        while (timeInput is not ("1" or "2"))
+        {
+            Console.WriteLine("You can only pick the mentioned options!");
+            timeInput = Console.ReadLine() ?? string.Empty;
+            if (dateInput.Equals("cancel", StringComparison.OrdinalIgnoreCase)) { Console.WriteLine(_cancelled); return; }
+        }
+        timeInput = timeInput == "1" ? "5:00 PM" : "9:30 PM";
+
+        Console.Clear();
+        Console.WriteLine("Enter the number of guests (1-6):");
+        Console.WriteLine(_toCancel);
+        string partySizeInput = Console.ReadLine() ?? string.Empty;
+        if (partySizeInput.Equals("cancel", StringComparison.OrdinalIgnoreCase)) { Console.WriteLine(_cancelled); return; }
+        int.TryParse(partySizeInput, out int partySize);
+        while (!SeatCount.WithinRange(partySize))
+        {
+            Console.WriteLine("Invalid number of guests. You can only have between 1-6:");
+            partySizeInput = Console.ReadLine() ?? string.Empty;
+            if (dateInput.Equals("cancel", StringComparison.OrdinalIgnoreCase)) { Console.WriteLine(_cancelled); return; }
+            int.TryParse(partySizeInput, out partySize);
+        }
+
+        List<TableModel> tables = ReservationLogic.GetTablesForReservation(partySize);
+        if (tables.Count == 0)
+        {
+            Console.Clear();
+            Console.WriteLine("No tables have enough seats for this party size.");
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey(true);
             return;
         }
 
-        ReservationModel reservation = new ReservationModel(0, time, date, partySize.Value, 0, selectedTable.Id);
-        ConfirmAndSave(reservation, orderLines);
-    }
-
-    private static string? AskDate()
-    {
-        while (true)
+        ReservationModel reservation = new ReservationModel
         {
-            Console.WriteLine($"Enter the date for your reservation ({DateFormat}):");
-            string input = (Console.ReadLine() ?? string.Empty).Trim();
+            Date = dateInput,
+            TimeSlot = timeInput
+        };
 
-            if (IsCancel(input))
-            {
-                PrintCancelled();
-                return null;
-            }
+        List<long> reservedTableIds = ReservationLogic.GetReservedTableIds(reservation);
+        List<TableModel> availableTables = tables.Where(table => !reservedTableIds.Contains(table.Id)).ToList();
 
-            if (!ReservationLogic.IsValidDateFormat(input))
-            {
-                Console.WriteLine($"Invalid date format. Please use {DateFormat}.\n");
-                continue;
-            }
-
-            if (!ReservationLogic.IsValidateDate(input))
-            {
-                Console.WriteLine("You cannot make a reservation that is in the past or more than a year ahead.\n");
-                continue;
-            }
-
-            return input;
-        }
-    }
-
-    private static string? AskTime()
-    {
-        while (true)
+        TableModel? selectedTable = null;
+        while (selectedTable == null)
         {
-            Console.WriteLine("\nChoose a time slot:");
-            Console.WriteLine("1) 5:00 PM");
-            Console.WriteLine("2) 9:30 PM");
-            Console.Write("Choice: ");
-
-            string input = (Console.ReadLine() ?? string.Empty).Trim();
-
-            if (IsCancel(input))
+            Console.Clear();
+            Console.WriteLine($"Tables for {dateInput} at {timeInput} (party size: {partySize}):");
+            FloorPlanUI.DrawReservationFloorPlan(tables, reservedTableIds);
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.Write("Green = available");
+            Console.ResetColor();
+            Console.Write("; ");
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("red = already reserved.");
+            Console.ResetColor();
+            if (availableTables.Count == 0)
             {
-                PrintCancelled();
-                return null;
-            }
-
-            if (input == "1") return "5:00 PM";
-            if (input == "2") return "9:30 PM";
-
-            Console.WriteLine("Invalid choice. Please enter 1 or 2.");
-        }
-    }
-
-    private static int? AskPartySize()
-    {
-        while (true)
-        {
-            Console.Write("\nEnter number of guests (1-6): ");
-            string input = (Console.ReadLine() ?? string.Empty).Trim();
-
-            if (IsCancel(input))
-            {
-                PrintCancelled();
-                return null;
-            }
-
-            if (int.TryParse(input, out int partySize) && SeatCount.WithinRange(partySize))
-            {
-                return partySize;
-            }
-
-            Console.WriteLine("Invalid number of guests. You can only reserve for 1 to 6 guests.");
-        }
-    }
-
-    private static TableModel? ChooseTable(string date, int partySize, string time)
-    {
-        List<TableModel> availableTables = ReservationLogic.GetAvailableTables(date, partySize, time);
-        if (availableTables.Count == 0)
-        {
-            Console.WriteLine("\nNo tables are available for this date, time and party size.");
-            Console.WriteLine("Press any key to continue...");
-            Console.ReadKey(true);
-            return null;
-        }
-
-        while (true)
-        {
-            Console.WriteLine("\nAvailable tables:");
-            foreach (TableModel table in availableTables)
-            {
-                Console.WriteLine($"Table #{table.Id}  |  Seats: {table.Capacity}");
-            }
-
-            Console.Write("Enter the table number: ");
-            string input = (Console.ReadLine() ?? string.Empty).Trim();
-
-            if (IsCancel(input))
-            {
-                PrintCancelled();
-                return null;
-            }
-
-            if (int.TryParse(input, out int selectedId))
-            {
-                foreach (TableModel table in availableTables)
-                {
-                    if (table.Id == selectedId)
-                    {
-                        return table;
-                    }
-                }
-            }
-
-            Console.WriteLine("Table number does not exist. Please pick a table from the list.");
-        }
-    }
-
-    private static void ConfirmAndSave(ReservationModel reservation, List<OrderLineModel> orderLines)
-    {
-        Console.Clear();
-        Console.WriteLine("=== RESERVATION SUMMARY ===");
-        Console.WriteLine($"Date:     {reservation.Date}");
-        Console.WriteLine($"Time:     {reservation.TimeSlot}");
-        Console.WriteLine($"Guests:   {reservation.PartySize}");
-        Console.WriteLine($"Table:    #{reservation.TableId}");
-        Console.WriteLine($"Order:    EUR {OrderLogic.GetTotal(orderLines):F2}");
-        Console.WriteLine("---------------------------");
-
-        while (true)
-        {
-            Console.Write("Do you want to confirm? (yes/no): ");
-            string input = (Console.ReadLine() ?? string.Empty).Trim().ToLowerInvariant();
-
-            if (input == "no" || input == "n")
-            {
-                PrintCancelled();
-                return;
-            }
-
-            if (input == "yes" || input == "y")
-            {
-                long reservationId = ReservationLogic.Write(reservation);
-                reservation.Id = reservationId;
-
-                if (orderLines.Count > 0)
-                {
-                    OrderModel order = new OrderModel(reservationId, orderLines);
-                    OrderLogic.Save(order);
-                }
-
-                Console.WriteLine($"\nReservation successfully made for {reservation.PartySize} guests on {reservation.Date} at {reservation.TimeSlot}.");
-                Console.WriteLine("Press any key to return to the menu...");
+                Console.WriteLine("No tables are available for this date and time.");
+                Console.WriteLine("Press any key to continue...");
                 Console.ReadKey(true);
                 return;
             }
-
-            Console.WriteLine("Invalid input! Only 'yes' or 'no' are allowed.");
+            Console.Write("Enter the table number: ");
+            string tableInput = Console.ReadLine() ?? string.Empty;
+            if (dateInput.Equals("cancel", StringComparison.OrdinalIgnoreCase)) { Console.WriteLine(_cancelled); return; }
+            if (!int.TryParse(tableInput, out int selectedId))
+            {
+                Console.WriteLine("You must pick a table number.");
+                if (dateInput.Equals("cancel", StringComparison.OrdinalIgnoreCase)) { Console.WriteLine(_cancelled); return; }
+                continue;
+            }
+            selectedTable = availableTables.FirstOrDefault(table => table.Id == selectedId);
+            if (selectedTable == null)
+            {
+                bool isReserved = reservedTableIds.Contains(selectedId);
+                Console.WriteLine(isReserved
+                    ? "That table is already reserved for this date and time. Choose a green table."
+                    : "Table number does not exist or is too small for your party.");
+            }
         }
+
+        List<OrderLineModel>? orderLines = OrderLogic.AskForOrder();
+        if (orderLines == null) { Console.WriteLine("Reservation cancelled."); return; }
+        Conformation(partySize, dateInput, timeInput, selectedTable.Id, orderLines);
     }
 
-    private static bool IsCancel(string input)
+    public static void Conformation(long partySize, string dateInput, string timeInput, long table, List<OrderLineModel> orderLines)
     {
-        return input.Equals("cancel", StringComparison.OrdinalIgnoreCase);
+        Console.Clear();
+        Console.WriteLine($"Your reservation:\nDate: {dateInput}\nTime: {timeInput}\nPeople attending: {partySize}\nTable: #{table}");
+        Console.WriteLine($"Order total: EUR {OrderLogic.GetTotal(orderLines):F2}");
+        Console.WriteLine("Do you want to confirm? (Yes/No)");
+        string input = Console.ReadLine() ?? string.Empty;
+        while (input.ToLowerInvariant() is not ("yes" or "y" or "no" or "n"))
+        {
+            Console.WriteLine("Wrong input! only Yes/No are allowed.");
+            input = Console.ReadLine() ?? string.Empty;
+        }
+        if (input.ToLowerInvariant() is "no" or "n") { Console.WriteLine(_cancelled); return; }
+        SaveReservation(partySize, dateInput, timeInput, table, orderLines);
+        Console.WriteLine($"Reservation made for {partySize} guests on {dateInput} at {timeInput}.");
     }
 
-    private static void PrintCancelled()
-    {
-        Console.WriteLine("Process canceled, you can try again.");
-    }
-}
+    private static void SaveReservation(long partySize, string dateInput, string timeInput, long table, List<OrderLineModel> orderLines)
+        {
+            ReservationModel reservation = new ReservationModel
+            {
+                PartySize = partySize,
+                Date = dateInput,
+                TimeSlot = timeInput,
+                TableId = table
+            };
+
+            long reservationId = ReservationLogic.Write(reservation);
+            if (orderLines.Count > 0) OrderAccess.Save(reservationId, orderLines);
+        }}
+    

@@ -2,55 +2,48 @@ using System.Globalization;
 
 public class ReservationLogic
 {
+    public ReservationModel? currentReservation { get; private set; }
+
+    public static List<ReservationModel> GetWithUserID(long User)
+    {
+        return ReservationAccess.GetWithUserID(User);
+    }
+
     public static long Write(ReservationModel reservation)
     {
-        if (UserLogic.CurrentAccount == null)
+        if (UserLogic.CurrentAccount is null)
         {
             throw new InvalidOperationException("You must be logged in to make a reservation.");
         }
 
-        if (!IsValidDateFormat(reservation.Date) || !IsValidateDate(reservation.Date))
-        {
-            throw new ArgumentException("Invalid reservation date.");
-        }
-
-        if (!SeatCount.WithinRange((int)reservation.PartySize))
-        {
-            throw new ArgumentException("Party size must be between 1 and 6.");
-        }
-
-        reservation.UserId = UserLogic.CurrentAccount.Id;
-        return ReservationAccess.Write(reservation);
+        return ReservationAccess.Write(
+            UserLogic.CurrentAccount,
+            reservation.PartySize,
+            reservation.Date,
+            reservation.TimeSlot,
+            reservation.TableId);
     }
 
-    public static List<ReservationModel> GetWithUserID(long userId)
+    public static List<TableModel> GetTablesForReservation(int partySize)
     {
-        List<ReservationModel> reservations = ReservationAccess.GetWithUserID(userId);
-        reservations.Sort();
-        return reservations;
-    }
-
-    public static List<OrderLineModel> GetOrder(long reservationId)
-    {
-        return OrderAccess.GetLines(reservationId);
-    }
-
-    public static List<TableModel> GetAvailableTables(string date, int partySize, string time)
-    {
-        List<ReservationModel> reservations = ReservationAccess.GetAllByDate(date);
-        List<TableModel> tables = TableAccess.GetWithMinimumCapacity(partySize);
-
-        List<long> reservedTableIds = new List<long>();
-        foreach (ReservationModel reservation in reservations)
+        ReservationModel reservation = new ReservationModel
         {
-            if (reservation.TimeSlot == time)
-            {
-                reservedTableIds.Add(reservation.TableId);
-            }
-        }
+            PartySize = partySize
+        };
+        return GetTablesForReservation(reservation);
+    }
 
+    public static List<TableModel> GetTablesForReservation(ReservationModel reservation)
+    {
+        return TableAccess.GetWithMinimumCapacity((int)reservation.PartySize);
+    }
+
+    public static List<TableModel> GetAvailableTables(ReservationModel reservation)
+    {
+        List<long> reservedTableIds = GetReservedTableIds(reservation);
         List<TableModel> availableTables = new List<TableModel>();
-        foreach (TableModel table in tables)
+
+        foreach (TableModel table in TableAccess.GetWithMinimumCapacity((int)reservation.PartySize))
         {
             if (!reservedTableIds.Contains(table.Id))
             {
@@ -61,9 +54,24 @@ public class ReservationLogic
         return availableTables;
     }
 
+    public static List<long> GetReservedTableIds(ReservationModel reservation)
+    {
+        List<long> reservedTableIds = new List<long>();
+
+        foreach (var existing in ReservationAccess.GetAllByDate(reservation.Date))
+        {
+            if (existing.TimeSlot == reservation.TimeSlot)
+            {
+                reservedTableIds.Add(existing.TableId);
+            }
+        }
+
+        return reservedTableIds;
+    }
+
     public static bool IsValidateDate(string date)
     {
-        if (string.IsNullOrWhiteSpace(date))
+        if (date == null || date == "")
         {
             return false;
         }
@@ -74,14 +82,14 @@ public class ReservationLogic
         }
 
         DateTime currentDate = DateTime.Today;
-        DateTime oneYearAhead = currentDate.AddDays(365);
+        DateTime OneYearAhead = currentDate.AddDays(365);
 
-        return parsedDate.Date >= currentDate && parsedDate.Date <= oneYearAhead;
+        return parsedDate.Date >= currentDate && parsedDate.Date <= OneYearAhead;
     }
 
     public static bool IsValidDateFormat(string date)
     {
-        if (string.IsNullOrWhiteSpace(date))
+        if (date == null || date == "")
         {
             return false;
         }

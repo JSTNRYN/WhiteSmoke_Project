@@ -25,7 +25,7 @@ public static class MyReservation
             List<string> options = new List<string>();
             foreach (ReservationModel reservation in reservations)
             {
-                options.Add($"Reservation #{reservation.Id} - {reservation.Date} ({reservation.TimeSlot}) - {reservation.PartySize}p - Table #{reservation.TableId}");
+                options.Add($"Reservation #{reservation.Id} - {reservation.Date}");
             }
             options.Add("Back to main menu");
 

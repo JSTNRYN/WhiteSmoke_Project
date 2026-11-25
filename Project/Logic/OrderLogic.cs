@@ -1,63 +1,112 @@
 public static class OrderLogic
 {
-    public static double GetTotal(OrderModel order)
+    public static List<OrderLineModel>? AskForOrder()
     {
-        return GetTotal(order.Lines);
+        List<MenuItemModel> menuItems = MenuLogic.GetMenuItemsForDisplay();
+        List<OrderLineModel> orderLines = new();
+
+        if (menuItems.Count == 0)
+        {
+            Console.WriteLine("The menu is currently empty.");
+            return null;
+        }
+
+        while (true)
+        {
+            Console.WriteLine();
+            Console.WriteLine("1) View menu");
+            Console.WriteLine("2) Make an order");
+            Console.WriteLine("3) View my order");
+            Console.WriteLine("4) Finish");
+            Console.WriteLine("5) Cancel");
+            Console.Write("Choice: ");
+
+            switch (Console.ReadLine()?.Trim())
+            {
+                case "1": MenuView.ShowMenu(); break;
+                  case "2": MakeOrder(menuItems, orderLines); break;
+                case "3": ShowOrder(orderLines); break;
+                case "4": return orderLines;
+                case "5": return null;
+                default: Console.WriteLine("Invalid input."); break;
+            }
+        }
+    }
+
+    private static void MakeOrder(List<MenuItemModel> menuItems, List<OrderLineModel> orderLines)
+    {
+        Console.WriteLine();
+        MenuView.PrintItems(menuItems);
+
+        while (true)
+        {
+            Console.Write("Dish number: ");
+            if (!int.TryParse(Console.ReadLine(), out int itemNumber)
+                || itemNumber < 1
+                || itemNumber > menuItems.Count)
+            {
+                Console.WriteLine("Invalid dish number.");
+                continue;
+            }
+
+            MenuItemModel selectedItem = menuItems[itemNumber - 1];
+            if (MenuLogic.IsAdultItem(selectedItem)
+                && !UserLogic.IsAdult(UserLogic.CurrentAccount?.DateOfBirth))
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("You are not old enough to order this adult item.");
+                Console.ResetColor();
+                continue;
+            }
+
+            Console.Write("Quantity: ");
+            if (!int.TryParse(Console.ReadLine(), out int quantity) || quantity < 1)
+            {
+                Console.WriteLine("Quantity must be at least 1.");
+                continue;
+            }
+
+            OrderLineModel? existingLine = orderLines.FirstOrDefault(line => line.MenuItem.Id == selectedItem.Id);
+            if (existingLine == null)
+                orderLines.Add(new OrderLineModel(selectedItem, quantity));
+            else
+                existingLine.Quantity += quantity;
+
+            Console.WriteLine($"Added {quantity}x {selectedItem.Name}.");
+            while (true)
+            {
+                Console.Write("Add another item? (y/n): ");
+                string? answer = Console.ReadLine()?.Trim().ToLowerInvariant();
+                if (answer is "n" or "no") return;
+                if (answer is "y" or "yes") break;
+                Console.WriteLine("Please answer y or n.");
+            }
+        }
     }
 
     public static double GetTotal(List<OrderLineModel> orderLines)
     {
-        double total = 0;
+        return orderLines.Sum(line => line.MenuItem.UnitPrice * line.Quantity);
+    }
+
+    private static void ShowOrder(List<OrderLineModel> orderLines)
+    {
+        Console.WriteLine();
+        Console.WriteLine("Your order:");
+
+        if (orderLines.Count == 0)
+        {
+            Console.WriteLine("Your order is empty.");
+            return;
+        }
+
         foreach (OrderLineModel line in orderLines)
         {
-            total += line.MenuItem.UnitPrice * line.Quantity;
-        }
-        return total;
-    }
-
-    public static void Save(OrderModel order)
-    {
-        OrderAccess.Save(order);
-    }
-
-    public static void Save(long reservationId, List<OrderLineModel> orderLines)
-    {
-        OrderAccess.Save(new OrderModel(reservationId, orderLines));
-    }
-
-    public static List<OrderLineModel> GetOrder(long reservationId)
-    {
-        return OrderAccess.GetLines(reservationId);
-    }
-
-    public static bool CanOrder(UserModel? user, MenuItemModel item)
-    {
-        if (MenuLogic.IsAdultItem(item))
-        {
-            return UserLogic.IsAdult(user?.DateOfBirth);
-        }
-        return true;
-    }
-
-    public static void AddOrUpdateLine(List<OrderLineModel> lines, MenuItemModel item, int quantity)
-    {
-        OrderLineModel? existing = null;
-        foreach (OrderLineModel line in lines)
-        {
-            if (line.MenuItem.Id == item.Id)
-            {
-                existing = line;
-                break;
-            }
+            double lineTotal = line.MenuItem.UnitPrice * line.Quantity;
+            Console.WriteLine($"{line.Quantity}x {line.MenuItem.Name,-35} EUR {lineTotal,7:F2}");
         }
 
-        if (existing == null)
-        {
-            lines.Add(new OrderLineModel(item, quantity));
-        }
-        else
-        {
-            existing.Quantity += quantity;
-        }
+        Console.WriteLine(new string('-', 55));
+        Console.WriteLine($"Total: EUR {GetTotal(orderLines):F2}");
     }
 }
