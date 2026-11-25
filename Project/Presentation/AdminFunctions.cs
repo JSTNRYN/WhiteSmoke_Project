@@ -1,6 +1,6 @@
 public static class AdminFunctions
 {
-    private static readonly string[] _adminMenuOptions = ["Manage Menu Items", "View and edit the floor plan", "View and manage customers", "View and edit reservations", "Back to main menu"];
+    private static readonly string[] _adminMenuOptions = ["Manage Menu Items", "View and edit the floor plan", "View and manage customers", "View and edit reservations", "Delete Customer", "Back to main menu"];
     
     public static bool ShowCustomers()
     {
@@ -41,7 +41,7 @@ public static class AdminFunctions
             return null;
         }
 
-        Console.WriteLine("Enter the ID of the customer you want to edit, or type 'q' to return to the main menu:");
+        Console.WriteLine("Enter the ID of the customer you want to choose, or type 'q' to return to the main menu:");
         string input = Console.ReadLine();
         if (input.ToLower() == "q")
         {
@@ -401,6 +401,9 @@ public static class AdminFunctions
                     ShowReservations();
                     break;
                 case 4:
+                    DeleteCustomer();
+                    return;
+                case 5:
                     return;
             }
         }
