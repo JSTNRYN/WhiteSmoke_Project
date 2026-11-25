@@ -75,20 +75,6 @@ public class MenuLogic
             .ToList();
     }
 
-    public static List<MenuItemModel> GetNonAdminMenuItems()
-    {
-        List<MenuItemModel> items = MenuItemAccess.GetAll();
-        foreach (MenuItemModel item in items)
-        {
-            item.Category = NormalizeCategory(item.Category);
-        }
-
-        return items
-            .Where(item => item.IsViewable is true)
-            .OrderBy(item => item.Category, StringComparer.OrdinalIgnoreCase)
-            .ThenBy(item => item.Name, StringComparer.OrdinalIgnoreCase)
-            .ToList();
-    }
 
     private static string NormalizeCategory(string category)
     {

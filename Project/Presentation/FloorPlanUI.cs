@@ -7,7 +7,7 @@ public static class FloorPlanUI
             Console.WriteLine("Only logged-in administrators can access the floor plan.");
             return;
         }
-    
+
         while (true)
         {
             DrawFloorPlan();
@@ -24,7 +24,7 @@ public static class FloorPlanUI
                 case "2": MoveTableMenu(); break;
                 case "3": DeleteTableMenu(); break;
                 case "0":
-                    return;   
+                    return;
                 default:
                     PrintError("Invalid choice.");
                     Pause();
@@ -56,14 +56,30 @@ public static class FloorPlanUI
         Console.WriteLine("                 ENTRANCE / RECEPTION                       ");
     }
 
+    // Zet tekst in het midden van een vak met vaste breedte
+    private static string Center(string text, int width)
+    {
+        if (text.Length >= width) return text;
+        int left = (width - text.Length) / 2;
+        return new string(' ', left) + text + new string(' ', width - text.Length - left);
+    }
+
     private static void DrawTableRows(List<TableModel> tables, List<long>? reservedTableIds = null)
     {
+        const int leftWidth = 24;
+        const int yWidth = 6;
+        const int cellWidth = 16;
+
+        int columns = TableLogic.MaxX + 1;
+        int innerWidth = yWidth + columns * (cellWidth + 1);
+        string separator = "+" + new string('-', innerWidth) + "+";
+
         var leftSide = new List<string>
         {
             "+----------------------+",
             "|         BAR          |",
             "| B1 B2 B3 B4 B5 B6... |",
-            "+---------------------- +",
+            "+----------------------+",
             "+----------------------+",
             "|      HOT SEATS       |",
             "| H1 H2 H3 H4 H5 H6    |",
@@ -72,75 +88,79 @@ public static class FloorPlanUI
             "+--------+--------+----+",
             "+----------------------+",
             "|      RESTROOMS       |",
-            "| Women Men Accessible|",
+            "| Women Men Accessible |",
             "+----------------------+"
         };
 
-        var tableSide = new List<string>
+        // Rechterkant: (tekst, rijnummer). Rijnummer is alleen gevuld bij een tafelrij.
+        var rightSide = new List<(string Text, int? Y)>
         {
-            "+-----------------------------------------------------------------+",
-            "|                       TABLES & DINING                            |",
-            "+-----------------------------------------------------------------+",
-            "|    Y    |       X0       |       X1       |       X2       |",
-            "+-----------------------------------------------------------------+"
+            (separator, null),
+            ("|" + Center("TABLES & DINING", innerWidth) + "|", null),
+            (separator, null),
         };
+
+        string header = "|" + Center("Y", yWidth) + "|";
+        for (int x = 0; x < columns; x++)
+            header += Center("X" + x, cellWidth) + "|";
+        rightSide.Add((header, null));
+        rightSide.Add((separator, null));
 
         for (int y = 0; y <= TableLogic.MaxY; y++)
         {
-            tableSide.Add("");
-            tableSide.Add("+-----------------------------------------------------------------+");
+            rightSide.Add(("", y));
+            rightSide.Add((separator, null));
         }
 
-    // De linkerkant (bar, toiletten) en rechterkant (tafels) zijn twee lijsten met regels.
-    int lineCount = Math.Max(leftSide.Count, tableSide.Count);
+        int lineCount = Math.Max(leftSide.Count, rightSide.Count);
 
-    for (int i = 0; i < lineCount; i++)
-    {
-        // Is een lijst korter dan de andere, dan vullen we aan zodat niets crasht.
-        // Links: spaties, zodat de rechterkant op dezelfde plek blijft staan.
-        string left = i < leftSide.Count ? leftSide[i] : "                        ";
-        string right = i < tableSide.Count ? tableSide[i] : "";
-
-        // Linkerkant altijd eerst, zonder nieuwe regel (Write), zodat rechts erachter komt
-        Console.Write(left);
-        Console.Write("    ");
-
-        // Tafelrijen staan op regel 5, 7, 9, ... (de regels ertussen zijn scheidingslijnen)
-        if (i >= 5 && i < 5 + TableLogic.MaxY * 2 + 1 && (i - 5) % 2 == 0)
+        for (int i = 0; i < lineCount; i++)
         {
-            // Regelnummer omrekenen naar rijnummer: 5 -> Y0, 7 -> Y1, 9 -> Y2
-            int y = (i - 5) / 2;
-            Console.Write("|    Y" + y + "    |");
+            string left = i < leftSide.Count ? leftSide[i] : "";
+            Console.Write(left.PadRight(leftWidth));
+            Console.Write("    ");
 
-            for (int x = 0; x <= TableLogic.MaxX; x++)
+            if (i < rightSide.Count)
             {
-                // Staat er een tafel op (x, y)? Zo niet, dan is table null
-                TableModel? table = tables.FirstOrDefault(t => t.X == x && t.Y == y);
+                var (text, rowY) = rightSide[i];
 
-                if (table == null)
+                if (rowY == null)
                 {
-                    Console.Write("    [ empty ]    |");
-                    continue;
+                    Console.Write(text);
                 }
+                else
+                {
+                    int y = rowY.Value;
+                    Console.Write("|" + Center("Y" + y, yWidth) + "|");
 
-                // Alleen true als de lijst bestaat én de tafel erin staat
-                bool isReserved = reservedTableIds?.Contains(table.Id) == true;
+                    for (int x = 0; x < columns; x++)
+                    {
+                        TableModel? table = tables.FirstOrDefault(t => t.X == x && t.Y == y);
 
-                if (reservedTableIds != null)
-                    Console.ForegroundColor = isReserved ? ConsoleColor.Red : ConsoleColor.Green;
+                        if (table == null)
+                        {
+                            Console.Write(Center("[ empty ]", cellWidth));
+                        }
+                        else
+                        {
+                            bool isReserved = reservedTableIds?.Contains(table.Id) == true;
 
-                Console.Write("    [T" + table.Id + ": " + table.Capacity + "p]    |");
+                            if (reservedTableIds != null)
+                                Console.ForegroundColor = isReserved ? ConsoleColor.Red : ConsoleColor.Green;
 
-                // Kleur terugzetten, anders wordt alle volgende tekst ook rood of groen
-                if (reservedTableIds != null) Console.ResetColor();
+                            Console.Write(Center($"[T{table.Id}: {table.Capacity}p]", cellWidth));
+
+                            // Kleur terugzetten, anders wordt alle volgende tekst ook rood of groen
+                            if (reservedTableIds != null) Console.ResetColor();
+                        }
+
+                        Console.Write("|");
+                    }
+                }
             }
 
+            Console.WriteLine();   // elke regel sluit nu af
         }
-        else
-        {
-            Console.WriteLine(right);
-        }
-    }
     }
 
     private static void PrintError(string message)
@@ -167,12 +187,12 @@ public static class FloorPlanUI
 
             try
             {
-                validate(value);   
+                validate(value);
                 return value;
             }
             catch (ArgumentException ex)
             {
-                PrintError(ex.Message);   
+                PrintError(ex.Message);
             }
         }
     }
@@ -204,7 +224,6 @@ public static class FloorPlanUI
         Console.WriteLine("Press any key to continue...");
         Console.ReadKey(true);
     }
-
 
     private static void AddTableMenu()
     {

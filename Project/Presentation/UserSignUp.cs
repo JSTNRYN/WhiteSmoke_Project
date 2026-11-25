@@ -4,7 +4,6 @@ public class UserSignUp
     private static UserLogic _userLogic = new UserLogic();
     public static void Start()
     {
-        Console.Clear();
         Console.WriteLine("Account Sign up\n");
         string firstName = UserLogic.AskFirstName() ?? string.Empty;
         while (!UserLogic.ValidateName(firstName))

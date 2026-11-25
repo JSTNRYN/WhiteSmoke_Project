@@ -1,12 +1,7 @@
 public static class MenuView
 {
-    public static void ShowMenu(UserModel currentUser)
+    public static void ShowMenu()
     {
-        if (currentUser == null)
-        {
-            Console.WriteLine("You must log in before viewing the menu.");
-            return;
-        }
 
         List<MenuItemModel> menuItems = MenuLogic.GetMenuItemsForDisplay();
         if (menuItems.Count == 0)

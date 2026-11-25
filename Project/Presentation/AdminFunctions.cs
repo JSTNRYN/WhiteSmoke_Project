@@ -119,7 +119,7 @@ public static class AdminFunctions
                     newEmail = Console.ReadLine();
                 }
                 UserLogic.UpdateEmail(customer, newEmail.Trim());
-                Console.WriteLine("Email succesfully updated.");
+                Console.WriteLine("Email successfully updated.");
                 Console.Clear();
                 return;
             }
