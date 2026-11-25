@@ -1,3 +1,4 @@
+using System.Globalization;
 using Dapper;
 using Microsoft.Data.Sqlite;
 
@@ -24,12 +25,18 @@ public static class OrderAccess
 
         foreach (var row in rows)
         {
+            double unitPrice = 0;
+            if (row.UnitPrice != null)
+            {
+                double.TryParse(Convert.ToString(row.UnitPrice), NumberStyles.Any, CultureInfo.InvariantCulture, out unitPrice);
+            }
+
             MenuItemModel item = new MenuItemModel(
                 Convert.ToInt32(row.Id),
                 Convert.ToString(row.Menu) ?? string.Empty,
                 Convert.ToString(row.Name) ?? string.Empty,
                 Convert.ToString(row.Category) ?? string.Empty,
-                Convert.ToDouble(row.UnitPrice),
+                unitPrice,
                 Convert.ToString(row.Description) ?? string.Empty);
 
             item.Adult = Convert.ToInt64(row.Adult) != 0;
