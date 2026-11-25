@@ -93,4 +93,13 @@ public class UserAccess
         _connection.Close();
     }
 
+    public static bool DeleteCustomer(UserModel customer)
+    {
+        string sql = $"DELETE FROM {Table} WHERE id = @Id";
+        _connection.Open();
+        _connection.Execute(sql, new { Id = customer.Id });
+        _connection.Close();
+        return true;
+    }
+
 }

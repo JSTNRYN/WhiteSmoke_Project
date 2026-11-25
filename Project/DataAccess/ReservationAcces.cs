@@ -64,4 +64,14 @@ public static class ReservationAccess
         connection.Open();
         connection.Execute(query, new { Id = id });
     }
+
+    public static bool DeleteReservationsByUserId(long userId)
+    {
+        string query = $"DELETE FROM {_table} WHERE UserID = @UserId";
+        using var connection = Database.CreateConnection();
+        connection.Open();
+        connection.Execute(query, new { UserId = userId });
+        return true;
+    }
+    
 }
