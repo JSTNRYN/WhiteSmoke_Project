@@ -57,7 +57,7 @@ public class UserSignUp
 
     private static bool IsQuit(string? input)
     {
-        return input?.Trim().ToLower() == "q";
+        return input.Trim().ToLower() == "q";
     }
 
     public static string? AskEmail()
